@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtualenv
+.venv/
+venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Testes
+htmlcov/
+.coverage
+.tox/
+
+# mkdocs
+/site/
+
+# Outros
+.DS_Store
+Thumbs.db 
