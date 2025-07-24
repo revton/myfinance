@@ -1,0 +1,5 @@
+site_name: MyFinance Docs
+nav:
+  - Início: index.md
+  - Desenvolvedor: dev/index.md
+  - Usuário: user/index.md
