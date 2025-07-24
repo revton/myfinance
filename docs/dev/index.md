@@ -31,4 +31,38 @@
 
 ## Docker
 
-- O projeto será dockerizado para facilitar o deploy e o uso em diferentes ambientes. 
+- O projeto será dockerizado para facilitar o deploy e o uso em diferentes ambientes.
+
+## Endpoints de Receitas e Despesas
+
+### Criar Receita ou Despesa
+
+`POST /transactions/`
+
+**Exemplo de payload:**
+```json
+{
+  "type": "income", // ou "expense"
+  "amount": 100.0,
+  "description": "Salário"
+}
+```
+
+**Resposta:**
+- 201 Created
+- JSON com os dados cadastrados
+
+### Listar Receitas e Despesas
+
+`GET /transactions/`
+
+**Resposta:**
+- 200 OK
+- Lista de receitas e despesas cadastradas
+
+## Testes Automatizados
+
+Os testes estão em `tests/test_transactions.py` e cobrem:
+- Cadastro de receita
+- Cadastro de despesa
+- Listagem de transações 
