@@ -119,6 +119,14 @@ Para visualizar a documentação localmente:
   uv run invoke security-frontend
   ```
 
+## Métricas e Qualidade de Código
+
+- **Ruff (Python):**
+  ```sh
+  uv pip install -r pyproject.toml --extra quality
+  uv run invoke quality-ruff
+  ```
+
 ## Gitflow
 
 - Use branches de feature para cada funcionalidade.

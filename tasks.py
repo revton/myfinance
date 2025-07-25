@@ -43,6 +43,11 @@ def test_all(c):
     c.run("uv run invoke test-frontend")
 
 @task
+def test_coverage(c):
+    """Executa os testes do backend e gera relatório de cobertura."""
+    c.run("uv run pytest")
+
+@task
 def security_backend(c):
     """Valida vulnerabilidades nas dependências Python (backend e docs) usando safety."""
     c.run("uv run safety check")
@@ -51,4 +56,9 @@ def security_backend(c):
 def security_frontend(c):
     """Valida vulnerabilidades nas dependências do frontend (Node.js) usando npm audit."""
     with c.cd('frontend'):
-        c.run("npm audit") 
+        c.run("npm audit")
+
+@task
+def quality_ruff(c):
+    """Roda o ruff para análise de qualidade e estilo do código Python."""
+    c.run("uv run ruff check src tests") 
