@@ -108,6 +108,7 @@ Para visualizar a documentação localmente:
 ## Testes Automatizados
 
 Os testes estão em `tests/test_transactions.py` (backend) e `frontend/src/App.test.tsx` (frontend) e cobrem:
+
 - Cadastro de receita
 - Cadastro de despesa
 - Listagem de transações 
