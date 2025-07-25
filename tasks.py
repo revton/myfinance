@@ -105,10 +105,11 @@ def quality_bandit(c):
 
 @task
 def quality_eslint_html(c):
-    """Roda o ESLint no frontend e gera relatório HTML."""
+    """Roda o ESLint no frontend e gera relatório HTML na pasta reports/ (fora do versionamento)."""
+    os.makedirs("reports", exist_ok=True)
     with c.cd('frontend'):
-        c.run("npx eslint src --format html -o eslint-report.html")
-    print('Relatório HTML do ESLint gerado em frontend/eslint-report.html')
+        c.run("npx eslint src --format html -o ../reports/eslint-report.html")
+    print('Relatório HTML do ESLint gerado em reports/eslint-report.html')
 
 @task
 def test_frontend_coverage_html(c):
