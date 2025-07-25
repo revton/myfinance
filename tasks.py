@@ -116,14 +116,25 @@ def test_frontend_coverage_html(c):
     """Executa os testes do frontend e gera relatório de cobertura em HTML."""
     with c.cd('frontend'):
         c.run("npm run test -- --coverage")
-    print('Relatório HTML de cobertura gerado em frontend/coverage/lcov-report/index.html')
+    # Move o relatório HTML para fora da pasta frontend
+    import shutil, os
+    src = 'frontend/coverage/lcov-report'
+    dst = 'reports/coverage-frontend/lcov-report'
+    if os.path.exists(src):
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        if os.path.exists(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(src, dst)
+    print('Relatório HTML de cobertura gerado em reports/coverage-frontend/lcov-report/index.html')
 
 @task
 def quality_plato(c):
     """Gera relatório de métricas do frontend com Plato."""
+    import os
+    os.makedirs('reports/plato-report', exist_ok=True)
     with c.cd('frontend'):
-        c.run("npx plato -r -d plato-report src")
-    print('Relatório HTML do Plato gerado em frontend/plato-report/index.html')
+        c.run("npx plato -r -d ../reports/plato-report src")
+    print('Relatório HTML do Plato gerado em reports/plato-report/index.html')
 
 @task
 def quality_frontend_all(c):
@@ -131,3 +142,17 @@ def quality_frontend_all(c):
     c.run("uv run invoke quality-eslint-html")
     c.run("uv run invoke test-frontend-coverage-html")
     c.run("uv run invoke quality-plato") 
+
+@task
+def coverage_all_reports(c):
+    """Gera todos os relatórios de cobertura e xunit para SonarQube."""
+    import os
+    # Backend: coverage.xml (htmlcov) e xunit
+    os.makedirs('htmlcov', exist_ok=True)
+    os.makedirs('reports', exist_ok=True)
+    c.run("uv run pytest --cov=src --cov-report=xml:htmlcov/coverage.xml --cov-report=html --junitxml=reports/pytest-xunit.xml")
+    # Frontend: lcov
+    with c.cd('frontend'):
+        c.run("npm run test -- --coverage")
+    # lcov.info já estará em reports/coverage-frontend/lcov.info
+    print('Relatórios de cobertura e xunit prontos para SonarQube!') 
