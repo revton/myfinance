@@ -8,8 +8,8 @@ const mockedAxios = axios as unknown as { get: typeof axios.get; post: typeof ax
 
 describe('MyFinance App', () => {
   beforeEach(() => {
-    (mockedAxios.get as any).mockResolvedValue({ data: [] });
-    (mockedAxios.post as any).mockImplementation(async (_url: string, data: any) => ({ data }));
+    (mockedAxios.get as jest.Mock).mockResolvedValue({ data: [] });
+    (mockedAxios.post as jest.Mock).mockImplementation(async (_url: string, data: unknown) => ({ data }));
   });
 
   it('renderiza o formulário e a lista', async () => {
