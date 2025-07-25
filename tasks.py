@@ -24,4 +24,21 @@ def all(c):
     print("Abra três terminais e execute:\n")
     print("invoke backend")
     print("invoke frontend")
-    print("invoke docs") 
+    print("invoke docs")
+
+@task
+def test_backend(c):
+    """Executa os testes do backend com pytest."""
+    c.run(".venv\\Scripts\\activate && pytest", pty=True)
+
+@task
+def test_frontend(c):
+    """Executa os testes do frontend com npm test."""
+    with c.cd('frontend'):
+        c.run("npm test", pty=True)
+
+@task
+def test_all(c):
+    """Executa todos os testes (backend e frontend)."""
+    c.run("invoke test_backend", pty=True)
+    c.run("invoke test_frontend", pty=True) 
