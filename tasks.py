@@ -44,23 +44,11 @@ def test_all(c):
 
 @task
 def security_backend(c):
-    """Valida vulnerabilidades nas dependências do backend/docs (Python) usando safety."""
-    c.run("uv run safety check -r pyproject.toml")
-
-@task
-def security_docs(c):
-    """Valida vulnerabilidades nas dependências de documentação (Python) usando safety."""
-    c.run("uv run safety check -r pyproject.toml --extra docs")
+    """Valida vulnerabilidades nas dependências Python (backend e docs) usando safety."""
+    c.run("uv run safety check")
 
 @task
 def security_frontend(c):
-    """Valida vulnerabilidades nas dependências do frontend (npm audit)."""
+    """Valida vulnerabilidades nas dependências do frontend (Node.js) usando npm audit."""
     with c.cd('frontend'):
-        c.run("npm audit")
-
-@task
-def security_all(c):
-    """Valida vulnerabilidades em backend, frontend e docs."""
-    c.run("uv run invoke security_backend")
-    c.run("uv run invoke security_frontend")
-    c.run("uv run invoke security_docs") 
+        c.run("npm audit") 
