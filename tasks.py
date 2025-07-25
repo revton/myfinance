@@ -99,8 +99,9 @@ def test_coverage_html(c):
 @task
 def quality_bandit(c):
     """Roda o bandit para análise de segurança do código Python."""
-    c.run("uv run bandit -r src -f html -o bandit-report.html")
-    print('Relatório HTML de segurança gerado em bandit-report.html')
+    os.makedirs("reports", exist_ok=True)
+    c.run("uv run bandit -r src -f html -o reports/bandit-report.html")
+    print('Relatório HTML de segurança gerado em reports/bandit-report.html')
 
 @task
 def quality_eslint_html(c):

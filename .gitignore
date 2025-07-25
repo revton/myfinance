@@ -27,3 +27,4 @@ htmlcov/
 # Outros
 .DS_Store
 Thumbs.db 
+reports/ 
