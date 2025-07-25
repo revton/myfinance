@@ -25,7 +25,8 @@ security = [
     "safety"
 ] 
 quality = [
-    "ruff"
+    "ruff",
+    "radon"
 ]
 
 [tool.pytest.ini_options]

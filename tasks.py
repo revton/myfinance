@@ -66,4 +66,26 @@ def quality_ruff(c):
 @task
 def quality_ruff_fix(c):
     """Roda o ruff com --fix para corrigir automaticamente problemas de estilo em src e tests."""
-    c.run("uv run ruff check src tests --fix") 
+    c.run("uv run ruff check src tests --fix")
+
+@task
+def quality_radon_cc(c):
+    """Mede a complexidade ciclomática do código Python com radon."""
+    c.run("uv run radon cc -s -a src tests")
+
+@task
+def quality_radon_mi(c):
+    """Mede o índice de manutenibilidade do código Python com radon."""
+    c.run("uv run radon mi -s src tests")
+
+@task
+def quality_radon_raw(c):
+    """Mostra métricas brutas do código Python com radon."""
+    c.run("uv run radon raw src tests")
+
+@task
+def quality_radon_all(c):
+    """Executa todas as métricas do radon (cc, mi, raw)."""
+    c.run("uv run invoke quality-radon-cc")
+    c.run("uv run invoke quality-radon-mi")
+    c.run("uv run invoke quality-radon-raw") 

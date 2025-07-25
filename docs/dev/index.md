@@ -126,6 +126,14 @@ Para visualizar a documentação localmente:
   uv pip install -r pyproject.toml --extra quality
   uv run invoke quality-ruff
   ```
+- **Radon (Python):**
+  ```sh
+  uv pip install -r pyproject.toml --extra quality
+  uv run invoke quality-radon-cc   # Complexidade ciclomática
+  uv run invoke quality-radon-mi   # Índice de manutenibilidade
+  uv run invoke quality-radon-raw  # Métricas brutas
+  uv run invoke quality-radon-all  # Todas as métricas
+  ```
 
 ## Gitflow
 
