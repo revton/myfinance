@@ -14,18 +14,31 @@
    ```sh
    uv venv
    ```
-2. Instale as dependências principais do projeto:
-   ```sh
-   uv pip install -r pyproject.toml
-   ```
-   Para dependências de desenvolvimento (ex: invoke):
-   ```sh
-   uv pip install -r pyproject.toml --extra dev
-   ```
-   Para dependências de documentação:
-   ```sh
-   uv pip install -r pyproject.toml --extra docs
-   ```
+2. Instale as dependências necessárias:
+   - Backend:
+     ```sh
+     uv pip install -r pyproject.toml --extra backend
+     ```
+   - Desenvolvimento:
+     ```sh
+     uv pip install -r pyproject.toml --extra dev
+     ```
+   - Testes:
+     ```sh
+     uv pip install -r pyproject.toml --extra test
+     ```
+   - Documentação:
+     ```sh
+     uv pip install -r pyproject.toml --extra docs
+     ```
+   - Segurança:
+     ```sh
+     uv pip install -r pyproject.toml --extra security
+     ```
+   - Para instalar tudo:
+     ```sh
+     uv pip install -r pyproject.toml --extra backend --extra dev --extra test --extra docs --extra security
+     ```
 3. Execute os comandos de automação (sem ativar o ambiente):
    ```sh
    uv run invoke backend
@@ -35,6 +48,9 @@
    uv run invoke test-backend
    uv run invoke test-frontend
    uv run invoke test-all
+   uv run invoke test-coverage
+   uv run invoke security-backend
+   uv run invoke security-frontend
    ```
    > **Dica:** No VS Code, abra 3 abas do terminal integrado e execute backend, frontend e docs separadamente para usar o profile padrão da IDE.
    >
@@ -63,21 +79,45 @@
    O frontend estará disponível em http://localhost:5173
 
 #### Proxy de API
-O Vite está configurado para redirecionar `/transactions` para o backend FastAPI em `http://localhost:8000`.
+O Vite está configurado para redirecionar `/transactions` para o backend FastAPI em `http://localhost:8002`.
 
 ## Documentação (MkDocs)
 
 Para visualizar a documentação localmente:
 
-1. Ative o ambiente virtual Python:
-   ```powershell
-   .venv\Scripts\activate
-   ```
-2. Execute o servidor MkDocs em outra porta (ex: 8001) para evitar conflito com o backend:
+1. Instale as dependências de docs (veja acima).
+2. Execute:
    ```sh
-   mkdocs serve -a 127.0.0.1:8001
+   uv run invoke docs
    ```
    Acesse a documentação em http://localhost:8001
+
+## Testes Automatizados
+
+- **Backend:**
+  ```sh
+  uv run invoke test-backend
+  uv run invoke test-coverage  # Com relatório de cobertura
+  ```
+- **Frontend:**
+  ```sh
+  uv run invoke test-frontend
+  ```
+- **Todos:**
+  ```sh
+  uv run invoke test-all
+  ```
+
+## Validação de Segurança das Dependências
+
+- **Backend/Docs (Python):**
+  ```sh
+  uv run invoke security-backend
+  ```
+- **Frontend (Node.js):**
+  ```sh
+  uv run invoke security-frontend
+  ```
 
 ## Gitflow
 
@@ -94,24 +134,6 @@ Para visualizar a documentação localmente:
 ## Docker
 
 - O projeto será dockerizado para facilitar o deploy e o uso em diferentes ambientes.
-
-## Validação de Segurança das Dependências
-
-- **Backend/Docs (Python):**
-  ```sh
-  uv pip install -r pyproject.toml --extra security
-  uv run invoke security_backend
-  uv run invoke security_docs
-  ```
-- **Frontend (Node.js):**
-  ```sh
-  cd frontend
-  npm audit
-  ```
-- **Tudo de uma vez:**
-  ```sh
-  uv run invoke security_all
-  ```
 
 ## Endpoints de Receitas e Despesas
 
@@ -138,12 +160,4 @@ Para visualizar a documentação localmente:
 
 **Resposta:**
 - 200 OK
-- Lista de receitas e despesas cadastradas
-
-## Testes Automatizados
-
-Os testes estão em `tests/test_transactions.py` (backend) e `frontend/src/App.test.tsx` (frontend) e cobrem:
-
-- Cadastro de receita
-- Cadastro de despesa
-- Listagem de transações 
+- Lista de receitas e despesas cadastradas 
