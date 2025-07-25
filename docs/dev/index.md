@@ -48,6 +48,20 @@
 #### Proxy de API
 O Vite está configurado para redirecionar `/transactions` para o backend FastAPI em `http://localhost:8000`.
 
+## Documentação (MkDocs)
+
+Para visualizar a documentação localmente:
+
+1. Ative o ambiente virtual Python:
+   ```powershell
+   .venv\Scripts\activate
+   ```
+2. Execute o servidor MkDocs em outra porta (ex: 8001) para evitar conflito com o backend:
+   ```sh
+   mkdocs serve -a 127.0.0.1:8001
+   ```
+   Acesse a documentação em http://localhost:8001
+
 ## Gitflow
 
 - Use branches de feature para cada funcionalidade.
