@@ -61,4 +61,9 @@ def security_frontend(c):
 @task
 def quality_ruff(c):
     """Roda o ruff para análise de qualidade e estilo do código Python."""
-    c.run("uv run ruff check src tests") 
+    c.run("uv run ruff check src tests")
+
+@task
+def quality_ruff_fix(c):
+    """Roda o ruff com --fix para corrigir automaticamente problemas de estilo em src e tests."""
+    c.run("uv run ruff check src tests --fix") 
