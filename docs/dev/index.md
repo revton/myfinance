@@ -13,18 +13,35 @@
 1. Crie o ambiente virtual:
    ```sh
    uv venv
-   .venv\Scripts\activate  # Windows
    ```
-2. Instale as dependências:
+2. Instale as dependências principais do projeto:
    ```sh
-   uv pip install -r requirements.txt  # ou use os comandos individuais
+   uv pip install -r pyproject.toml
    ```
-3. Execute o backend:
+   Para dependências de desenvolvimento (ex: invoke):
    ```sh
-   .venv\Scripts\activate
-   uvicorn src.main:app --reload
+   uv pip install -r pyproject.toml --extra dev
    ```
-   O backend estará disponível em http://localhost:8000
+   Para dependências de documentação:
+   ```sh
+   uv pip install -r pyproject.toml --extra docs
+   ```
+3. Execute os comandos de automação (sem ativar o ambiente):
+   ```sh
+   uv run invoke backend
+   uv run invoke frontend
+   uv run invoke docs
+   uv run invoke run-all
+   uv run invoke test-backend
+   uv run invoke test-frontend
+   uv run invoke test-all
+   ```
+   > **Dica:** No VS Code, abra 3 abas do terminal integrado e execute backend, frontend e docs separadamente para usar o profile padrão da IDE.
+   >
+   > **Atenção:** Agora backend e docs estão acessíveis na rede local. Descubra o IP do seu computador (ex: 192.168.1.75) e acesse:
+   > - Backend: `http://192.168.1.75:8002`
+   > - Docs: `http://192.168.1.75:8001`
+   > - Frontend: `http://192.168.1.75:5173`
 
 ### Frontend (Node.js + React)
 1. Instale o Node.js (LTS):
@@ -77,6 +94,24 @@ Para visualizar a documentação localmente:
 ## Docker
 
 - O projeto será dockerizado para facilitar o deploy e o uso em diferentes ambientes.
+
+## Validação de Segurança das Dependências
+
+- **Backend/Docs (Python):**
+  ```sh
+  uv pip install -r pyproject.toml --extra security
+  uv run invoke security_backend
+  uv run invoke security_docs
+  ```
+- **Frontend (Node.js):**
+  ```sh
+  cd frontend
+  npm audit
+  ```
+- **Tudo de uma vez:**
+  ```sh
+  uv run invoke security_all
+  ```
 
 ## Endpoints de Receitas e Despesas
 
