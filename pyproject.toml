@@ -18,8 +18,12 @@ dev = [
 ]
 test = [
     "pytest",
-    "httpx"
+    "httpx",
+    "pytest-cov"
 ]
 security = [
     "safety"
 ] 
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=term-missing" 
