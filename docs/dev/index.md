@@ -135,6 +135,40 @@ Para visualizar a documentação localmente:
   uv run invoke quality-radon-all  # Todas as métricas
   ```
 
+## Relatórios HTML e Métricas Visuais
+
+- **Backend (Python):**
+  - Cobertura de testes:
+    ```sh
+    uv run invoke test-coverage-html
+    # Abra htmlcov/index.html no navegador
+    ```
+  - Segurança (Bandit):
+    ```sh
+    uv run invoke quality-bandit
+    # Abra bandit-report.html no navegador
+    ```
+- **Frontend (Node.js/React):**
+  - Lint (ESLint):
+    ```sh
+    uv run invoke quality-eslint-html
+    # Abra frontend/eslint-report.html no navegador
+    ```
+  - Cobertura de testes:
+    ```sh
+    uv run invoke test-frontend-coverage-html
+    # Abra frontend/coverage/lcov-report/index.html no navegador
+    ```
+  - Métricas de código (Plato):
+    ```sh
+    uv run invoke quality-plato
+    # Abra frontend/plato-report/index.html no navegador
+    ```
+  - Tudo de uma vez:
+    ```sh
+    uv run invoke quality-frontend-all
+    ```
+
 ## Gitflow
 
 - Use branches de feature para cada funcionalidade.

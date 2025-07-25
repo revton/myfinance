@@ -88,4 +88,44 @@ def quality_radon_all(c):
     """Executa todas as métricas do radon (cc, mi, raw)."""
     c.run("uv run invoke quality-radon-cc")
     c.run("uv run invoke quality-radon-mi")
-    c.run("uv run invoke quality-radon-raw") 
+    c.run("uv run invoke quality-radon-raw")
+
+@task
+def test_coverage_html(c):
+    """Executa os testes do backend e gera relatório de cobertura em HTML."""
+    c.run("uv run pytest --cov=src --cov-report=html")
+    print('Relatório HTML gerado em htmlcov/index.html')
+
+@task
+def quality_bandit(c):
+    """Roda o bandit para análise de segurança do código Python."""
+    c.run("uv run bandit -r src -f html -o bandit-report.html")
+    print('Relatório HTML de segurança gerado em bandit-report.html')
+
+@task
+def quality_eslint_html(c):
+    """Roda o ESLint no frontend e gera relatório HTML."""
+    with c.cd('frontend'):
+        c.run("npx eslint src --format html -o eslint-report.html")
+    print('Relatório HTML do ESLint gerado em frontend/eslint-report.html')
+
+@task
+def test_frontend_coverage_html(c):
+    """Executa os testes do frontend e gera relatório de cobertura em HTML."""
+    with c.cd('frontend'):
+        c.run("npm run test -- --coverage")
+    print('Relatório HTML de cobertura gerado em frontend/coverage/lcov-report/index.html')
+
+@task
+def quality_plato(c):
+    """Gera relatório de métricas do frontend com Plato."""
+    with c.cd('frontend'):
+        c.run("npx plato -r -d plato-report src")
+    print('Relatório HTML do Plato gerado em frontend/plato-report/index.html')
+
+@task
+def quality_frontend_all(c):
+    """Executa todas as métricas e relatórios do frontend (ESLint, cobertura, Plato)."""
+    c.run("uv run invoke quality-eslint-html")
+    c.run("uv run invoke test-frontend-coverage-html")
+    c.run("uv run invoke quality-plato") 

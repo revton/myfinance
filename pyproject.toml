@@ -26,7 +26,8 @@ security = [
 ] 
 quality = [
     "ruff",
-    "radon"
+    "radon",
+    "bandit"
 ]
 
 [tool.pytest.ini_options]
