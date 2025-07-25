@@ -146,7 +146,7 @@ Para visualizar a documentação localmente:
   - Segurança (Bandit):
     ```sh
     uv run invoke quality-bandit
-    # Abra bandit-report.html no navegador
+    # Abra reports/bandit-report.html no navegador
     ```
 - **Frontend (Node.js/React):**
   - Lint (ESLint):
