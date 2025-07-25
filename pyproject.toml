@@ -1,0 +1,10 @@
+[project]
+name = "myfinance"
+version = "0.1.0"
+description = "Sistema de finanças pessoais"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "invoke"
+] 
