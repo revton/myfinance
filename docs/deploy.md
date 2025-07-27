@@ -33,9 +33,9 @@ Este documento descreve como fazer o deploy gratuito do MyFinance usando platafo
      - **Environment**: Python
      - **Build Command**: `pip install -r requirements.txt`
      - **Start Command**: `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
-     - **Python Version**: 3.11.0 (será detectado automaticamente)
+     - **Python Version**: 3.12.11 (será detectado automaticamente)
 
-   > **Nota**: O projeto usa Python 3.11.0 para compatibilidade. Se preferir usar uv, use o comando: `uv pip install -r pyproject.toml --extra backend`
+   > **Nota**: O projeto usa Python 3.12.11 para compatibilidade com Render. Se preferir usar uv, use o comando: `uv pip install -r pyproject.toml --extra backend`
 
 3. **Configurar variáveis de ambiente**:
    ```
