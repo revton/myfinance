@@ -20,18 +20,21 @@ supabase db push
 ### 3. Configurar Render
 - Conectar repositório GitHub
 - Criar Web Service
+- Usar arquivo `render.yaml` (configurado para Python 3.11)
 - Adicionar variáveis:
   ```
   SUPABASE_URL=sua_url
   SUPABASE_ANON_KEY=sua_key
   ```
 
+**Nota importante:** O projeto está configurado para usar Python 3.11 para evitar problemas de compatibilidade com Python 3.13 e dependências descontinuadas.
+
 ### 4. Configurar Vercel
 - Importar repositório
 - Diretório: `frontend`
 - Variáveis:
   ```
-  VITE_API_URL=https://seu-backend.railway.app
+  VITE_API_URL=https://seu-backend.onrender.com
   ```
 
 ### 5. GitHub Secrets
@@ -45,11 +48,22 @@ SUPABASE_ANON_KEY=xxx
 
 ## 📁 Arquivos de Configuração
 
-- `Dockerfile` - Container do backend
-- `render.yaml` - Config Render
+- `Dockerfile` - Container do backend (Python 3.11)
+- `render.yaml` - Config Render (Python 3.11, pip-only)
+- `requirements.txt` - Dependências Python (Pydantic 2.5.3 para compatibilidade)
 - `frontend/vercel.json` - Config Vercel
 - `supabase/migrations/` - Schema database
 - `.github/workflows/deploy.yml` - CI/CD
+
+## 🔧 Soluções de Problemas
+
+### Erro: typing_inspection-0.4.1 (Read-only file system)
+**Solução:** Atualizado Pydantic de 2.5.0 para 2.5.3, que removeu a dependência descontinuada `typing-inspection`. Configurado Python 3.11 nos arquivos de deploy para evitar problemas de compatibilidade.
+
+### Versões de Dependências
+- FastAPI: 0.104.1
+- Pydantic: 2.5.3 (sem typing-inspection)
+- Python: 3.11 (especificado no runtime)
 
 ## 🔗 URLs Finais
 

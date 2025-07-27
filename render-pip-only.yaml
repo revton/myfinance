@@ -11,4 +11,5 @@ services:
       - key: SUPABASE_ANON_KEY
         sync: false
     healthCheckPath: /health
-    autoDeploy: true 
+    autoDeploy: true
+    runtime: python-3.11 
