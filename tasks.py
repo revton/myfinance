@@ -119,14 +119,14 @@ def test_frontend_coverage_html(c):
         c.run("npm run test -- --coverage")
     # Move o relatório HTML para fora da pasta frontend
     import shutil, os
-    src = 'frontend/coverage/lcov-report'
-    dst = 'reports/coverage-frontend/lcov-report'
+    src = 'frontend/coverage'
+    dst = 'reports/coverage-frontend'
     if os.path.exists(src):
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         if os.path.exists(dst):
             shutil.rmtree(dst)
         shutil.copytree(src, dst)
-    print('Relatório HTML de cobertura gerado em reports/coverage-frontend/lcov-report/index.html')
+    print('Relatório HTML de cobertura gerado em reports/coverage-frontend/index.html')
 
 @task
 def quality_plato(c):
