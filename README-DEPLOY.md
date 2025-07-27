@@ -18,14 +18,24 @@ supabase db push
 ```
 
 ### 3. Configurar Render
+
+**IMPORTANTE: Para evitar o erro typing-inspection**
+
 - Conectar repositório GitHub
-- Criar Web Service
-- Usar arquivo `render.yaml` (configurado para Python 3.11)
-- Adicionar variáveis:
+- Criar Web Service 
+- **MANUALMENTE configurar:**
+  - **Build Command:** `pip install --upgrade pip && pip install -r requirements.txt`
+  - **Start Command:** `python -m uvicorn src.main:app --host 0.0.0.0 --port $PORT`
+  - **Python Version:** `3.11` (no Advanced settings)
+- Adicionar variáveis de ambiente:
   ```
   SUPABASE_URL=sua_url
   SUPABASE_ANON_KEY=sua_key
+  DISABLE_UV=1
+  PIP_DISABLE_PIP_VERSION_CHECK=1
   ```
+
+**Não usar** o arquivo de configuração automático - configurar manualmente para forçar pip!
 
 **Nota importante:** O projeto está configurado para usar Python 3.11 para evitar problemas de compatibilidade com Python 3.13 e dependências descontinuadas.
 

@@ -1,3 +1,4 @@
 # Ignore uv.lock and pyproject.toml for deployment
 # Force use of requirements.txt and render.yaml config
 uv.lock
+pyproject.toml
