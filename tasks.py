@@ -45,7 +45,7 @@ def test_all(c):
 @task
 def test_coverage(c):
     """Executa os testes do backend e gera relatório de cobertura."""
-    c.run("uv run pytest")
+    c.run("uv run pytest --cov=src --cov-report=term-missing")
 
 @task
 def security_backend(c):
