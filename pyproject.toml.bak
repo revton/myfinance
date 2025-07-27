@@ -1,18 +1,23 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "myfinance"
 version = "0.1.0"
 description = "Sistema de finanças pessoais"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.13"
 dependencies = []
 
 [project.optional-dependencies]
 backend = [
-    "fastapi",
-    "uvicorn",
-    "supabase",
-    "psycopg2-binary",
-    "sqlalchemy",
-    "alembic"
+    "fastapi==0.104.1",
+    "uvicorn[standard]==0.24.0",
+    "supabase==2.0.2",
+    "psycopg2-binary==2.9.9",
+    "sqlalchemy==2.0.23",
+    "alembic==1.13.1",
+    "pydantic==2.5.3"
 ]
 docs = [
     "mkdocs",

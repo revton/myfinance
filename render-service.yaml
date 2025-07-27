@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: myfinance-backend-pip-only
+    name: myfinance-backend
     env: python
     plan: free
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
@@ -10,6 +10,7 @@ services:
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
+      - key: PYTHON_VERSION
+        value: "3.11"
     healthCheckPath: /health
     autoDeploy: true
-    pythonVersion: "3.11" 
