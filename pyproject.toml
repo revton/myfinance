@@ -8,10 +8,16 @@ dependencies = []
 [project.optional-dependencies]
 backend = [
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "supabase",
+    "psycopg2-binary",
+    "sqlalchemy",
+    "alembic"
 ]
 docs = [
-    "mkdocs"
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocs-git-revision-date-localized-plugin"
 ]
 dev = [
     "invoke"
