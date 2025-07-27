@@ -1,8 +1,10 @@
+# Render configuration - Force pip usage
 services:
   - type: web
-    name: myfinance-backend-simple
+    name: myfinance-backend-pip
     env: python
     plan: free
+    # Force pip installation instead of uv
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
     envVars:
