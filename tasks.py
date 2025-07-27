@@ -51,6 +51,7 @@ def test_coverage(c):
 @task
 def security_backend(c):
     """Valida vulnerabilidades nas dependências Python (backend e docs) usando safety."""
+    # TODO: Migrar para 'safety scan' quando necessário (requer login)
     c.run("uv run safety check")
 
 @task
