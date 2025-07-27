@@ -4,8 +4,8 @@ services:
     name: myfinance-backend-pip
     env: python
     plan: free
-    # Force pip installation instead of uv
-    buildCommand: pip install -r requirements.txt
+    # Force pip installation instead of uv and use Python 3.11
+    buildCommand: ./render-build.sh
     startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: SUPABASE_URL
@@ -14,4 +14,4 @@ services:
         sync: false
     healthCheckPath: /health
     autoDeploy: true
-    runtime: python-3.11 
+    pythonVersion: "3.11" 

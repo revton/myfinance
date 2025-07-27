@@ -3,7 +3,7 @@ services:
     name: myfinance-backend-pip-only
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
     startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: SUPABASE_URL
@@ -12,4 +12,4 @@ services:
         sync: false
     healthCheckPath: /health
     autoDeploy: true
-    runtime: python-3.11 
+    pythonVersion: "3.11" 
