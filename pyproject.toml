@@ -1,0 +1,38 @@
+[project]
+name = "myfinance"
+version = "0.1.0"
+description = "Sistema de finanças pessoais"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+backend = [
+    "fastapi",
+    "uvicorn"
+]
+docs = [
+    "mkdocs"
+]
+dev = [
+    "invoke"
+]
+test = [
+    "pytest",
+    "httpx",
+    "pytest-cov"
+]
+security = [
+    "safety"
+] 
+quality = [
+    "ruff",
+    "radon",
+    "bandit"
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=term-missing" 
+
+[tool.coverage.run]
+relative_files = true 
+source = ["src"]
