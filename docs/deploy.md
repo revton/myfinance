@@ -31,8 +31,10 @@ Este documento descreve como fazer o deploy gratuito do MyFinance usando platafo
    - Configure:
      - **Name**: myfinance-backend
      - **Environment**: Python
-     - **Build Command**: `pip install uv && uv pip install -r pyproject.toml --extra backend`
-     - **Start Command**: `uv run uvicorn src.main:app --host 0.0.0.0 --port $PORT`
+     - **Build Command**: `pip install -r requirements.txt`
+     - **Start Command**: `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
+
+   > **Nota**: Se preferir usar uv, use o comando: `uv pip install -r pyproject.toml --extra backend`
 
 3. **Configurar variáveis de ambiente**:
    ```
