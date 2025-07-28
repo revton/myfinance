@@ -173,5 +173,6 @@ Após estas correções e configuração dos secrets:
 
 ---
 
-**📅 Data das Correções:** $(date)  
-**🔄 Status:** Pronto para merge e configuração de secrets
+**📅 Data das Correções:** Janeiro 2025  
+**🔄 Status:** ✅ Correções aplicadas e funcional  
+**🔁 Última atualização:** Workflows atualizados na branch develop
