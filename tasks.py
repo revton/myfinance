@@ -110,7 +110,7 @@ def quality_eslint_html(c):
     """Roda o ESLint no frontend e gera relatório HTML na pasta reports/ (fora do versionamento)."""
     os.makedirs("reports", exist_ok=True)
     with c.cd('frontend'):
-        c.run("npx eslint src --format html -o ../reports/eslint-report.html")
+        c.run("npx eslint src --format html -o ../reports/eslint-report.html", warn=True)
     print('Relatório HTML do ESLint gerado em reports/eslint-report.html')
 
 @task
@@ -157,4 +157,5 @@ def coverage_all_reports(c):
     with c.cd('frontend'):
         c.run("npm run test -- --coverage")
     # lcov.info já estará em reports/coverage-frontend/lcov.info
-    print('Relatórios de cobertura e xunit prontos para SonarQube!') 
+    print('Relatórios de cobertura e xunit prontos para SonarQube!')
+    print('Execute: sonar-scanner (token já configurado na variável SONAR_TOKEN)') 

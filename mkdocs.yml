@@ -1,5 +1,42 @@
 site_name: MyFinance Docs
+site_description: Documentação do sistema de finanças pessoais
+site_author: MyFinance Team
+site_url: https://revton.github.io/myfinance/
+
+repo_name: revton/myfinance
+repo_url: https://github.com/revton/myfinance
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
 nav:
   - Início: index.md
   - Desenvolvedor: dev/index.md
   - Usuário: user/index.md
+  - Deploy: deploy.md
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
