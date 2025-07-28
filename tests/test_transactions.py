@@ -5,6 +5,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from fastapi.testclient import TestClient
 from src.main import app
 
+# Mock das variáveis de ambiente para teste
+os.environ['SUPABASE_URL'] = 'https://test.supabase.co'
+os.environ['SUPABASE_ANON_KEY'] = 'test-key'
+
 client = TestClient(app)
 
 def test_create_income():
@@ -35,4 +39,11 @@ def test_list_transactions():
     response = client.get("/transactions/")
     assert response.status_code == 200
     data = response.json()
-    assert isinstance(data, list) 
+    assert isinstance(data, list)
+
+def test_health_check():
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert "MyFinance API is running" in data["message"] 
