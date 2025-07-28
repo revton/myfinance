@@ -54,7 +54,7 @@ jobs:
 
       - name: Run frontend tests
         working-directory: ./frontend
-        run: npm test -- --coverage --watchAll=false
+        run: npm test -- --coverage --run
         env:
           CI: true
           VITE_API_URL: "http://localhost:8002"
