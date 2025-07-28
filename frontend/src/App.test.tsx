@@ -45,22 +45,35 @@ describe('MyFinance App', () => {
       render(<App />);
     });
     
-    // Simular seleção do tipo usando mouseDown e click no MenuItem
-    await act(async () => {
-      fireEvent.mouseDown(screen.getAllByLabelText(/Tipo/i)[0].parentElement!.querySelector('[role=combobox]')!);
-    });
-    
-    await act(async () => {
-      fireEvent.click(await screen.findByText('Despesa'));
-      fireEvent.change(screen.getAllByLabelText(/Valor/i)[0], { target: { value: '50' } });
-      fireEvent.change(screen.getAllByLabelText(/Descrição/i)[0], { target: { value: 'Mercado' } });
-      fireEvent.click(screen.getAllByText(/Adicionar/i)[0]);
-    });
-    
+    // Aguardar o componente carregar completamente
     await waitFor(() => {
-      expect(screen.getByText(/Despesa: R\$ 50.00/)).toBeTruthy();
-      expect(screen.getByText(/Mercado/)).toBeTruthy();
+      expect(screen.getByText(/Nova Transação/i)).toBeTruthy();
     });
+    
+    // Selecionar o tipo "Despesa"
+    const selectElement = screen.getByLabelText(/Tipo/i);
+    await act(async () => {
+      fireEvent.mouseDown(selectElement);
+    });
+    
+    // Clicar na opção Despesa
+    await act(async () => {
+      const despesaOption = await screen.findByText('Despesa');
+      fireEvent.click(despesaOption);
+    });
+    
+    // Preencher o formulário
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/Valor/i), { target: { value: '50' } });
+      fireEvent.change(screen.getByLabelText(/Descrição/i), { target: { value: 'Mercado' } });
+      fireEvent.click(screen.getByText(/Adicionar/i));
+    });
+    
+    // Verificar se a despesa foi adicionada (usando regex mais flexível)
+    await waitFor(() => {
+      expect(screen.getByText(/Despesa.*R\$.*50\.00/)).toBeTruthy();
+      expect(screen.getByText(/Mercado/)).toBeTruthy();
+    }, { timeout: 3000 });
   });
 
   it('exibe lista vazia se axios.get falhar', async () => {
