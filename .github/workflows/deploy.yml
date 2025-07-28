@@ -25,11 +25,11 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          pip install fastapi uvicorn supabase psycopg2-binary sqlalchemy alembic pydantic pytest httpx pytest-cov
+          pip install fastapi uvicorn supabase psycopg2-binary sqlalchemy alembic pydantic pytest httpx pytest-cov python-multipart
 
       - name: Run backend tests
         run: |
-          PYTHONPATH=$PYTHONPATH:. python -m pytest tests/ --cov=src --cov-report=xml
+          PYTHONPATH=$PYTHONPATH:. python -m pytest tests/ -v --cov=src --cov-report=xml --tb=short
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
