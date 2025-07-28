@@ -12,6 +12,7 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 
 ## 📚 Navegação
 
+- [🗺️ Roadmap](roadmap/) - Planejamento e fases do projeto
 - [Guia do Usuário](user/) - Como usar o sistema
 - [Guia do Desenvolvedor](dev/) - Configuração e desenvolvimento
 - [Deploy](deploy/) - Instruções de implantação
@@ -19,7 +20,7 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 ## 🚀 Tecnologias
 
 - **Backend**: FastAPI + SQLAlchemy + Supabase
-- **Frontend**: HTML5 + CSS3 + JavaScript
+- **Frontend**: React 18 + TypeScript + Material-UI
 - **Documentação**: MkDocs + Material Theme
 - **Deploy**: Render.com (gratuito)
 
@@ -30,8 +31,17 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 - ✅ **Frontend Tests**: Vitest + React funcionando
 - ✅ **GitHub Pages**: Deploy moderno configurado
 
+## 📊 Status do Projeto
+
+| Métrica | Valor |
+|---------|-------|
+| **Fase Atual** | ✅ Fase 1 - MVP (Concluída) |
+| **Próxima Fase** | 📋 Fase 2 - Categorias e Autenticação |
+| **Tecnologias** | FastAPI + React + Supabase |
+| **Deploy** | Render.com + Vercel |
+
 ---
 
 *Documentação gerada automaticamente via GitHub Actions*
 
-<!-- Trigger para teste da pipeline - 2025-01-27 19:30 UTC -->
+<!-- Trigger para roadmap update - 2025-01-27 22:00 UTC -->

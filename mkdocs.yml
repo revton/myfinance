@@ -32,6 +32,7 @@ theme:
 
 nav:
   - Início: index.md
+  - 🗺️ Roadmap: roadmap.md
   - Desenvolvedor: dev/index.md
   - Usuário: user/index.md
   - Deploy: deploy.md
