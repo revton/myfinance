@@ -28,18 +28,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv venv .venv
-          source .venv/bin/activate
-          uv pip install -e .[docs]
+          uv pip install --extra docs -e .
 
       - name: Build documentation
         run: |
-          source .venv/bin/activate
-          mkdocs build
+          uv run mkdocs build
 
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
