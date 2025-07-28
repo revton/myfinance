@@ -12,6 +12,16 @@ export default defineConfig({
       reporter: ['text', 'json', 'html', 'lcov'],
       include: ['src/**/*'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/setupTests.ts', 'src/vite-env.d.ts']
-    }
+    },
+    deps: {
+      optimizer: {
+        web: {
+          include: ['@testing-library/react', '@testing-library/jest-dom']
+        }
+      }
+    },
+    transformMode: {
+      web: [/\.[jt]sx?$/],
+    },
   },
 }); 

@@ -13,11 +13,17 @@ os.environ['SUPABASE_ANON_KEY'] = 'test-key'
 
 from fastapi.testclient import TestClient
 from src.main import app
+from src.config import settings
+
+# Create a mock supabase client
+mock_supabase_client = MagicMock()
+
+# Set the mock client in settings
+settings.set_mock_supabase_client(mock_supabase_client)
 
 client = TestClient(app)
 
-@patch('src.main.settings.supabase_client')
-def test_create_income(mock_supabase):
+def test_create_income():
     # Mock da resposta do Supabase
     mock_result = MagicMock()
     mock_result.data = [{
@@ -28,7 +34,7 @@ def test_create_income(mock_supabase):
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z"
     }]
-    mock_supabase.table.return_value.insert.return_value.execute.return_value = mock_result
+    mock_supabase_client.table.return_value.insert.return_value.execute.return_value = mock_result
     
     response = client.post("/transactions/", json={
         "type": "income",
@@ -41,8 +47,7 @@ def test_create_income(mock_supabase):
     assert data["amount"] == 100.0
     assert data["description"] == "Salário"
 
-@patch('src.main.settings.supabase_client')
-def test_create_expense(mock_supabase):
+def test_create_expense():
     # Mock da resposta do Supabase
     mock_result = MagicMock()
     mock_result.data = [{
@@ -53,7 +58,7 @@ def test_create_expense(mock_supabase):
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z"
     }]
-    mock_supabase.table.return_value.insert.return_value.execute.return_value = mock_result
+    mock_supabase_client.table.return_value.insert.return_value.execute.return_value = mock_result
     
     response = client.post("/transactions/", json={
         "type": "expense",
@@ -66,8 +71,7 @@ def test_create_expense(mock_supabase):
     assert data["amount"] == 50.0
     assert data["description"] == "Mercado"
 
-@patch('src.main.settings.supabase_client')
-def test_list_transactions(mock_supabase):
+def test_list_transactions():
     # Mock da resposta do Supabase
     mock_result = MagicMock()
     mock_result.data = [
@@ -88,7 +92,7 @@ def test_list_transactions(mock_supabase):
             "updated_at": "2023-01-01T00:00:00Z"
         }
     ]
-    mock_supabase.table.return_value.select.return_value.order.return_value.execute.return_value = mock_result
+    mock_supabase_client.table.return_value.select.return_value.order.return_value.execute.return_value = mock_result
     
     response = client.get("/transactions/")
     assert response.status_code == 200
