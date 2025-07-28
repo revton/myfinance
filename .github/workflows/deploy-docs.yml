@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv pip install --extra docs -e .
+          uv pip install -e . --extra docs
 
       - name: Build documentation
         run: |
