@@ -30,7 +30,7 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          uv pip install --extra backend --extra test -e .
+          uv pip install -e . --extra backend --extra test
 
       - name: Run backend tests
         run: |
