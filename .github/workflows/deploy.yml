@@ -23,18 +23,13 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
       - name: Install backend dependencies
         run: |
           pip install fastapi uvicorn supabase psycopg2-binary sqlalchemy alembic pydantic pytest httpx pytest-cov
 
       - name: Run backend tests
         run: |
-          pytest --cov=src --cov-report=xml
+          python -m pytest --cov=src --cov-report=xml
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -93,7 +88,8 @@ jobs:
 
       - name: Deploy to Vercel
         working-directory: ./frontend
-        run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
+        run: |
+          vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }} 
