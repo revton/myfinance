@@ -1,17 +1,28 @@
-# Welcome to MkDocs
+# Sistema de Finanças Pessoais - MyFinance
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Bem-vindo à documentação do MyFinance, um sistema completo para controle de finanças pessoais.
 
-## Commands
+## 📋 Funcionalidades
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+- ✅ Controle de receitas e despesas
+- ✅ Categorização de transações
+- ✅ Relatórios financeiros detalhados
+- ✅ Interface web moderna e responsiva
+- ✅ Deploy gratuito no Render.com
 
-## Project layout
+## 📚 Navegação
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+- [Guia do Usuário](user/) - Como usar o sistema
+- [Guia do Desenvolvedor](dev/) - Configuração e desenvolvimento
+- [Deploy](deploy/) - Instruções de implantação
+
+## 🚀 Tecnologias
+
+- **Backend**: FastAPI + SQLAlchemy + Supabase
+- **Frontend**: HTML5 + CSS3 + JavaScript
+- **Documentação**: MkDocs + Material Theme
+- **Deploy**: Render.com (gratuito)
+
+---
+
+*Documentação gerada automaticamente via GitHub Actions*
