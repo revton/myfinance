@@ -26,3 +26,5 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 ---
 
 *Documentação gerada automaticamente via GitHub Actions*
+
+<!-- Trigger para teste da pipeline - $(date) -->
