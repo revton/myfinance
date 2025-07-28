@@ -1,14 +1,18 @@
 import sys
 import os
 from unittest.mock import patch, MagicMock
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+# Ensure the project root is in the Python path
+project_root = os.path.join(os.path.dirname(__file__), '..')
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# Set test environment variables before importing the app
+os.environ['SUPABASE_URL'] = 'https://test.supabase.co'
+os.environ['SUPABASE_ANON_KEY'] = 'test-key'
 
 from fastapi.testclient import TestClient
 from src.main import app
-
-# Mock das variáveis de ambiente para teste
-os.environ['SUPABASE_URL'] = 'https://test.supabase.co'
-os.environ['SUPABASE_ANON_KEY'] = 'test-key'
 
 client = TestClient(app)
 
