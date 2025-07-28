@@ -23,8 +23,15 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 - **Documentação**: MkDocs + Material Theme
 - **Deploy**: Render.com (gratuito)
 
+## 🔧 Status das Correções
+
+- ✅ **GitHub Actions**: Totalmente corrigidas
+- ✅ **Backend Tests**: Supabase mocking funcionando
+- ✅ **Frontend Tests**: Vitest + React funcionando
+- ✅ **GitHub Pages**: Deploy moderno configurado
+
 ---
 
 *Documentação gerada automaticamente via GitHub Actions*
 
-<!-- Trigger para teste da pipeline - $(date) -->
+<!-- Trigger para teste da pipeline - 2025-01-27 19:30 UTC -->
