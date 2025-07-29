@@ -1,171 +1,235 @@
-# 🧪 Teste Local de GitHub Actions
+# Teste Local de GitHub Actions
 
-Este guia explica como testar as GitHub Actions localmente sem precisar fazer push para o repositório.
+Este documento explica como testar os GitHub Actions localmente no projeto MyFinance.
 
-## 🛠️ Ferramentas Necessárias
+## Opções de Teste
 
-### 1. Act (GitHub Actions Local)
+### 1. Usando Docker (Recomendado) ⭐
+
+A solução mais limpa e isolada - usa `act` em um container Docker sem instalar nada na sua máquina.
+
+#### Pré-requisitos
+- Docker Desktop instalado e rodando
+
+#### Uso
+
+**Bash (Linux/macOS/Git Bash):**
 ```bash
-# Windows (Chocolatey)
+# Instalar imagem Docker do act (primeira vez)
+./scripts/test-actions-docker.sh install
+
+# Testar tudo
+./scripts/test-actions-docker.sh all
+
+# Testar apenas backend
+./scripts/test-actions-docker.sh backend
+
+# Testar apenas frontend
+./scripts/test-actions-docker.sh frontend
+
+# Testar apenas deploy
+./scripts/test-actions-docker.sh deploy
+```
+
+**PowerShell (Windows):**
+```powershell
+# Instalar imagem Docker do act (primeira vez)
+.\scripts\test-actions-docker.ps1 install
+
+# Testar tudo
+.\scripts\test-actions-docker.ps1 all
+
+# Testar apenas backend
+.\scripts\test-actions-docker.ps1 backend
+
+# Testar apenas frontend
+.\scripts\test-actions-docker.ps1 frontend
+
+# Testar apenas deploy
+.\scripts\test-actions-docker.ps1 deploy
+```
+
+#### Vantagens
+- ✅ **Isolado**: Não afeta seu sistema
+- ✅ **Limpo**: Não instala nada na máquina
+- ✅ **Consistente**: Mesmo ambiente sempre
+- ✅ **Fácil**: Apenas Docker necessário
+
+### 2. Usando act-cli (Avançado)
+
+O `act` é uma ferramenta que permite executar GitHub Actions localmente usando Docker.
+
+#### Instalação
+
+**Windows:**
+```powershell
+# Como administrador
+Set-ExecutionPolicy Bypass -Scope Process -Force
+iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 choco install act-cli
+```
 
-# macOS (Homebrew)
+**macOS:**
+```bash
 brew install act
+```
 
-# Linux
+**Linux:**
+```bash
 curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 ```
 
-### 2. Vercel CLI
+#### Uso
+
 ```bash
-npm install -g vercel
-```
-
-## 🚀 Como Usar
-
-### Teste Completo (Recomendado)
-```bash
-# Testar tudo
-./scripts/test-actions.sh all
-
-# Testar apenas backend
+# Testar backend
 ./scripts/test-actions.sh backend
 
-# Testar apenas frontend
+# Testar frontend
 ./scripts/test-actions.sh frontend
 
-# Testar apenas deploy
+# Testar deploy
 ./scripts/test-actions.sh deploy
+
+# Testar tudo
+./scripts/test-actions.sh all
 ```
 
-### Teste Específico do Token Vercel
+### 3. Scripts Alternativos (Básico)
+
+Se você não conseguir instalar o `act-cli` ou Docker, use os scripts alternativos que fazem verificações básicas:
+
+#### Bash (Linux/macOS/Git Bash)
 ```bash
-# Configurar token
+# Testar tudo
+./scripts/test-actions-local.sh all
+
+# Testar apenas backend
+./scripts/test-actions-local.sh backend
+
+# Testar apenas frontend
+./scripts/test-actions-local.sh frontend
+
+# Testar apenas deploy
+./scripts/test-actions-local.sh deploy
+```
+
+#### PowerShell (Windows)
+```powershell
+# Testar tudo
+.\scripts\test-actions-local.ps1 all
+
+# Testar apenas backend
+.\scripts\test-actions-local.ps1 backend
+
+# Testar apenas frontend
+.\scripts\test-actions-local.ps1 frontend
+
+# Testar apenas deploy
+.\scripts\test-actions-local.ps1 deploy
+```
+
+## O que os Scripts Verificam
+
+### Backend
+- ✅ Existência de `src/main.py`
+- ✅ Existência de `requirements.txt`
+- ✅ Python instalado
+- ✅ pip instalado
+- ✅ Diretório `tests/`
+
+### Frontend
+- ✅ Diretório `frontend/`
+- ✅ `frontend/package.json`
+- ✅ Node.js instalado
+- ✅ npm instalado
+- ✅ `frontend/src/App.tsx`
+- ✅ `frontend/vite.config.ts`
+
+### Deploy
+- ✅ `frontend/vercel.json`
+- ✅ `Procfile`
+- ✅ `runtime.txt`
+- ✅ `requirements-render.txt`
+
+## Comparação das Opções
+
+| Aspecto | Docker | act-cli | Scripts Locais |
+|---------|--------|---------|----------------|
+| **Instalação** | Apenas Docker | act + Docker | Nenhuma |
+| **Isolamento** | ✅ Completo | ✅ Completo | ❌ Sistema local |
+| **Consistência** | ✅ Sempre igual | ✅ Sempre igual | ⚠️ Depende do sistema |
+| **Facilidade** | ✅ Muito fácil | ⚠️ Média | ✅ Muito fácil |
+| **Funcionalidade** | ✅ Completa | ✅ Completa | ⚠️ Básica |
+| **Recomendação** | ⭐ **Principal** | 🔧 **Avançado** | 🆘 **Fallback** |
+
+## Troubleshooting
+
+### Problemas com Docker
+
+1. **Docker não encontrado:**
+   - Instale Docker Desktop: https://www.docker.com/products/docker-desktop
+   - Certifique-se de que está rodando
+
+2. **Erro de permissão:**
+   - Execute como administrador (Windows)
+   - Adicione usuário ao grupo docker (Linux)
+
+### Problemas com act-cli no Windows
+
+1. **Erro de permissão:**
+   - Execute PowerShell como administrador
+   - Verifique se a política de execução permite scripts
+
+2. **Docker não encontrado:**
+   - Instale Docker Desktop para Windows
+   - Certifique-se de que o Docker está rodando
+
+3. **Chocolatey não funciona:**
+   - Use o download manual: https://github.com/nektos/act/releases
+   - Ou use os scripts alternativos
+
+### Problemas com Scripts Alternativos
+
+1. **Permissão negada (Bash):**
+   ```bash
+   chmod +x scripts/test-actions-local.sh
+   ```
+
+2. **Política de execução (PowerShell):**
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+## Próximos Passos
+
+Após os testes locais, você pode:
+
+1. Fazer commit das mudanças
+2. Fazer push para o repositório
+3. Verificar se os GitHub Actions passam no GitHub
+4. Criar um Pull Request
+
+## Workflows Disponíveis
+
+- `test-local.yml` - Testes locais para backend, frontend e deploy
+- `test.yml` - Testes automatizados no GitHub
+- `deploy.yml` - Deploy automático
+
+## Configuração de Variáveis de Ambiente
+
+Para testes completos, configure as variáveis de ambiente:
+
+```bash
+# Token Vercel (para deploy)
 export VERCEL_TOKEN='seu-token-aqui'
 
-# Testar token
-./scripts/test-vercel-token.sh
+# Token GitHub (opcional)
+export GITHUB_TOKEN='seu-token-aqui'
 ```
 
-## 📋 Workflows Disponíveis
-
-### 1. `test-local.yml`
-Workflow específico para testes locais com:
-- ✅ Teste de backend (Python/FastAPI)
-- ✅ Teste de frontend (React/Node.js)
-- ✅ Teste de deploy (Vercel)
-- ✅ Validação de token
-- ✅ Simulação de deploy
-
-### 2. Scripts de Conveniência
-- `scripts/test-actions.sh` - Testa workflows completos
-- `scripts/test-vercel-token.sh` - Testa apenas token Vercel
-
-## 🔧 Configuração
-
-### Variáveis de Ambiente
-```bash
-# Token Vercel (obrigatório para deploy)
-export VERCEL_TOKEN='seu-token-aqui'
-
-# Outras variáveis (opcionais)
-export SUPABASE_URL='https://test.supabase.co'
-export SUPABASE_ANON_KEY='test-key'
-```
-
-### Obter Token Vercel
+**Obter Token Vercel:**
 1. Acesse: https://vercel.com/account/tokens
 2. Clique em "Create Token"
 3. Dê um nome (ex: "MyFinance Deploy")
-4. Copie o token gerado
-5. Configure no GitHub Secrets ou localmente
-
-## 🧪 Exemplos de Uso
-
-### Teste Rápido do Backend
-```bash
-./scripts/test-actions.sh backend
-```
-
-### Teste Rápido do Frontend
-```bash
-./scripts/test-actions.sh frontend
-```
-
-### Verificar Token Vercel
-```bash
-export VERCEL_TOKEN='seu-token'
-./scripts/test-vercel-token.sh
-```
-
-### Teste Completo
-```bash
-./scripts/test-actions.sh all
-```
-
-## 🔍 Debug e Troubleshooting
-
-### Problemas Comuns
-
-#### 1. Act não encontrado
-```bash
-# Verificar instalação
-act --version
-
-# Reinstalar se necessário
-# Windows: choco uninstall act-cli && choco install act-cli
-# macOS: brew uninstall act && brew install act
-```
-
-#### 2. Token Vercel inválido
-```bash
-# Testar token
-vercel whoami --token $VERCEL_TOKEN
-
-# Gerar novo token se necessário
-# https://vercel.com/account/tokens
-```
-
-#### 3. Docker não disponível
-```bash
-# Act requer Docker
-docker --version
-
-# Instalar Docker se necessário
-# https://docs.docker.com/get-docker/
-```
-
-### Logs Detalhados
-```bash
-# Verbose mode
-act -v
-
-# Debug mode
-act -d
-```
-
-## 📊 Benefícios
-
-### ✅ Vantagens
-- **Rápido**: Teste local sem push/pull
-- **Seguro**: Não afeta repositório
-- **Flexível**: Teste partes específicas
-- **Debug**: Logs detalhados
-- **Economia**: Não consome minutos do GitHub Actions
-
-### ⚠️ Limitações
-- **Docker**: Requer Docker instalado
-- **Recursos**: Usa recursos locais
-- **Diferenças**: Pode ter pequenas diferenças do ambiente real
-
-## 🎯 Próximos Passos
-
-1. **Instalar ferramentas** (act, vercel-cli)
-2. **Configurar token** Vercel
-3. **Testar localmente** antes de fazer PR
-4. **Corrigir problemas** identificados
-5. **Fazer PR** apenas quando tudo estiver OK
-
----
-
-**💡 Dica**: Use sempre o teste local antes de fazer PR para economizar tempo e recursos! 
+4. Copie o token gerado 

@@ -11,10 +11,16 @@ echo "=============================================="
 # Verificar se act está instalado
 if ! command -v act &> /dev/null; then
     echo "❌ 'act' não está instalado!"
-    echo "💡 Instale em: https://github.com/nektos/act"
+    echo "💡 Opções de instalação:"
     echo "   Windows: choco install act-cli"
     echo "   macOS: brew install act"
     echo "   Linux: curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash"
+    echo ""
+    echo "🔧 Alternativa: Use os scripts locais sem act:"
+    echo "   Bash: ./scripts/test-actions-local.sh all"
+    echo "   PowerShell: .\scripts\test-actions-local.ps1 all"
+    echo ""
+    echo "📖 Mais informações: docs/local-testing.md"
     exit 1
 fi
 
