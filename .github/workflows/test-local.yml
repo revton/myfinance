@@ -93,35 +93,34 @@ jobs:
       - name: Test Vercel Token
         working-directory: ./frontend
         run: |
-          echo "🔍 Testando configuração do Vercel..."
+          echo "Testando configuracao do Vercel..."
           echo "Token length: ${#VERCEL_TOKEN}"
           
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "❌ VERCEL_TOKEN está vazio!"
-            echo "💡 Configure o token em: Settings > Secrets and variables > Actions"
+            echo "VERCEL_TOKEN esta vazio!"
+            echo "Configure o token em: Settings > Secrets and variables > Actions"
             exit 1
           fi
           
-          echo "✅ Token configurado (length: ${#VERCEL_TOKEN})"
+          echo "Token configurado (length: ${#VERCEL_TOKEN})"
           
-          # Testar se o token é válido (sem fazer deploy)
-          echo "🔐 Testando autenticação..."
+          echo "Testando autenticacao..."
           vercel whoami --token $VERCEL_TOKEN || {
-            echo "❌ Token inválido ou expirado!"
-            echo "💡 Gere um novo token em: https://vercel.com/account/tokens"
+            echo "Token invalido ou expirado!"
+            echo "Gere um novo token em: https://vercel.com/account/tokens"
             exit 1
           }
           
-          echo "✅ Token válido!"
+          echo "Token valido!"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Simulate Deploy (Dry Run)
         working-directory: ./frontend
         run: |
-          echo "🚀 Simulando deploy (dry run)..."
+          echo "Simulando deploy (dry run)..."
           echo "Comando que seria executado:"
-          echo "vercel --prod --token \$VERCEL_TOKEN --yes"
-          echo "✅ Deploy simulado com sucesso!"
+          echo "vercel --prod --token $VERCEL_TOKEN --yes"
+          echo "Deploy simulado com sucesso!"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} 
