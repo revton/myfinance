@@ -1,16 +1,15 @@
-# Configuração de Múltiplos Ambientes no Supabase
+# Configuração de Ambientes no Supabase
 
-Este documento explica como configurar e gerenciar múltiplos ambientes (desenvolvimento, teste, produção) no Supabase para o projeto MyFinance.
+Este documento explica como configurar e gerenciar ambientes (desenvolvimento e produção) no Supabase para o projeto MyFinance.
 
 ## 🎯 Visão Geral
 
-O projeto MyFinance suporta três ambientes distintos:
+O projeto MyFinance suporta dois ambientes distintos:
 
 - **Development**: Para desenvolvimento local
-- **Testing**: Para testes automatizados e QA
 - **Production**: Para ambiente de produção
 
-Cada ambiente tem seu próprio projeto Supabase com dados isolados.
+Cada ambiente tem seu próprio projeto Supabase com dados isolados. Os testes usam mocks completos e não requerem conexão real com o Supabase.
 
 ## 🏗️ Configuração no Supabase
 
@@ -24,13 +23,6 @@ Cada ambiente tem seu próprio projeto Supabase com dados isolados.
    - **Database Password**: Senha forte
    - **Region**: Escolha a região mais próxima
 4. Clique em "Create new project"
-
-#### Projeto de Teste
-1. Repita o processo acima
-2. Configure:
-   - **Name**: `myfinance-test`
-   - **Database Password**: Senha forte (pode ser a mesma)
-   - **Region**: Mesma região do projeto de desenvolvimento
 
 #### Projeto de Produção
 1. Repita o processo acima
@@ -82,7 +74,7 @@ Para cada projeto, configure as políticas de segurança:
 -- Habilitar RLS
 ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 
--- Política para permitir todas as operações (para desenvolvimento/teste)
+-- Política para permitir todas as operações (para desenvolvimento)
 -- Em produção, configure políticas mais restritivas
 CREATE POLICY "Allow all operations" ON transactions
     FOR ALL USING (true);
@@ -114,12 +106,6 @@ SUPABASE_URL=https://your-dev-project.supabase.co
 SUPABASE_ANON_KEY=your-dev-supabase-anon-key
 
 # =============================================================================
-# SUPABASE - TESTE
-# =============================================================================
-SUPABASE_TEST_URL=https://your-test-project.supabase.co
-SUPABASE_TEST_ANON_KEY=your-test-supabase-anon-key
-
-# =============================================================================
 # SUPABASE - PRODUÇÃO
 # =============================================================================
 SUPABASE_PROD_URL=https://your-prod-project.supabase.co
@@ -138,9 +124,6 @@ uv run invoke show-env
 # Para desenvolvimento
 uv run invoke switch-env development
 
-# Para teste
-uv run invoke switch-env testing
-
 # Para produção
 uv run invoke switch-env production
 ```
@@ -152,27 +135,28 @@ uv run invoke check-env
 
 ### Executar em Ambiente Específico
 ```bash
-# Backend em ambiente de teste
-uv run invoke backend --env=testing
+# Backend em ambiente de desenvolvimento
+uv run invoke backend --env=development
 
 # Backend em ambiente de produção
 uv run invoke backend --env=production
 ```
 
-## 🧪 Testes com Ambientes
+## 🧪 Testes com Mocks
 
 ### Executar Testes
 ```bash
-# Testes sempre usam ambiente de teste automaticamente
+# Testes usam mocks completos (sem conexão real com Supabase)
 uv run invoke test-backend
 uv run invoke test-all
 ```
 
-### Configuração Automática
+### Configuração de Testes
 Os testes automaticamente:
-- Definem `ENVIRONMENT=testing`
-- Usam `SUPABASE_TEST_URL` e `SUPABASE_TEST_ANON_KEY`
+- Usam mocks completos do Supabase
+- Não requerem configuração de ambiente de teste
 - Não afetam dados de desenvolvimento ou produção
+- São rápidos e confiáveis
 
 ## 📊 Diferentes Configurações por Ambiente
 
@@ -181,18 +165,14 @@ Os testes automaticamente:
 - **Log Level**: `DEBUG`
 - **Dados**: Dados de desenvolvimento
 - **Performance**: Não crítica
-
-### Testing
-- **Debug**: `False`
-- **Log Level**: `INFO`
-- **Dados**: Dados de teste (podem ser resetados)
-- **Performance**: Moderada
+- **Políticas RLS**: Permissivas
 
 ### Production
 - **Debug**: `False`
 - **Log Level**: `WARNING`
 - **Dados**: Dados reais dos usuários
 - **Performance**: Crítica
+- **Políticas RLS**: Restritivas
 
 ## 🔒 Segurança por Ambiente
 
@@ -200,30 +180,23 @@ Os testes automaticamente:
 - Políticas RLS permissivas
 - Dados de exemplo
 - Acesso amplo para desenvolvimento
-
-### Testing
-- Políticas RLS permissivas
-- Dados de teste
-- Pode ser resetado frequentemente
+- Debug habilitado
 
 ### Production
 - Políticas RLS restritivas
 - Dados reais dos usuários
 - Backup regular
 - Monitoramento de segurança
+- Debug desabilitado
 
 ## 📈 Migrações entre Ambientes
 
-### Desenvolvimento → Teste
-1. Execute migrações no projeto de teste
-2. Copie estrutura de dados se necessário
-3. Execute testes para validar
-
-### Teste → Produção
+### Desenvolvimento → Produção
 1. Execute migrações no projeto de produção
 2. Valide todas as funcionalidades
-3. Configure políticas de segurança
+3. Configure políticas de segurança restritivas
 4. Faça backup antes de deploy
+5. Teste em produção com dados reais
 
 ## 🐛 Troubleshooting
 
@@ -242,10 +215,16 @@ Os testes automaticamente:
 - Confirme se as tabelas foram criadas
 - Verifique as políticas RLS
 
+### Testes falhando
+- Os testes usam mocks, não precisam de conexão real
+- Verifique se os mocks estão configurados corretamente
+- Execute `uv run invoke test-backend` para ver detalhes
+
 ## 📝 Próximos Passos
 
 - [ ] Configurar backup automático para produção
 - [ ] Implementar monitoramento de performance
 - [ ] Configurar alertas de segurança
 - [ ] Implementar migrações automatizadas
-- [ ] Configurar CI/CD para diferentes ambientes 
+- [ ] Configurar CI/CD para diferentes ambientes
+- [ ] Implementar políticas RLS mais restritivas para produção 

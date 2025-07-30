@@ -42,10 +42,8 @@ def run_all(c):
 
 @task
 def test_backend(c):
-    """Executa os testes do backend com pytest."""
-    # Força ambiente de teste
-    os.environ["ENVIRONMENT"] = "testing"
-    print("Executando testes em ambiente: testing")
+    """Executa os testes do backend com pytest usando mocks."""
+    print("Executando testes com mocks (sem conexão real com Supabase)")
     c.run("uv run pytest")
 
 @task
@@ -63,8 +61,7 @@ def test_all(c):
 @task
 def test_coverage(c):
     """Executa os testes do backend e gera relatório de cobertura."""
-    # Força ambiente de teste
-    os.environ["ENVIRONMENT"] = "testing"
+    print("Executando testes com mocks (sem conexão real com Supabase)")
     c.run("uv run pytest --cov=src --cov-report=term-missing --cov-report=html")
     print('Relatório HTML gerado em htmlcov/index.html')
 
@@ -115,8 +112,7 @@ def quality_radon_all(c):
 @task
 def test_coverage_html(c):
     """Executa os testes do backend e gera relatório de cobertura em HTML."""
-    # Força ambiente de teste
-    os.environ["ENVIRONMENT"] = "testing"
+    print("Executando testes com mocks (sem conexão real com Supabase)")
     c.run("uv run pytest --cov=src --cov-report=html")
     print('Relatório HTML gerado em htmlcov/index.html')
 
@@ -171,8 +167,7 @@ def quality_frontend_all(c):
 def coverage_all_reports(c):
     """Gera todos os relatórios de cobertura e xunit para SonarQube."""
     import os
-    # Força ambiente de teste
-    os.environ["ENVIRONMENT"] = "testing"
+    print("Executando testes com mocks (sem conexão real com Supabase)")
     
     # Backend: coverage.xml (htmlcov) e xunit
     os.makedirs('htmlcov', exist_ok=True)
@@ -205,9 +200,7 @@ def check_env(c):
     environment = os.getenv("ENVIRONMENT", "development")
     print(f"Verificando configuração para ambiente: {environment}")
     
-    if environment == "testing":
-        required_vars = ['SUPABASE_TEST_URL', 'SUPABASE_TEST_ANON_KEY']
-    elif environment == "production":
+    if environment == "production":
         required_vars = ['SUPABASE_PROD_URL', 'SUPABASE_PROD_ANON_KEY']
     else:  # development
         required_vars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
@@ -229,8 +222,8 @@ def check_env(c):
 @task
 def switch_env(c, env):
     """Altera o ambiente atual no arquivo .env."""
-    if env not in ['development', 'testing', 'production']:
-        print('Ambiente deve ser: development, testing ou production')
+    if env not in ['development', 'production']:
+        print('Ambiente deve ser: development ou production')
         return
     
     if not os.path.exists('.env'):
@@ -267,12 +260,7 @@ def show_env(c):
     print(f"Ambiente atual: {environment}")
     print()
     
-    if environment == "testing":
-        url = os.getenv("SUPABASE_TEST_URL", "Não configurado")
-        key = os.getenv("SUPABASE_TEST_ANON_KEY", "Não configurado")
-        print(f"SUPABASE_TEST_URL: {url}")
-        print(f"SUPABASE_TEST_ANON_KEY: {key[:10]}..." if len(key) > 10 else f"SUPABASE_TEST_ANON_KEY: {key}")
-    elif environment == "production":
+    if environment == "production":
         url = os.getenv("SUPABASE_PROD_URL", "Não configurado")
         key = os.getenv("SUPABASE_PROD_ANON_KEY", "Não configurado")
         print(f"SUPABASE_PROD_URL: {url}")

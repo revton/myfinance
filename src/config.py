@@ -15,10 +15,7 @@ class Settings:
     # Supabase - Configuração baseada no ambiente
     def _get_supabase_config(self) -> tuple[str, str]:
         """Retorna configuração do Supabase baseada no ambiente"""
-        if self.ENVIRONMENT == "testing":
-            url = os.getenv("SUPABASE_TEST_URL", "")
-            key = os.getenv("SUPABASE_TEST_ANON_KEY", "")
-        elif self.ENVIRONMENT == "production":
+        if self.ENVIRONMENT == "production":
             url = os.getenv("SUPABASE_PROD_URL", "")
             key = os.getenv("SUPABASE_PROD_ANON_KEY", "")
         else:  # development (padrão)
@@ -40,9 +37,7 @@ class Settings:
     # Database - Configuração baseada no ambiente
     def _get_database_url(self) -> Optional[str]:
         """Retorna URL do banco baseada no ambiente"""
-        if self.ENVIRONMENT == "testing":
-            return os.getenv("DATABASE_TEST_URL")
-        elif self.ENVIRONMENT == "production":
+        if self.ENVIRONMENT == "production":
             return os.getenv("DATABASE_PROD_URL")
         else:  # development (padrão)
             return os.getenv("DATABASE_URL")
