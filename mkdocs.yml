@@ -35,6 +35,7 @@ nav:
   - Desenvolvedor: 
     - dev/index.md
     - dev/env-setup.md
+    - dev/supabase-environments.md
   - Usuário: user/index.md
   - Deploy: deploy.md
 

@@ -9,12 +9,48 @@ load_dotenv()
 class Settings:
     """Configurações da aplicação"""
     
-    # Supabase
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-    SUPABASE_ANON_KEY: str = os.getenv("SUPABASE_ANON_KEY", "")
+    # Ambiente
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     
-    # Database
-    DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
+    # Supabase - Configuração baseada no ambiente
+    def _get_supabase_config(self) -> tuple[str, str]:
+        """Retorna configuração do Supabase baseada no ambiente"""
+        if self.ENVIRONMENT == "testing":
+            url = os.getenv("SUPABASE_TEST_URL", "")
+            key = os.getenv("SUPABASE_TEST_ANON_KEY", "")
+        elif self.ENVIRONMENT == "production":
+            url = os.getenv("SUPABASE_PROD_URL", "")
+            key = os.getenv("SUPABASE_PROD_ANON_KEY", "")
+        else:  # development (padrão)
+            url = os.getenv("SUPABASE_URL", "")
+            key = os.getenv("SUPABASE_ANON_KEY", "")
+        
+        return url, key
+    
+    @property
+    def SUPABASE_URL(self) -> str:
+        """URL do Supabase baseada no ambiente"""
+        return self._get_supabase_config()[0]
+    
+    @property
+    def SUPABASE_ANON_KEY(self) -> str:
+        """Chave anônima do Supabase baseada no ambiente"""
+        return self._get_supabase_config()[1]
+    
+    # Database - Configuração baseada no ambiente
+    def _get_database_url(self) -> Optional[str]:
+        """Retorna URL do banco baseada no ambiente"""
+        if self.ENVIRONMENT == "testing":
+            return os.getenv("DATABASE_TEST_URL")
+        elif self.ENVIRONMENT == "production":
+            return os.getenv("DATABASE_PROD_URL")
+        else:  # development (padrão)
+            return os.getenv("DATABASE_URL")
+    
+    @property
+    def DATABASE_URL(self) -> Optional[str]:
+        """URL do banco de dados baseada no ambiente"""
+        return self._get_database_url()
     
     # API
     API_V1_STR: str = "/api/v1"
@@ -46,7 +82,11 @@ class Settings:
             
         # Verifica se as variáveis de ambiente estão configuradas
         if not self.SUPABASE_URL or not self.SUPABASE_ANON_KEY:
-            raise ValueError("SUPABASE_URL e SUPABASE_ANON_KEY devem ser configurados")
+            raise ValueError(
+                f"Configuração do Supabase não encontrada para ambiente '{self.ENVIRONMENT}'. "
+                f"Configure SUPABASE_{self.ENVIRONMENT.upper()}_URL e "
+                f"SUPABASE_{self.ENVIRONMENT.upper()}_ANON_KEY no arquivo .env"
+            )
         
         # Cria e cache o cliente
         self._supabase_client = create_client(self.SUPABASE_URL, self.SUPABASE_ANON_KEY)

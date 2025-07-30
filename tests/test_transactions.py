@@ -6,8 +6,9 @@ from src.main import app
 from fastapi.testclient import TestClient
 
 # Configurar variáveis de ambiente para testes
-os.environ['SUPABASE_URL'] = os.getenv('TEST_SUPABASE_URL', 'https://test.supabase.co')
-os.environ['SUPABASE_ANON_KEY'] = os.getenv('TEST_SUPABASE_ANON_KEY', 'test-key')
+os.environ['ENVIRONMENT'] = 'testing'
+os.environ['SUPABASE_TEST_URL'] = os.getenv('SUPABASE_TEST_URL', 'https://test.supabase.co')
+os.environ['SUPABASE_TEST_ANON_KEY'] = os.getenv('SUPABASE_TEST_ANON_KEY', 'test-key')
 
 @pytest.fixture
 def client():
@@ -110,4 +111,9 @@ def test_health_check(client):
     assert data["status"] == "healthy"
     assert "MyFinance API is running" in data["message"]
     assert "environment" in data
-    assert "debug" in data 
+    assert "debug" in data
+
+def test_environment_configuration():
+    """Testa se a configuração de ambiente está correta para testes"""
+    assert settings.ENVIRONMENT == "testing"
+    assert "test" in settings.SUPABASE_URL or settings.SUPABASE_URL == "https://test.supabase.co" 

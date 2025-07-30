@@ -6,10 +6,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 @task
-def backend(c, port=None):
+def backend(c, port=None, env=None):
     """Inicia o backend FastAPI na porta especificada ou da variável de ambiente."""
+    # Define ambiente se especificado
+    if env:
+        os.environ["ENVIRONMENT"] = env
+        print(f"Executando backend em ambiente: {env}")
+    
     api_port = port or os.getenv("API_PORT", "8002")
     api_host = os.getenv("API_HOST", "0.0.0.0")
+    environment = os.getenv("ENVIRONMENT", "development")
+    
+    print(f"Backend iniciando em {api_host}:{api_port} (ambiente: {environment})")
     c.run(f"uv run uvicorn src.main:app --reload --host {api_host} --port {api_port}")
 
 @task
@@ -35,6 +43,9 @@ def run_all(c):
 @task
 def test_backend(c):
     """Executa os testes do backend com pytest."""
+    # Força ambiente de teste
+    os.environ["ENVIRONMENT"] = "testing"
+    print("Executando testes em ambiente: testing")
     c.run("uv run pytest")
 
 @task
@@ -52,6 +63,8 @@ def test_all(c):
 @task
 def test_coverage(c):
     """Executa os testes do backend e gera relatório de cobertura."""
+    # Força ambiente de teste
+    os.environ["ENVIRONMENT"] = "testing"
     c.run("uv run pytest --cov=src --cov-report=term-missing --cov-report=html")
     print('Relatório HTML gerado em htmlcov/index.html')
 
@@ -102,6 +115,8 @@ def quality_radon_all(c):
 @task
 def test_coverage_html(c):
     """Executa os testes do backend e gera relatório de cobertura em HTML."""
+    # Força ambiente de teste
+    os.environ["ENVIRONMENT"] = "testing"
     c.run("uv run pytest --cov=src --cov-report=html")
     print('Relatório HTML gerado em htmlcov/index.html')
 
@@ -156,6 +171,9 @@ def quality_frontend_all(c):
 def coverage_all_reports(c):
     """Gera todos os relatórios de cobertura e xunit para SonarQube."""
     import os
+    # Força ambiente de teste
+    os.environ["ENVIRONMENT"] = "testing"
+    
     # Backend: coverage.xml (htmlcov) e xunit
     os.makedirs('htmlcov', exist_ok=True)
     os.makedirs('reports', exist_ok=True)
@@ -184,7 +202,16 @@ def setup_env(c):
 @task
 def check_env(c):
     """Verifica se as variáveis de ambiente necessárias estão configuradas."""
-    required_vars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
+    environment = os.getenv("ENVIRONMENT", "development")
+    print(f"Verificando configuração para ambiente: {environment}")
+    
+    if environment == "testing":
+        required_vars = ['SUPABASE_TEST_URL', 'SUPABASE_TEST_ANON_KEY']
+    elif environment == "production":
+        required_vars = ['SUPABASE_PROD_URL', 'SUPABASE_PROD_ANON_KEY']
+    else:  # development
+        required_vars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
+    
     missing_vars = []
     
     for var in required_vars:
@@ -192,9 +219,71 @@ def check_env(c):
             missing_vars.append(var)
     
     if missing_vars:
-        print(f'Variáveis de ambiente ausentes: {", ".join(missing_vars)}')
+        print(f'Variáveis de ambiente ausentes para {environment}: {", ".join(missing_vars)}')
         print('Configure estas variáveis no arquivo .env')
         return False
     else:
-        print('Todas as variáveis de ambiente necessárias estão configuradas')
-        return True 
+        print(f'Todas as variáveis de ambiente necessárias para {environment} estão configuradas')
+        return True
+
+@task
+def switch_env(c, env):
+    """Altera o ambiente atual no arquivo .env."""
+    if env not in ['development', 'testing', 'production']:
+        print('Ambiente deve ser: development, testing ou production')
+        return
+    
+    if not os.path.exists('.env'):
+        print('Arquivo .env não encontrado. Execute "uv run invoke setup-env" primeiro.')
+        return
+    
+    # Lê o arquivo .env
+    with open('.env', 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    
+    # Atualiza a linha ENVIRONMENT
+    updated = False
+    for i, line in enumerate(lines):
+        if line.startswith('ENVIRONMENT='):
+            lines[i] = f'ENVIRONMENT={env}\n'
+            updated = True
+            break
+    
+    if not updated:
+        # Adiciona se não existir
+        lines.append(f'ENVIRONMENT={env}\n')
+    
+    # Escreve de volta
+    with open('.env', 'w', encoding='utf-8') as f:
+        f.writelines(lines)
+    
+    print(f'Ambiente alterado para: {env}')
+    print('Execute "uv run invoke check-env" para verificar a configuração')
+
+@task
+def show_env(c):
+    """Mostra o ambiente atual e suas configurações."""
+    environment = os.getenv("ENVIRONMENT", "development")
+    print(f"Ambiente atual: {environment}")
+    print()
+    
+    if environment == "testing":
+        url = os.getenv("SUPABASE_TEST_URL", "Não configurado")
+        key = os.getenv("SUPABASE_TEST_ANON_KEY", "Não configurado")
+        print(f"SUPABASE_TEST_URL: {url}")
+        print(f"SUPABASE_TEST_ANON_KEY: {key[:10]}..." if len(key) > 10 else f"SUPABASE_TEST_ANON_KEY: {key}")
+    elif environment == "production":
+        url = os.getenv("SUPABASE_PROD_URL", "Não configurado")
+        key = os.getenv("SUPABASE_PROD_ANON_KEY", "Não configurado")
+        print(f"SUPABASE_PROD_URL: {url}")
+        print(f"SUPABASE_PROD_ANON_KEY: {key[:10]}..." if len(key) > 10 else f"SUPABASE_PROD_ANON_KEY: {key}")
+    else:  # development
+        url = os.getenv("SUPABASE_URL", "Não configurado")
+        key = os.getenv("SUPABASE_ANON_KEY", "Não configurado")
+        print(f"SUPABASE_URL: {url}")
+        print(f"SUPABASE_ANON_KEY: {key[:10]}..." if len(key) > 10 else f"SUPABASE_ANON_KEY: {key}")
+    
+    print()
+    print(f"API_PORT: {os.getenv('API_PORT', '8002')}")
+    print(f"DEBUG: {os.getenv('DEBUG', 'True')}")
+    print(f"LOG_LEVEL: {os.getenv('LOG_LEVEL', 'INFO')}") 
