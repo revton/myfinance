@@ -5,8 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 import uuid
 from datetime import datetime
+import logging
+import os
 
-app = FastAPI(title=settings.PROJECT_NAME)
+# Configuração de logging
+logging.basicConfig(
+    level=getattr(logging, settings.LOG_LEVEL),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    debug=settings.DEBUG
+)
 
 # Permitir CORS para facilitar o desenvolvimento
 app.add_middleware(
@@ -54,11 +66,13 @@ async def create_transaction(transaction: Transaction):
         result = supabase.table("transactions").insert(data).execute()
         
         if result.data:
+            logger.info(f"Transação criada: {result.data[0]['id']}")
             return TransactionResponse(**result.data[0])
         else:
             raise HTTPException(status_code=500, detail="Erro ao criar transação")
             
     except Exception as e:
+        logger.error(f"Erro ao criar transação: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
 @app.get("/transactions/", response_model=List[TransactionResponse])
@@ -68,11 +82,27 @@ async def list_transactions():
         
         result = supabase.table("transactions").select("*").order("created_at", desc=True).execute()
         
+        logger.info(f"Listadas {len(result.data)} transações")
         return [TransactionResponse(**transaction) for transaction in result.data]
         
     except Exception as e:
+        logger.error(f"Erro ao listar transações: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "message": "MyFinance API is running"} 
+    return {
+        "status": "healthy", 
+        "message": "MyFinance API is running",
+        "environment": os.getenv("ENVIRONMENT", "development"),
+        "debug": settings.DEBUG
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "src.main:app",
+        host=settings.API_HOST,
+        port=settings.API_PORT,
+        reload=settings.DEBUG
+    ) 

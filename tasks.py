@@ -1,10 +1,16 @@
 from invoke import task
 import os
+from dotenv import load_dotenv
+
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
 
 @task
-def backend(c, port=8002):
-    """Inicia o backend FastAPI na porta especificada (padrão: 8002), acessível na rede."""
-    c.run(f"uv run uvicorn src.main:app --reload --host 0.0.0.0 --port {port}")
+def backend(c, port=None):
+    """Inicia o backend FastAPI na porta especificada ou da variável de ambiente."""
+    api_port = port or os.getenv("API_PORT", "8002")
+    api_host = os.getenv("API_HOST", "0.0.0.0")
+    c.run(f"uv run uvicorn src.main:app --reload --host {api_host} --port {api_port}")
 
 @task
 def frontend(c):
@@ -14,9 +20,10 @@ def frontend(c):
         c.run("npm run dev -- --host")
 
 @task
-def docs(c, port=8001):
-    """Inicia a documentação MkDocs na porta especificada (padrão: 8001), acessível na rede."""
-    c.run(f"uv run mkdocs serve -a 0.0.0.0:{port}")
+def docs(c, port=None):
+    """Inicia a documentação MkDocs na porta especificada ou da variável de ambiente."""
+    docs_port = port or os.getenv("DOCS_PORT", "8001")
+    c.run(f"uv run mkdocs serve -a 0.0.0.0:{docs_port}")
 
 @task
 def run_all(c):
@@ -158,4 +165,36 @@ def coverage_all_reports(c):
         c.run("npm run test -- --coverage")
     # lcov.info já estará em reports/coverage-frontend/lcov.info
     print('Relatórios de cobertura e xunit prontos para SonarQube!')
-    print('Execute: sonar-scanner (token já configurado na variável SONAR_TOKEN)') 
+    print('Execute: sonar-scanner (token já configurado na variável SONAR_TOKEN)')
+
+@task
+def setup_env(c):
+    """Cria arquivo .env baseado no env.example se não existir."""
+    if not os.path.exists('.env'):
+        if os.path.exists('env.example'):
+            import shutil
+            shutil.copy('env.example', '.env')
+            print('Arquivo .env criado baseado no env.example')
+            print('Configure as variáveis no arquivo .env antes de executar a aplicação')
+        else:
+            print('Arquivo env.example não encontrado')
+    else:
+        print('Arquivo .env já existe')
+
+@task
+def check_env(c):
+    """Verifica se as variáveis de ambiente necessárias estão configuradas."""
+    required_vars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
+    missing_vars = []
+    
+    for var in required_vars:
+        if not os.getenv(var):
+            missing_vars.append(var)
+    
+    if missing_vars:
+        print(f'Variáveis de ambiente ausentes: {", ".join(missing_vars)}')
+        print('Configure estas variáveis no arquivo .env')
+        return False
+    else:
+        print('Todas as variáveis de ambiente necessárias estão configuradas')
+        return True 

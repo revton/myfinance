@@ -1,6 +1,10 @@
 import os
 from typing import Optional
 from supabase import create_client, Client
+from dotenv import load_dotenv
+
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
 
 class Settings:
     """Configurações da aplicação"""
@@ -15,6 +19,9 @@ class Settings:
     # API
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "MyFinance"
+    API_PORT: int = int(os.getenv("API_PORT", "8002"))
+    API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
+    DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
     
     # CORS
     BACKEND_CORS_ORIGINS: list = [
@@ -23,6 +30,9 @@ class Settings:
         "https://myfinance.vercel.app",
         "https://myfinance-frontend.vercel.app"
     ]
+    
+    # Logs
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     
     def __init__(self):
         self._supabase_client = None

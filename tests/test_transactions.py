@@ -1,108 +1,113 @@
-import sys
+import pytest
 import os
-from unittest.mock import patch, MagicMock
-
-# Ensure the project root is in the Python path
-project_root = os.path.join(os.path.dirname(__file__), '..')
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-# Set test environment variables before importing the app
-os.environ['SUPABASE_URL'] = 'https://test.supabase.co'
-os.environ['SUPABASE_ANON_KEY'] = 'test-key'
-
-from fastapi.testclient import TestClient
-from src.main import app
+from unittest.mock import Mock, patch
 from src.config import settings
+from src.main import app
+from fastapi.testclient import TestClient
 
-# Create a mock supabase client
-mock_supabase_client = MagicMock()
+# Configurar variáveis de ambiente para testes
+os.environ['SUPABASE_URL'] = os.getenv('TEST_SUPABASE_URL', 'https://test.supabase.co')
+os.environ['SUPABASE_ANON_KEY'] = os.getenv('TEST_SUPABASE_ANON_KEY', 'test-key')
 
-# Set the mock client in settings
-settings.set_mock_supabase_client(mock_supabase_client)
+@pytest.fixture
+def client():
+    """Cliente de teste para a aplicação FastAPI"""
+    return TestClient(app)
 
-client = TestClient(app)
-
-def test_create_income():
-    # Mock da resposta do Supabase
-    mock_result = MagicMock()
-    mock_result.data = [{
-        "id": "test-id",
-        "type": "income",
-        "amount": 100.0,
-        "description": "Salário",
-        "created_at": "2023-01-01T00:00:00Z",
-        "updated_at": "2023-01-01T00:00:00Z"
-    }]
-    mock_supabase_client.table.return_value.insert.return_value.execute.return_value = mock_result
+@pytest.fixture
+def mock_supabase():
+    """Mock do cliente Supabase para testes"""
+    mock_client = Mock()
     
-    response = client.post("/transactions/", json={
-        "type": "income",
-        "amount": 100.0,
-        "description": "Salário"
-    })
-    assert response.status_code == 201
-    data = response.json()
-    assert data["type"] == "income"
-    assert data["amount"] == 100.0
-    assert data["description"] == "Salário"
-
-def test_create_expense():
-    # Mock da resposta do Supabase
-    mock_result = MagicMock()
-    mock_result.data = [{
-        "id": "test-id",
-        "type": "expense",
-        "amount": 50.0,
-        "description": "Mercado",
-        "created_at": "2023-01-01T00:00:00Z",
-        "updated_at": "2023-01-01T00:00:00Z"
-    }]
-    mock_supabase_client.table.return_value.insert.return_value.execute.return_value = mock_result
+    # Mock para inserção de transação
+    mock_insert = Mock()
+    mock_insert.execute.return_value = Mock(
+        data=[{
+            'id': 'test-id-123',
+            'type': 'income',
+            'amount': 100.0,
+            'description': 'Test transaction',
+            'created_at': '2024-01-01T00:00:00Z',
+            'updated_at': '2024-01-01T00:00:00Z'
+        }]
+    )
+    mock_client.table.return_value.insert.return_value = mock_insert
     
-    response = client.post("/transactions/", json={
-        "type": "expense",
-        "amount": 50.0,
-        "description": "Mercado"
-    })
-    assert response.status_code == 201
-    data = response.json()
-    assert data["type"] == "expense"
-    assert data["amount"] == 50.0
-    assert data["description"] == "Mercado"
+    # Mock para listagem de transações
+    mock_select = Mock()
+    mock_select.order.return_value.execute.return_value = Mock(
+        data=[{
+            'id': 'test-id-123',
+            'type': 'income',
+            'amount': 100.0,
+            'description': 'Test transaction',
+            'created_at': '2024-01-01T00:00:00Z',
+            'updated_at': '2024-01-01T00:00:00Z'
+        }]
+    )
+    mock_client.table.return_value.select.return_value = mock_select
+    
+    return mock_client
 
-def test_list_transactions():
-    # Mock da resposta do Supabase
-    mock_result = MagicMock()
-    mock_result.data = [
-        {
-            "id": "test-id-1",
+def test_create_transaction_success(client, mock_supabase):
+    """Testa criação bem-sucedida de transação"""
+    with patch.object(settings, 'supabase_client', mock_supabase):
+        response = client.post("/transactions/", json={
             "type": "income",
             "amount": 100.0,
-            "description": "Salário",
-            "created_at": "2023-01-01T00:00:00Z",
-            "updated_at": "2023-01-01T00:00:00Z"
-        },
-        {
-            "id": "test-id-2",
-            "type": "expense",
-            "amount": 50.0,
-            "description": "Mercado",
-            "created_at": "2023-01-01T00:00:00Z",
-            "updated_at": "2023-01-01T00:00:00Z"
-        }
-    ]
-    mock_supabase_client.table.return_value.select.return_value.order.return_value.execute.return_value = mock_result
-    
-    response = client.get("/transactions/")
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) == 2
+            "description": "Test transaction"
+        })
+        
+        assert response.status_code == 201
+        data = response.json()
+        assert data["type"] == "income"
+        assert data["amount"] == 100.0
+        assert data["description"] == "Test transaction"
+        assert "id" in data
+        assert "created_at" in data
+        assert "updated_at" in data
 
-def test_health_check():
+def test_create_transaction_invalid_type(client):
+    """Testa criação de transação com tipo inválido"""
+    response = client.post("/transactions/", json={
+        "type": "invalid",
+        "amount": 100.0,
+        "description": "Test transaction"
+    })
+    
+    assert response.status_code == 400
+    assert "Tipo deve ser 'income' ou 'expense'" in response.json()["detail"]
+
+def test_create_transaction_invalid_amount(client):
+    """Testa criação de transação com valor inválido"""
+    response = client.post("/transactions/", json={
+        "type": "income",
+        "amount": -100.0,
+        "description": "Test transaction"
+    })
+    
+    assert response.status_code == 400
+    assert "Valor deve ser maior que zero" in response.json()["detail"]
+
+def test_list_transactions_success(client, mock_supabase):
+    """Testa listagem bem-sucedida de transações"""
+    with patch.object(settings, 'supabase_client', mock_supabase):
+        response = client.get("/transactions/")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) == 1
+        assert data[0]["type"] == "income"
+        assert data[0]["amount"] == 100.0
+
+def test_health_check(client):
+    """Testa endpoint de health check"""
     response = client.get("/health")
+    
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert "MyFinance API is running" in data["message"] 
+    assert "MyFinance API is running" in data["message"]
+    assert "environment" in data
+    assert "debug" in data 
