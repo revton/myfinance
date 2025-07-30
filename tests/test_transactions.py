@@ -63,27 +63,29 @@ def test_create_transaction_success(client, mock_supabase):
         assert "created_at" in data
         assert "updated_at" in data
 
-def test_create_transaction_invalid_type(client):
+def test_create_transaction_invalid_type(client, mock_supabase):
     """Testa criação de transação com tipo inválido"""
-    response = client.post("/transactions/", json={
-        "type": "invalid",
-        "amount": 100.0,
-        "description": "Test transaction"
-    })
-    
-    assert response.status_code == 400
-    assert "Tipo deve ser 'income' ou 'expense'" in response.json()["detail"]
+    with patch.object(settings, 'supabase_client', mock_supabase):
+        response = client.post("/transactions/", json={
+            "type": "invalid",
+            "amount": 100.0,
+            "description": "Test transaction"
+        })
+        
+        assert response.status_code == 400
+        assert "Tipo deve ser 'income' ou 'expense'" in response.json()["detail"]
 
-def test_create_transaction_invalid_amount(client):
+def test_create_transaction_invalid_amount(client, mock_supabase):
     """Testa criação de transação com valor inválido"""
-    response = client.post("/transactions/", json={
-        "type": "income",
-        "amount": -100.0,
-        "description": "Test transaction"
-    })
-    
-    assert response.status_code == 400
-    assert "Valor deve ser maior que zero" in response.json()["detail"]
+    with patch.object(settings, 'supabase_client', mock_supabase):
+        response = client.post("/transactions/", json={
+            "type": "income",
+            "amount": -100.0,
+            "description": "Test transaction"
+        })
+        
+        assert response.status_code == 400
+        assert "Valor deve ser maior que zero" in response.json()["detail"]
 
 def test_list_transactions_success(client, mock_supabase):
     """Testa listagem bem-sucedida de transações"""

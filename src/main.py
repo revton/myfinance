@@ -71,6 +71,9 @@ async def create_transaction(transaction: Transaction):
         else:
             raise HTTPException(status_code=500, detail="Erro ao criar transação")
             
+    except HTTPException:
+        # Re-raise HTTPException para manter o status code correto
+        raise
     except Exception as e:
         logger.error(f"Erro ao criar transação: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
@@ -85,6 +88,9 @@ async def list_transactions():
         logger.info(f"Listadas {len(result.data)} transações")
         return [TransactionResponse(**transaction) for transaction in result.data]
         
+    except HTTPException:
+        # Re-raise HTTPException para manter o status code correto
+        raise
     except Exception as e:
         logger.error(f"Erro ao listar transações: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")

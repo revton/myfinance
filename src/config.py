@@ -59,6 +59,16 @@ class Settings:
         self._supabase_client = create_client(self.SUPABASE_URL, self.SUPABASE_ANON_KEY)
         return self._supabase_client
     
+    @supabase_client.setter
+    def supabase_client(self, value):
+        """Setter para permitir mocking nos testes"""
+        self._supabase_client = value
+    
+    @supabase_client.deleter
+    def supabase_client(self):
+        """Deleter para permitir mocking nos testes"""
+        self._supabase_client = None
+    
     def set_mock_supabase_client(self, mock_client):
         """Método para definir um cliente mock durante os testes"""
         self._supabase_client = mock_client
