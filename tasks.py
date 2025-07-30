@@ -200,11 +200,7 @@ def check_env(c):
     environment = os.getenv("ENVIRONMENT", "development")
     print(f"Verificando configuração para ambiente: {environment}")
     
-    if environment == "production":
-        required_vars = ['SUPABASE_PROD_URL', 'SUPABASE_PROD_ANON_KEY']
-    else:  # development
-        required_vars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
-    
+    required_vars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
     missing_vars = []
     
     for var in required_vars:
@@ -212,11 +208,11 @@ def check_env(c):
             missing_vars.append(var)
     
     if missing_vars:
-        print(f'Variáveis de ambiente ausentes para {environment}: {", ".join(missing_vars)}')
+        print(f'Variáveis de ambiente ausentes: {", ".join(missing_vars)}')
         print('Configure estas variáveis no arquivo .env')
         return False
     else:
-        print(f'Todas as variáveis de ambiente necessárias para {environment} estão configuradas')
+        print(f'Variáveis de ambiente configuradas para {environment}')
         return True
 
 @task
@@ -251,6 +247,7 @@ def switch_env(c, env):
         f.writelines(lines)
     
     print(f'Ambiente alterado para: {env}')
+    print('⚠️  IMPORTANTE: Configure SUPABASE_URL e SUPABASE_ANON_KEY para o novo ambiente!')
     print('Execute "uv run invoke check-env" para verificar a configuração')
 
 @task
@@ -260,16 +257,10 @@ def show_env(c):
     print(f"Ambiente atual: {environment}")
     print()
     
-    if environment == "production":
-        url = os.getenv("SUPABASE_PROD_URL", "Não configurado")
-        key = os.getenv("SUPABASE_PROD_ANON_KEY", "Não configurado")
-        print(f"SUPABASE_PROD_URL: {url}")
-        print(f"SUPABASE_PROD_ANON_KEY: {key[:10]}..." if len(key) > 10 else f"SUPABASE_PROD_ANON_KEY: {key}")
-    else:  # development
-        url = os.getenv("SUPABASE_URL", "Não configurado")
-        key = os.getenv("SUPABASE_ANON_KEY", "Não configurado")
-        print(f"SUPABASE_URL: {url}")
-        print(f"SUPABASE_ANON_KEY: {key[:10]}..." if len(key) > 10 else f"SUPABASE_ANON_KEY: {key}")
+    url = os.getenv("SUPABASE_URL", "Não configurado")
+    key = os.getenv("SUPABASE_ANON_KEY", "Não configurado")
+    print(f"SUPABASE_URL: {url}")
+    print(f"SUPABASE_ANON_KEY: {key[:10]}..." if len(key) > 10 else f"SUPABASE_ANON_KEY: {key}")
     
     print()
     print(f"API_PORT: {os.getenv('API_PORT', '8002')}")

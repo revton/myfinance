@@ -100,16 +100,11 @@ Edite o arquivo `.env`:
 ENVIRONMENT=development
 
 # =============================================================================
-# SUPABASE - DESENVOLVIMENTO
+# SUPABASE
 # =============================================================================
+# Configure estas variáveis de acordo com o ambiente atual
 SUPABASE_URL=https://your-dev-project.supabase.co
 SUPABASE_ANON_KEY=your-dev-supabase-anon-key
-
-# =============================================================================
-# SUPABASE - PRODUÇÃO
-# =============================================================================
-SUPABASE_PROD_URL=https://your-prod-project.supabase.co
-SUPABASE_PROD_ANON_KEY=your-prod-supabase-anon-key
 ```
 
 ## 🚀 Comandos para Gerenciar Ambientes
@@ -128,6 +123,8 @@ uv run invoke switch-env development
 uv run invoke switch-env production
 ```
 
+**⚠️ IMPORTANTE**: Após alterar o ambiente, você deve configurar `SUPABASE_URL` e `SUPABASE_ANON_KEY` para o novo ambiente!
+
 ### Verificar Configuração
 ```bash
 uv run invoke check-env
@@ -140,6 +137,42 @@ uv run invoke backend --env=development
 
 # Backend em ambiente de produção
 uv run invoke backend --env=production
+```
+
+## 🔄 Workflow de Mudança de Ambiente
+
+### Para Desenvolvimento
+```bash
+# 1. Alterar ambiente
+uv run invoke switch-env development
+
+# 2. Configurar credenciais de desenvolvimento
+# Editar .env:
+# SUPABASE_URL=https://your-dev-project.supabase.co
+# SUPABASE_ANON_KEY=your-dev-supabase-anon-key
+
+# 3. Verificar configuração
+uv run invoke check-env
+
+# 4. Executar aplicação
+uv run invoke backend
+```
+
+### Para Produção
+```bash
+# 1. Alterar ambiente
+uv run invoke switch-env production
+
+# 2. Configurar credenciais de produção
+# Editar .env:
+# SUPABASE_URL=https://your-prod-project.supabase.co
+# SUPABASE_ANON_KEY=your-prod-supabase-anon-key
+
+# 3. Verificar configuração
+uv run invoke check-env
+
+# 4. Executar aplicação
+uv run invoke backend
 ```
 
 ## 🧪 Testes com Mocks
@@ -201,9 +234,9 @@ Os testes automaticamente:
 ## 🐛 Troubleshooting
 
 ### Erro: "Configuração do Supabase não encontrada"
-- Verifique se as variáveis de ambiente estão configuradas
+- Verifique se `SUPABASE_URL` e `SUPABASE_ANON_KEY` estão configuradas
 - Execute `uv run invoke show-env` para verificar
-- Confirme se o ambiente está correto
+- Confirme se as credenciais correspondem ao ambiente atual
 
 ### Erro: "Connection refused"
 - Verifique se as URLs do Supabase estão corretas
@@ -211,7 +244,7 @@ Os testes automaticamente:
 - Teste a conexão no Supabase Dashboard
 
 ### Dados não aparecem
-- Verifique se está no ambiente correto
+- Verifique se está no ambiente correto (`ENVIRONMENT`)
 - Confirme se as tabelas foram criadas
 - Verifique as políticas RLS
 
