@@ -58,8 +58,24 @@ def disable_database():
             mock_session_local.return_value = mock_session
             yield
 
-def test_create_transaction_success(client, mock_get_db):
+def test_create_transaction_success(client):
     """Testa criação bem-sucedida de transação"""
+    # Mock específico para criação
+    mock_session = Mock(spec=Session)
+    
+    # Mock que simula o comportamento do SQLAlchemy
+    def mock_refresh(mock_obj):
+        # Simula o que acontece quando o SQLAlchemy faz refresh
+        mock_obj.created_at = datetime.now()
+        mock_obj.updated_at = datetime.now()
+    
+    mock_session.add = Mock()
+    mock_session.commit = Mock()
+    mock_session.refresh = Mock(side_effect=mock_refresh)
+    
+    def mock_get_db():
+        yield mock_session
+    
     with patch('src.main.get_db', mock_get_db):
         response = client.post("/transactions/", json={
             "type": "income",
