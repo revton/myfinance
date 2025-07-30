@@ -21,15 +21,14 @@ def backend(c, port=None, env=None):
     c.run(f"uv run uvicorn src.main:app --reload --host {api_host} --port {api_port}")
 
 @task
-def frontend(c):
-    """Inicia o frontend React (Vite) permitindo acesso externo."""
-    with c.cd('frontend'):
-        c.run("npm install")
-        c.run("npm run dev -- --host")
+def frontend(c, port=5173):
+    """Inicia o frontend React/Vite na porta especificada (padrão: 5173)."""
+    frontend_port = port or os.getenv("VITE_PORT", "5173")
+    c.run(f"cd frontend && uv run npm run dev -- --port {frontend_port}")
 
 @task
-def docs(c, port=None):
-    """Inicia a documentação MkDocs na porta especificada ou da variável de ambiente."""
+def docs(c, port=8001):
+    """Inicia a documentação MkDocs na porta especificada (padrão: 8001), acessível na rede."""
     docs_port = port or os.getenv("DOCS_PORT", "8001")
     c.run(f"uv run mkdocs serve -a 0.0.0.0:{docs_port}")
 
@@ -266,3 +265,91 @@ def show_env(c):
     print(f"API_PORT: {os.getenv('API_PORT', '8002')}")
     print(f"DEBUG: {os.getenv('DEBUG', 'True')}")
     print(f"LOG_LEVEL: {os.getenv('LOG_LEVEL', 'INFO')}") 
+
+@task
+def generate_schema(c):
+    """Gera schema SQL baseado nos modelos Pydantic do FastAPI."""
+    print("Gerando schema SQL baseado nos modelos Pydantic...")
+    c.run("uv run python scripts/generate_schema.py")
+
+@task
+def test_schema(c):
+    """Testa se o schema foi aplicado corretamente no Supabase."""
+    print("Testando schema aplicado no Supabase...")
+    c.run("uv run python scripts/generate_schema.py --test")
+
+@task
+def setup_database(c):
+    """Configura o banco de dados no Supabase baseado nos modelos Pydantic."""
+    print("Configurando banco de dados baseado nos modelos Pydantic...")
+    print("1. Gerando schema SQL...")
+    c.run("uv run invoke generate-schema")
+    print()
+    print("2. Execute o SQL gerado no Supabase SQL Editor")
+    print("3. Teste a configuração com: uv run invoke test-schema") 
+
+# =============================================================================
+# TAREFAS DE MIGRAÇÃO COM ALEMBIC
+# =============================================================================
+
+@task
+def migrate_init(c):
+    """Cria a migração inicial baseada nos modelos Pydantic."""
+    print("Criando migração inicial baseada nos modelos Pydantic...")
+    c.run("uv run python scripts/migrate_database.py")
+
+@task
+def migrate_generate(c, message):
+    """Gera uma nova migração baseada nos modelos."""
+    print(f"Gerando migração: {message}")
+    c.run(f'uv run alembic revision --autogenerate -m "{message}"')
+
+@task
+def migrate_upgrade(c):
+    """Aplica as migrações pendentes."""
+    print("Aplicando migrações pendentes...")
+    c.run("uv run alembic upgrade head")
+
+@task
+def migrate_status(c):
+    """Mostra o status das migrações."""
+    print("Status das migrações:")
+    c.run("uv run alembic current")
+
+@task
+def migrate_history(c):
+    """Mostra o histórico de migrações."""
+    print("Histórico de migrações:")
+    c.run("uv run alembic history")
+
+@task
+def migrate_downgrade(c, revision):
+    """Reverte para uma revisão específica."""
+    print(f"Revertendo para revisão: {revision}")
+    c.run(f"uv run alembic downgrade {revision}")
+
+@task
+def setup_migrations(c):
+    """Configura o sistema de migrações completo."""
+    print("🚀 Configurando sistema de migrações com Pydantic e Alembic")
+    print("=" * 60)
+    
+    # Verifica ambiente
+    if not check_env(c):
+        print("❌ Configure o ambiente primeiro")
+        return
+    
+    # Verifica DATABASE_URL
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        print("❌ DATABASE_URL não configurado")
+        print("💡 Configure DATABASE_URL no .env com a URL do banco Supabase")
+        return
+    
+    print("✅ Ambiente configurado")
+    print()
+    print("🎯 Próximos passos:")
+    print("1. Execute: uv run invoke migrate-init")
+    print("2. Revise a migração gerada em alembic/versions/")
+    print("3. Execute: uv run invoke migrate-upgrade")
+    print("4. Teste com: uv run invoke test-backend") 
