@@ -1,0 +1,126 @@
+name: Test Local Actions
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Tipo de teste'
+        required: true
+        default: 'backend'
+        type: choice
+        options:
+        - backend
+        - frontend
+        - deploy
+        - all
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_type == 'backend' || github.event.inputs.test_type == 'all'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest httpx pytest-cov python-multipart
+
+      - name: Run backend tests
+        run: |
+          PYTHONPATH=$PYTHONPATH:. python -m pytest tests/ -v --cov=src --cov-report=xml --tb=short
+        env:
+          SUPABASE_URL: "https://test.supabase.co"
+          SUPABASE_ANON_KEY: "test-key"
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_type == 'frontend' || github.event.inputs.test_type == 'all'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npm test -- --coverage --run
+        env:
+          CI: true
+          VITE_API_URL: "http://localhost:8002"
+
+  test-deploy:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_type == 'deploy' || github.event.inputs.test_type == 'all'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Test Vercel Token
+        working-directory: ./frontend
+        run: |
+          echo "Testando configuracao do Vercel..."
+          echo "Token length: ${#VERCEL_TOKEN}"
+          
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "VERCEL_TOKEN esta vazio!"
+            echo "Configure o token em: Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          
+          echo "Token configurado (length: ${#VERCEL_TOKEN})"
+          
+          echo "Testando autenticacao..."
+          vercel whoami --token $VERCEL_TOKEN || {
+            echo "Token invalido ou expirado!"
+            echo "Gere um novo token em: https://vercel.com/account/tokens"
+            exit 1
+          }
+          
+          echo "Token valido!"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Simulate Deploy (Dry Run)
+        working-directory: ./frontend
+        run: |
+          echo "Simulando deploy (dry run)..."
+          echo "Comando que seria executado:"
+          echo "vercel --prod --token $VERCEL_TOKEN --yes"
+          echo "Deploy simulado com sucesso!"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} 
