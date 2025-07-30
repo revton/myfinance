@@ -18,7 +18,20 @@ def backend(c, port=None, env=None):
     environment = os.getenv("ENVIRONMENT", "development")
     
     print(f"Backend iniciando em {api_host}:{api_port} (ambiente: {environment})")
+    print("Usando SQLAlchemy direto com Supabase")
     c.run(f"uv run uvicorn src.main:app --reload --host {api_host} --port {api_port}")
+
+@task
+def test_sqlalchemy_migration(c):
+    """Testa a migração para SQLAlchemy direto."""
+    print("Testando migração para SQLAlchemy...")
+    c.run("uv run python scripts/test_sqlalchemy_migration.py")
+
+@task
+def test_database_connection(c):
+    """Testa a conexão direta com o banco via SQLAlchemy."""
+    print("Testando conexão com banco via SQLAlchemy...")
+    c.run("uv run python scripts/test_supabase_sqlalchemy.py")
 
 @task
 def frontend(c, port=5173):

@@ -5,11 +5,9 @@ Baseados nos modelos Pydantic para integração com Alembic
 from datetime import datetime
 from sqlalchemy import Column, String, Float, Text, DateTime, CheckConstraint, Index
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
+from .database_sqlalchemy import Base
 import uuid
-
-Base = declarative_base()
 
 class Transaction(Base):
     """Modelo SQLAlchemy para transações"""
