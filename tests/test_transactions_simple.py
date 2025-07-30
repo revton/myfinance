@@ -104,7 +104,13 @@ def test_list_transactions_success_mocked(client):
     def mock_get_db():
         yield mock_session
     
-    with patch('src.main.get_db', mock_get_db):
+    # Patch mais específico para garantir que o mock seja aplicado
+    with patch('src.main.get_db', mock_get_db), \
+         patch('src.database_sqlalchemy.SessionLocal') as mock_session_local:
+        
+        # Configura o mock da SessionLocal para retornar nossa sessão mock
+        mock_session_local.return_value = mock_session
+        
         response = client.get("/transactions/")
         
         assert response.status_code == 200
