@@ -211,6 +211,11 @@ Acesse em [http://localhost:9000](http://localhost:9000) (usuário/senha padrão
 
 - O projeto será dockerizado para facilitar o deploy e o uso em diferentes ambientes.
 
+## Documentação Técnica
+
+### Migração para SQLAlchemy
+- [Resumo da Migração SQLAlchemy](migration-sqlalchemy-summary.md) - Documentação completa da migração do Supabase para SQLAlchemy direto
+
 ## Endpoints de Receitas e Despesas
 
 ### Criar Receita ou Despesa
