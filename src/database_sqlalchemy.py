@@ -37,8 +37,10 @@ def get_database_url():
 # Engine SQLAlchemy
 engine = create_engine(
     get_database_url(),
-    poolclass=StaticPool,  # Pool estático para evitar problemas de conexão
+    pool_size=5,           # Pool de conexões
+    max_overflow=10,       # Conexões extras permitidas
     pool_pre_ping=True,    # Verifica conexão antes de usar
+    pool_recycle=3600,     # Recicla conexões a cada hora
     echo=settings.DEBUG    # Log SQL em modo debug
 )
 
