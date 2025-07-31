@@ -31,7 +31,9 @@ class Settings:
         "http://localhost:3000",
         "http://localhost:5173",
         "https://myfinance.vercel.app",
-        "https://myfinance-frontend.vercel.app"
+        "https://myfinance-frontend.vercel.app",
+        "https://myfinance-three.vercel.app",  # URL atual do frontend em produção
+        "https://myfinance-backend-xcct.onrender.com"  # URL atual do backend em produção
     ]
     
     # Logs
