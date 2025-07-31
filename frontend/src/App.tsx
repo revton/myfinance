@@ -38,10 +38,32 @@ function App() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    axios.get('/transactions/').then(res => {
-      const data = Array.isArray(res.data) ? res.data : [];
-      setTransactions(data as Transaction[]);
-    }).catch(() => setTransactions([]));
+    const abortController = new AbortController();
+    
+    const loadTransactions = async () => {
+      try {
+        const response = await axios.get('/transactions/', {
+          signal: abortController.signal,
+          timeout: 10000
+        });
+        
+        const data = Array.isArray(response.data) ? response.data : [];
+        setTransactions(data as Transaction[]);
+      } catch (error) {
+        // Se foi cancelado, não faz nada
+        if (axios.isCancel(error)) {
+          return;
+        }
+        setTransactions([]);
+      }
+    };
+
+    loadTransactions();
+    
+    // Cleanup function para cancelar requisições pendentes
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
