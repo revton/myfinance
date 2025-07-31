@@ -33,4 +33,27 @@ reports/
 # Variáveis de ambiente
 .env
 .env.local
-.env.*.local 
+.env.*.local
+
+# Build artifacts
+src/*.egg-info/
+*.egg-info/
+
+# Coverage reports
+coverage/
+frontend/coverage/
+
+# Temporary files
+*.bak
+*.tmp
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db 
