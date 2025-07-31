@@ -16,7 +16,7 @@ Oferecer uma solução completa, gratuita e moderna para controle de finanças p
 | **Fase Atual** | Fase 1 - MVP ✅ (Concluída) |
 | **Próxima Fase** | Fase 2 - Categorias e Autenticação |
 | **Tecnologias** | FastAPI + React + Supabase |
-| **Deploy** | Render.com (Backend) + Vercel (Frontend) |
+| **Deploy** | Vercel (Frontend) + Local (Backend) |
 | **Documentação** | GitHub Pages ✅ |
 | **CI/CD** | GitHub Actions ✅ |
 
@@ -34,7 +34,7 @@ Oferecer uma solução completa, gratuita e moderna para controle de finanças p
 - ✅ **CORS**: Configurado para desenvolvimento
 - ✅ **Banco de Dados**: Supabase PostgreSQL
 - ✅ **Testes**: Suite completa com mock do Supabase
-- ✅ **Deploy**: Render.com configurado
+- ✅ **Deploy**: Vercel (Frontend) configurado
 
 #### **Frontend (React + Material-UI)**
 - ✅ **Interface Principal**: Formulário de transações
@@ -394,7 +394,7 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 - **Backend**: FastAPI + Python 3.11
 - **Frontend**: React 18 + TypeScript + Material-UI
 - **Database**: Supabase (PostgreSQL)
-- **Deploy**: Render.com + Vercel
+- **Deploy**: Vercel (Frontend) + Local (Backend)
 - **CI/CD**: GitHub Actions
 - **Docs**: MkDocs + GitHub Pages
 
@@ -485,7 +485,7 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 
 #### **Infraestrutura (Mensal)**
 - **Supabase Pro**: $25/mês (até 100k usuários)
-- **Render.com**: $7/mês (backend)
+- **Render.com**: $7/mês (backend) - Não configurado
 - **Vercel Pro**: $20/mês (frontend)
 - **Monitoring**: $29/mês (Sentry)
 - **Total**: ~$81/mês

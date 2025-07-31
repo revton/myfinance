@@ -41,4 +41,5 @@ uv run invoke docs       # Documentação na porta 8001
 - **Backend**: FastAPI, Supabase
 - **Frontend**: React, Vite, Material-UI
 - **Documentação**: MkDocs
+- **Deploy**: Vercel (Frontend) + Local (Backend)
 - **Testes**: pytest, Vitest 

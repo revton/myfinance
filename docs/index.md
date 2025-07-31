@@ -8,7 +8,7 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 - ✅ Categorização de transações
 - ✅ Relatórios financeiros detalhados
 - ✅ Interface web moderna e responsiva
-- ✅ Deploy gratuito no Render.com
+- ✅ Deploy automático no Vercel (Frontend)
 
 ## 📚 Navegação
 
@@ -22,7 +22,7 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 - **Backend**: FastAPI + SQLAlchemy + Supabase
 - **Frontend**: React 18 + TypeScript + Material-UI
 - **Documentação**: MkDocs + Material Theme
-- **Deploy**: Render.com (gratuito)
+- **Deploy**: Vercel (Frontend) + Local (Backend)
 
 ## 🔧 Status das Correções
 
@@ -40,6 +40,14 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 - **Prioridade**: Baixa (funcionalidades core funcionando)
 - **Plano**: Corrigir em iteração futura
 
+### Deploy Automático
+- **Status**: ⚠️ **Parcialmente Funcionando**
+- **Frontend (Vercel)**: ✅ Funcionando - Deploy automático ativo
+- **Backend (Render)**: ❌ Não funcionando - Deploy manual necessário
+- **Impacto**: Backend precisa ser executado localmente para desenvolvimento
+- **Prioridade**: Média (funcionalidades core funcionando localmente)
+- **Plano**: Configurar deploy do backend em iteração futura
+
 ## 📊 Status do Projeto
 
 | Métrica | Valor |
@@ -47,7 +55,7 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 | **Fase Atual** | ✅ Fase 1 - MVP (Concluída) |
 | **Próxima Fase** | 📋 Fase 2 - Categorias e Autenticação |
 | **Tecnologias** | FastAPI + React + Supabase |
-| **Deploy** | Render.com + Vercel |
+| **Deploy** | Vercel (Frontend) + Local (Backend) |
 
 ---
 
