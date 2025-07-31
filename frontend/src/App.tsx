@@ -43,21 +43,44 @@ interface TransactionForm {
 
 function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<TransactionForm>({ type: 'income', amount: 0, description: '' });
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    console.log('Carregando transações...');
-    axios.get('/transactions/')
-      .then(res => {
-        console.log('Transações carregadas:', res.data);
-        const data = Array.isArray(res.data) ? res.data : [];
-        setTransactions(data as Transaction[]);
-      })
-      .catch(error => {
-        console.error('Erro ao carregar transações:', error);
+    const loadTransactions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('🔄 Iniciando carregamento de transações...');
+        const response = await axios.get('/transactions/');
+        console.log('✅ Resposta da API:', response);
+        console.log('📊 Dados recebidos:', response.data);
+        
+        if (Array.isArray(response.data)) {
+          console.log(`📋 ${response.data.length} transações encontradas`);
+          setTransactions(response.data as Transaction[]);
+        } else {
+          console.warn('⚠️ Resposta não é um array:', response.data);
+          setTransactions([]);
+        }
+      } catch (error) {
+        console.error('❌ Erro ao carregar transações:', error);
+        if (axios.isAxiosError(error)) {
+          console.error('📡 Status:', error.response?.status);
+          console.error('📡 Dados:', error.response?.data);
+          setError(`Erro ${error.response?.status}: ${error.response?.data?.detail || error.message}`);
+        } else {
+          setError('Erro desconhecido ao carregar transações');
+        }
         setTransactions([]);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTransactions();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,24 +147,36 @@ function App() {
           <Typography variant="h6" gutterBottom>
             Transações
           </Typography>
-          <List>
-            {transactions.map((t, i) => (
-              <React.Fragment key={i}>
-                <ListItem>
-                  <ListItemText
-                    primary={`${t.type === 'income' ? 'Receita' : 'Despesa'}: R$ ${t.amount.toFixed(2)}`}
-                    secondary={t.description}
-                  />
-                </ListItem>
-                {i < transactions.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-            {transactions.length === 0 && (
-              <Typography color="text.secondary" align="center" sx={{ mt: 2 }}>
-                Nenhuma transação cadastrada.
-              </Typography>
-            )}
-          </List>
+          {loading && (
+            <Typography color="text.secondary" align="center" sx={{ mt: 2 }}>
+              Carregando transações...
+            </Typography>
+          )}
+          {error && (
+            <Typography color="error" align="center" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+          {!loading && !error && (
+            <List>
+              {transactions.map((t, i) => (
+                <React.Fragment key={i}>
+                  <ListItem>
+                    <ListItemText
+                      primary={`${t.type === 'income' ? 'Receita' : 'Despesa'}: R$ ${t.amount.toFixed(2)}`}
+                      secondary={t.description}
+                    />
+                  </ListItem>
+                  {i < transactions.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+              {transactions.length === 0 && (
+                <Typography color="text.secondary" align="center" sx={{ mt: 2 }}>
+                  Nenhuma transação cadastrada.
+                </Typography>
+              )}
+            </List>
+          )}
         </Paper>
       </Container>
     </ThemeProvider>
