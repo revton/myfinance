@@ -1,12 +1,13 @@
+"""
+FastAPI com SQLAlchemy direto - alternativa ao Supabase
+"""
 from fastapi import FastAPI, status, HTTPException, Depends
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import text
 from .config import settings
-from .models import TransactionCreate, Transaction, TransactionList, TransactionUpdate
-from .database_sqlalchemy import get_db, create_tables, test_connection
-from .database import Transaction as TransactionModel
+from .models import TransactionCreate, Transaction, TransactionUpdate
+from .database_direct import get_db, create_tables, Transaction as DBTransaction
 import uuid
 from datetime import datetime
 import logging
@@ -35,40 +36,29 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    """Evento executado na inicialização da aplicação"""
-    try:
-        # Testa conexão com banco
-        if test_connection():
-            logger.info("Conexão com banco estabelecida com sucesso")
-        else:
-            logger.error("Falha ao conectar com banco")
-        
-        # Cria tabelas se não existirem
-        create_tables()
-        logger.info("Aplicação inicializada com sucesso")
-    except Exception as e:
-        logger.error(f"Erro na inicialização: {e}")
-        raise
+    """Criar tabelas na inicialização"""
+    create_tables()
+    logger.info("Tabelas criadas/verificadas")
 
 @app.post("/transactions/", status_code=status.HTTP_201_CREATED, response_model=Transaction)
 async def create_transaction(transaction: TransactionCreate, db: Session = Depends(get_db)):
     try:
-        # Cria instância do modelo SQLAlchemy
-        db_transaction = TransactionModel(
+        # Criar objeto do banco
+        db_transaction = DBTransaction(
             id=uuid.uuid4(),
             type=transaction.type.value,
             amount=transaction.amount,
             description=transaction.description
         )
         
-        # Adiciona e commita
+        # Salvar no banco
         db.add(db_transaction)
         db.commit()
         db.refresh(db_transaction)
         
         logger.info(f"Transação criada: {db_transaction.id}")
         
-        # Converte para modelo Pydantic
+        # Converter para modelo de resposta
         return Transaction(
             id=str(db_transaction.id),
             type=db_transaction.type,
@@ -77,10 +67,7 @@ async def create_transaction(transaction: TransactionCreate, db: Session = Depen
             created_at=db_transaction.created_at,
             updated_at=db_transaction.updated_at
         )
-            
-    except HTTPException:
-        # Re-raise HTTPException para manter o status code correto
-        raise
+        
     except Exception as e:
         db.rollback()
         logger.error(f"Erro ao criar transação: {str(e)}")
@@ -89,12 +76,12 @@ async def create_transaction(transaction: TransactionCreate, db: Session = Depen
 @app.get("/transactions/", response_model=List[Transaction])
 async def list_transactions(db: Session = Depends(get_db)):
     try:
-        # Busca todas as transações ordenadas por data de criação
-        db_transactions = db.query(TransactionModel).order_by(TransactionModel.created_at.desc()).all()
+        # Buscar todas as transações ordenadas por data
+        db_transactions = db.query(DBTransaction).order_by(DBTransaction.created_at.desc()).all()
         
         logger.info(f"Listadas {len(db_transactions)} transações")
         
-        # Converte para modelos Pydantic
+        # Converter para modelos de resposta
         return [
             Transaction(
                 id=str(t.id),
@@ -106,9 +93,6 @@ async def list_transactions(db: Session = Depends(get_db)):
             ) for t in db_transactions
         ]
         
-    except HTTPException:
-        # Re-raise HTTPException para manter o status code correto
-        raise
     except Exception as e:
         logger.error(f"Erro ao listar transações: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
@@ -116,15 +100,15 @@ async def list_transactions(db: Session = Depends(get_db)):
 @app.get("/transactions/{transaction_id}", response_model=Transaction)
 async def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
     try:
-        # Busca transação por ID
-        db_transaction = db.query(TransactionModel).filter(TransactionModel.id == transaction_id).first()
+        # Buscar transação específica
+        db_transaction = db.query(DBTransaction).filter(DBTransaction.id == transaction_id).first()
         
         if not db_transaction:
             raise HTTPException(status_code=404, detail="Transação não encontrada")
         
         logger.info(f"Transação encontrada: {transaction_id}")
         
-        # Converte para modelo Pydantic
+        # Converter para modelo de resposta
         return Transaction(
             id=str(db_transaction.id),
             type=db_transaction.type,
@@ -143,13 +127,13 @@ async def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
 @app.put("/transactions/{transaction_id}", response_model=Transaction)
 async def update_transaction(transaction_id: str, transaction: TransactionUpdate, db: Session = Depends(get_db)):
     try:
-        # Busca transação existente
-        db_transaction = db.query(TransactionModel).filter(TransactionModel.id == transaction_id).first()
+        # Buscar transação existente
+        db_transaction = db.query(DBTransaction).filter(DBTransaction.id == transaction_id).first()
         
         if not db_transaction:
             raise HTTPException(status_code=404, detail="Transação não encontrada")
         
-        # Atualiza campos fornecidos
+        # Atualizar campos fornecidos
         if transaction.type is not None:
             db_transaction.type = transaction.type.value
         if transaction.amount is not None:
@@ -157,13 +141,16 @@ async def update_transaction(transaction_id: str, transaction: TransactionUpdate
         if transaction.description is not None:
             db_transaction.description = transaction.description
         
-        # Commita as mudanças
+        # Atualizar timestamp
+        db_transaction.updated_at = datetime.utcnow()
+        
+        # Salvar alterações
         db.commit()
         db.refresh(db_transaction)
         
         logger.info(f"Transação atualizada: {transaction_id}")
         
-        # Converte para modelo Pydantic
+        # Converter para modelo de resposta
         return Transaction(
             id=str(db_transaction.id),
             type=db_transaction.type,
@@ -183,13 +170,13 @@ async def update_transaction(transaction_id: str, transaction: TransactionUpdate
 @app.delete("/transactions/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_transaction(transaction_id: str, db: Session = Depends(get_db)):
     try:
-        # Busca transação para deletar
-        db_transaction = db.query(TransactionModel).filter(TransactionModel.id == transaction_id).first()
+        # Buscar transação existente
+        db_transaction = db.query(DBTransaction).filter(DBTransaction.id == transaction_id).first()
         
         if not db_transaction:
             raise HTTPException(status_code=404, detail="Transação não encontrada")
         
-        # Remove e commita
+        # Deletar transação
         db.delete(db_transaction)
         db.commit()
         
@@ -206,7 +193,7 @@ async def delete_transaction(transaction_id: str, db: Session = Depends(get_db))
 def health_check():
     return {
         "status": "healthy", 
-        "message": "MyFinance API is running",
+        "message": "MyFinance API is running (SQLAlchemy Direct)",
         "environment": os.getenv("ENVIRONMENT", "development"),
         "debug": settings.DEBUG
     }
@@ -214,7 +201,7 @@ def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "src.main:app",
+        "src.main_direct:app",
         host=settings.API_HOST,
         port=settings.API_PORT,
         reload=settings.DEBUG

@@ -33,7 +33,10 @@ theme:
 nav:
   - Início: index.md
   - 🗺️ Roadmap: roadmap.md
-  - Desenvolvedor: dev/index.md
+  - Desenvolvedor: 
+    - dev/index.md
+    - dev/env-setup.md
+    - dev/supabase-environments.md
   - Usuário: user/index.md
   - Deploy: deploy.md
 

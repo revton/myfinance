@@ -17,6 +17,13 @@ import {
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import axios from 'axios';
+import { API_BASE_URL } from './config';
+
+// Configurar Axios com URL base
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
 
 const theme = createTheme({
   palette: {
@@ -38,10 +45,31 @@ function App() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    axios.get('/transactions/').then(res => {
-      const data = Array.isArray(res.data) ? res.data : [];
-      setTransactions(data as Transaction[]);
-    }).catch(() => setTransactions([]));
+    const abortController = new AbortController();
+    
+    const loadTransactions = async () => {
+      try {
+        const response = await api.get('/transactions/', {
+          signal: abortController.signal
+        });
+        
+        const data = Array.isArray(response.data) ? response.data : [];
+        setTransactions(data as Transaction[]);
+      } catch (error) {
+        // Se foi cancelado, não faz nada
+        if (axios.isCancel(error)) {
+          return;
+        }
+        setTransactions([]);
+      }
+    };
+
+    loadTransactions();
+    
+    // Cleanup function para cancelar requisições pendentes
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +79,7 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.description || !form.amount) return;
-    const res = await axios.post('/transactions/', { ...form, amount: Number(form.amount) });
+    const res = await api.post('/transactions/', { ...form, amount: Number(form.amount) });
     setTransactions([...transactions, res.data]);
     setForm({ ...form, amount: 0, description: '' });
   };
