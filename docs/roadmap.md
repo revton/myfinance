@@ -232,6 +232,149 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 
 ---
 
+## ⚠️ **Análise de Riscos e Mitigações**
+
+### 🛡️ **Riscos Técnicos**
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **Supabase Limits** | Média | Alto | Backup com Planetscale/Neon |
+| **Performance** | Baixa | Alto | Monitoramento e otimização contínua |
+| **Security** | Média | Crítico | Auditorias regulares e pentests |
+| **Deploy Failures** | Baixa | Médio | Rollback automático e backups |
+| **Data Loss** | Muito Baixa | Crítico | Backup automático e redundância |
+
+### 💼 **Riscos de Negócio**
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **Competition** | Alta | Médio | Diferenciação por UX e features |
+| **Low Adoption** | Média | Alto | Marketing orgânico e feedback loops |
+| **Monetization** | Média | Alto | Modelo freemium testado |
+| **Regulatory** | Baixa | Alto | Compliance desde o início |
+| **Team Scaling** | Média | Médio | Processos bem documentados |
+
+### 🚨 **Planos de Contingência**
+
+#### **Cenário 1: Supabase Limites Atingidos**
+- **Trigger**: 80% do limite gratuito
+- **Ação**: Migração para Planetscale/Neon
+- **Timeline**: 1 semana
+- **Responsável**: DevOps Lead
+
+#### **Cenário 2: Baixa Adoção de Usuários**
+- **Trigger**: < 50 usuários ativos após 3 meses
+- **Ação**: Revisão de UX e features core
+- **Timeline**: 2 semanas
+- **Responsável**: Product Manager
+
+#### **Cenário 3: Vulnerabilidade de Segurança**
+- **Trigger**: Relatório de vulnerabilidade crítica
+- **Ação**: Patch imediato e auditoria completa
+- **Timeline**: 24-48 horas
+- **Responsável**: Security Lead
+
+---
+
+## ✅ **Definition of Done (DoD)**
+
+### 📋 **Critérios Gerais para Cada Fase**
+
+#### **Funcionalidades**
+- ✅ **Implementação Completa**: Todas as features especificadas
+- ✅ **Testes Unitários**: Cobertura > 90%
+- ✅ **Testes de Integração**: Fluxos end-to-end
+- ✅ **Testes de Performance**: Tempo de resposta < 2s
+- ✅ **Validação de UX**: Testes com usuários reais
+
+#### **Qualidade**
+- ✅ **Code Review**: Aprovado por pelo menos 2 desenvolvedores
+- ✅ **Documentação**: Atualizada e completa
+- ✅ **Acessibilidade**: WCAG 2.1 AA compliance
+- ✅ **Segurança**: Scan de vulnerabilidades limpo
+- ✅ **Performance**: Lighthouse score > 90
+
+#### **Deploy e Monitoramento**
+- ✅ **Deploy em Produção**: Funcionando sem erros
+- ✅ **Monitoramento**: Alertas configurados
+- ✅ **Backup**: Estratégia de backup testada
+- ✅ **Rollback**: Plano de reversão documentado
+- ✅ **Métricas**: KPIs sendo coletados
+
+### 🎯 **DoD Específico por Fase**
+
+#### **Fase 2 - Auth & Categories**
+- ✅ 100+ usuários de teste registrados
+- ✅ Login/logout funcionando em todos os browsers
+- ✅ Categorias padrão criadas e funcionais
+- ✅ 80% das transações categorizadas automaticamente
+- ✅ Tempo de autenticação < 3 segundos
+
+#### **Fase 3 - Analytics**
+- ✅ Dashboard carregando em < 2 segundos
+- ✅ Gráficos responsivos em mobile
+- ✅ Exportação de relatórios funcionando
+- ✅ 60% dos usuários acessam dashboard semanalmente
+- ✅ Métricas de performance sendo coletadas
+
+---
+
+## 📊 **KPIs e Métricas de Validação**
+
+### 🎯 **Métricas por Fase**
+
+#### **Fase 2 - Auth & Categories**
+| KPI | Meta | Medição |
+|-----|------|---------|
+| **Usuários Registrados** | 100+ | Google Analytics |
+| **Taxa de Conversão** | > 30% | Funnel de registro |
+| **Transações Categorizadas** | > 80% | Database queries |
+| **Tempo de Login** | < 3s | Performance monitoring |
+| **Satisfação com UX** | > 4.0/5 | Survey pós-registro |
+
+#### **Fase 3 - Analytics**
+| KPI | Meta | Medição |
+|-----|------|---------|
+| **Acesso ao Dashboard** | > 60% | Google Analytics |
+| **Tempo de Carregamento** | < 2s | Lighthouse |
+| **Uso de Relatórios** | > 40% | Feature tracking |
+| **Exportação de Dados** | > 20% | User actions |
+| **Retenção Mensal** | > 70% | Cohort analysis |
+
+#### **Fase 4 - Advanced Finance**
+| KPI | Meta | Medição |
+|-----|------|---------|
+| **Contas Múltiplas** | > 50% | Feature adoption |
+| **Transações Recorrentes** | > 30% | Usage tracking |
+| **Importação de Dados** | > 25% | File upload stats |
+| **Metas Financeiras** | > 40% | Goal setting |
+| **Satisfação Geral** | > 4.5/5 | NPS survey |
+
+### 📈 **Métricas de Produto**
+
+#### **Engagement**
+- **Daily Active Users (DAU)**: Crescimento 20% mensal
+- **Monthly Active Users (MAU)**: Retenção > 70%
+- **Session Duration**: > 5 minutos por sessão
+- **Pages per Session**: > 3 páginas
+- **Bounce Rate**: < 40%
+
+#### **Performance**
+- **Page Load Time**: < 2 segundos
+- **API Response Time**: < 500ms
+- **Uptime**: > 99.9%
+- **Error Rate**: < 0.1%
+- **Core Web Vitals**: Todos verdes
+
+#### **Business**
+- **Cost per User**: < $1/mês
+- **User Acquisition Cost**: < $5
+- **Lifetime Value**: > $50
+- **Churn Rate**: < 10% mensal
+- **Feature Adoption**: > 60% para novas features
+
+---
+
 ## 📊 **Cronograma Consolidado**
 
 | Fase | Período | Duração | Status | Principais Entregas |
@@ -293,25 +436,147 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 
 ---
 
+## 👥 **Recursos e Capacidade**
+
+### 🕐 **Estimativas de Desenvolvimento**
+
+#### **Fase 2 - Auth & Categories (6 semanas)**
+| Atividade | Desenvolvedor | Tempo | Dependências |
+|-----------|---------------|-------|--------------|
+| **Supabase Auth Setup** | Backend | 1 semana | - |
+| **JWT Implementation** | Backend | 1 semana | Supabase Auth |
+| **Categories Model** | Backend | 1 semana | - |
+| **Frontend Auth UI** | Frontend | 2 semanas | Backend Auth |
+| **Categories UI** | Frontend | 1 semana | Categories Model |
+| **Testing & Polish** | Full-stack | 1 semana | Todas as features |
+
+#### **Fase 3 - Analytics (8 semanas)**
+| Atividade | Desenvolvedor | Tempo | Dependências |
+|-----------|---------------|-------|--------------|
+| **Dashboard Backend** | Backend | 2 semanas | Categories |
+| **Charts Integration** | Frontend | 2 semanas | Dashboard Backend |
+| **Reports System** | Backend | 2 semanas | Dashboard |
+| **Export Features** | Full-stack | 1 semana | Reports |
+| **Mobile Optimization** | Frontend | 1 semana | Charts |
+
+### 🎯 **Equipe Necessária**
+
+#### **Mínimo (MVP)**
+- **1 Full-stack Developer**: Desenvolvimento principal
+- **1 DevOps**: Infraestrutura e deploy
+- **1 Product Manager**: Roadmap e priorização
+
+#### **Recomendado (Fases 2-3)**
+- **1 Backend Developer**: API e banco de dados
+- **1 Frontend Developer**: UI/UX e performance
+- **1 DevOps Engineer**: Infraestrutura e monitoramento
+- **1 Product Manager**: Estratégia e validação
+- **1 QA Engineer**: Testes e qualidade
+
+#### **Ideal (Fases 4-6)**
+- **2 Backend Developers**: API e microsserviços
+- **2 Frontend Developers**: UI/UX e mobile
+- **1 DevOps Engineer**: Infraestrutura escalável
+- **1 Data Engineer**: Analytics e ML
+- **1 Product Manager**: Estratégia de produto
+- **1 UX Designer**: Experiência do usuário
+
+### 💰 **Estimativas de Custo**
+
+#### **Infraestrutura (Mensal)**
+- **Supabase Pro**: $25/mês (até 100k usuários)
+- **Render.com**: $7/mês (backend)
+- **Vercel Pro**: $20/mês (frontend)
+- **Monitoring**: $29/mês (Sentry)
+- **Total**: ~$81/mês
+
+#### **Desenvolvimento**
+- **Fase 2**: 240 horas × $50/h = $12.000
+- **Fase 3**: 320 horas × $50/h = $16.000
+- **Fase 4**: 400 horas × $50/h = $20.000
+
+---
+
 ## 🤝 **Como Contribuir**
 
-### **Para Desenvolvedores**
-1. **Fork** do repositório
-2. **Feature branch** para sua funcionalidade (**a partir da develop**)
-3. **Testes** completos obrigatórios
-4. **Pull Request** com descrição detalhada (**para develop**)
-5. **Code Review** pela equipe
+### 🛠️ **Para Desenvolvedores**
 
-### **Para Usuários**
-1. **Feedback** via GitHub Issues
-2. **Feature Requests** documentadas
-3. **Bug Reports** com reprodução
-4. **User Testing** de novas funcionalidades
+#### **Processo de Contribuição**
+1. **Fork** do repositório
+2. **Feature branch** a partir da `develop`
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/nome-da-feature
+   ```
+3. **Desenvolvimento** seguindo padrões
+   - Commits atômicos e descritivos
+   - Testes obrigatórios (cobertura > 90%)
+   - Documentação atualizada
+4. **Pull Request** para `develop`
+   - Descrição detalhada da feature
+   - Screenshots/vídeos se aplicável
+   - Checklist de DoD preenchido
+5. **Code Review** pela equipe
+   - Aprovação de pelo menos 2 desenvolvedores
+   - Testes passando em CI/CD
+   - Deploy em staging aprovado
+
+#### **Padrões de Código**
+- **Backend**: PEP 8, type hints, docstrings
+- **Frontend**: ESLint, Prettier, TypeScript
+- **Commits**: Conventional Commits
+- **Branches**: Gitflow workflow
+
+### 👥 **Para Usuários**
+
+#### **Feedback e Sugestões**
+1. **GitHub Issues** para bugs e features
+   - Template preenchido completamente
+   - Screenshots/vídeos de reprodução
+   - Informações do ambiente
+2. **Discussions** para ideias e debates
+3. **User Testing** de novas funcionalidades
+4. **Documentation** feedback e melhorias
+
+#### **Como Reportar Bugs**
+```markdown
+**Descrição**: [Descrição clara do problema]
+
+**Passos para Reproduzir**:
+1. Vá para [URL]
+2. Clique em [botão]
+3. Veja o erro
+
+**Comportamento Esperado**: [O que deveria acontecer]
+**Comportamento Atual**: [O que está acontecendo]
+
+**Informações do Sistema**:
+- Browser: [Chrome/Firefox/Safari]
+- Versão: [X.X.X]
+- OS: [Windows/Mac/Linux]
+
+**Screenshots**: [Se aplicável]
+```
+
+### 🎯 **Para Empresas e Parceiros**
+
+#### **Integrações**
+- **API Pública**: Documentação completa
+- **Webhooks**: Notificações em tempo real
+- **OAuth**: Autenticação segura
+- **White Label**: Solução customizada
+
+#### **Suporte**
+- **Documentação**: Guias detalhados
+- **Exemplos**: Código de exemplo
+- **Comunidade**: Fórum e Discord
+- **Enterprise**: Suporte dedicado
 
 ---
 
 **📅 Última Atualização**: Janeiro 2025  
-**📍 Versão do Roadmap**: 1.0  
+**📍 Versão do Roadmap**: 2.0  
 **🔄 Próxima Revisão**: Março 2025  
 
 ---
