@@ -12,10 +12,10 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 
 ## 📚 Navegação
 
-- [🗺️ Roadmap](roadmap/) - Planejamento e fases do projeto
-- [Guia do Usuário](user/) - Como usar o sistema
-- [Guia do Desenvolvedor](dev/) - Configuração e desenvolvimento
-- [Deploy](deploy/) - Instruções de implantação
+- [🗺️ Roadmap](roadmap.md) - Planejamento e fases do projeto
+- [Guia do Usuário](user/index.md) - Como usar o sistema
+- [Guia do Desenvolvedor](dev/index.md) - Configuração e desenvolvimento
+- [Deploy](deploy.md) - Instruções de implantação
 
 ## 🚀 Tecnologias
 
@@ -26,10 +26,19 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 
 ## 🔧 Status das Correções
 
-- ✅ **GitHub Actions**: Totalmente corrigidas
+- ⚠️ **GitHub Actions**: Problemas conhecidos (ver seção abaixo)
 - ✅ **Backend Tests**: Supabase mocking funcionando
 - ✅ **Frontend Tests**: Vitest + React funcionando
 - ✅ **GitHub Pages**: Deploy moderno configurado
+
+## ⚠️ Problemas Conhecidos
+
+### GitHub Actions
+- **Status**: ⚠️ **Parcialmente Funcionando**
+- **Problemas**: Alguns workflows com erros que foram ignorados para continuar o desenvolvimento
+- **Impacto**: Deploy e testes automatizados podem falhar
+- **Prioridade**: Baixa (funcionalidades core funcionando)
+- **Plano**: Corrigir em iteração futura
 
 ## 📊 Status do Projeto
 

@@ -37,8 +37,10 @@ nav:
     - dev/index.md
     - dev/env-setup.md
     - dev/supabase-environments.md
+    - dev/migration-sqlalchemy-summary.md
   - Usuário: user/index.md
   - Deploy: deploy.md
+  - Testes: local-testing.md
 
 plugins:
   - search
