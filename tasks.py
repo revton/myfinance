@@ -37,7 +37,8 @@ def test_database_connection(c):
 def frontend(c, port=5173):
     """Inicia o frontend React/Vite na porta especificada (padrão: 5173)."""
     frontend_port = port or os.getenv("VITE_PORT", "5173")
-    c.run(f"cd frontend && uv run npm run dev -- --port {frontend_port}")
+    with c.cd('frontend'):
+        c.run(f"npm run dev -- --port {frontend_port}")
 
 @task
 def docs(c, port=8001):

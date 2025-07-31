@@ -27,6 +27,15 @@ const theme = createTheme({
 });
 
 interface Transaction {
+  id: string;
+  type: 'income' | 'expense';
+  amount: number;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TransactionForm {
   type: 'income' | 'expense';
   amount: number;
   description: string;
@@ -34,26 +43,34 @@ interface Transaction {
 
 function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [form, setForm] = useState<Transaction>({ type: 'income', amount: 0, description: '' });
+  const [form, setForm] = useState<TransactionForm>({ type: 'income', amount: 0, description: '' });
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    axios.get('/transactions/').then(res => {
-      const data = Array.isArray(res.data) ? res.data : [];
-      setTransactions(data as Transaction[]);
-    }).catch(() => setTransactions([]));
+    console.log('Carregando transações...');
+    axios.get('/transactions/')
+      .then(res => {
+        console.log('Transações carregadas:', res.data);
+        const data = Array.isArray(res.data) ? res.data : [];
+        setTransactions(data as Transaction[]);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar transações:', error);
+        setTransactions([]);
+      });
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: name === 'amount' ? Number(value) : value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.description || !form.amount) return;
-    const res = await axios.post('/transactions/', { ...form, amount: Number(form.amount) });
+    const res = await axios.post('/transactions/', form);
     setTransactions([...transactions, res.data]);
-    setForm({ ...form, amount: 0, description: '' });
+    setForm({ type: 'income', amount: 0, description: '' });
   };
 
   return (
