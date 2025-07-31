@@ -17,6 +17,13 @@ import {
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import axios from 'axios';
+import { API_BASE_URL } from './config';
+
+// Configurar Axios com URL base
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
 
 const theme = createTheme({
   palette: {
@@ -42,9 +49,8 @@ function App() {
     
     const loadTransactions = async () => {
       try {
-        const response = await axios.get('/transactions/', {
-          signal: abortController.signal,
-          timeout: 10000
+        const response = await api.get('/transactions/', {
+          signal: abortController.signal
         });
         
         const data = Array.isArray(response.data) ? response.data : [];
@@ -73,7 +79,7 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.description || !form.amount) return;
-    const res = await axios.post('/transactions/', { ...form, amount: Number(form.amount) });
+    const res = await api.post('/transactions/', { ...form, amount: Number(form.amount) });
     setTransactions([...transactions, res.data]);
     setForm({ ...form, amount: 0, description: '' });
   };

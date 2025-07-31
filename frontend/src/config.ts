@@ -1,5 +1,8 @@
 // Configuração da API
-export const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:8002';
+export const API_BASE_URL = process.env.VITE_API_URL || 
+  (process.env.NODE_ENV === 'production' 
+    ? 'https://myfinance-backend.onrender.com' 
+    : 'http://localhost:8002');
 
 // Configuração da aplicação
 export const APP_CONFIG = {
