@@ -23,7 +23,7 @@ Oferecer uma solução completa, gratuita e moderna para controle de finanças p
 ---
 
 ## 🚀 **Fase 1 - MVP (Produto Mínimo Viável)**
-> **Status**: ✅ **CONCLUÍDA** | **Duração**: 4 semanas | **Data**: Dezembro 2024 - Janeiro 2025
+> **Status**: ✅ **CONCLUÍDA** | **Duração**: 4 semanas | **Data**: Julho 2025
 
 ### 📋 **Funcionalidades Implementadas**
 
@@ -379,7 +379,7 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 
 | Fase | Período | Duração | Status | Principais Entregas |
 |------|---------|---------|--------|---------------------|
-| **Fase 1 - MVP** | Dez/24 - Jan/25 | 4 semanas | ✅ Concluída | CRUD Transações, Deploy, Testes |
+| **Fase 1 - MVP** | Jul/25 | 4 semanas | ✅ Concluída | CRUD Transações, Deploy, Testes |
 | **Fase 2 - Auth & Categories** | Ago/25 - Set/25 | 6 semanas | 📋 Planejada | Login, Categorias, UX |
 | **Fase 3 - Analytics** | Out/25 - Dez/25 | 8 semanas | 📋 Planejada | Dashboard, Relatórios |
 | **Fase 4 - Advanced Finance** | Jan/26 - Mar/26 | 10 semanas | 💭 Conceitual | Contas, Recorrência, Import |
