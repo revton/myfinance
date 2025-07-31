@@ -1,49 +1,79 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "myfinance"
 version = "0.1.0"
-description = "Sistema de finanças pessoais"
-requires-python = ">=3.11,<3.13"
-dependencies = []
+description = "Aplicação de controle financeiro pessoal"
+authors = [
+    {name = "Revton", email = "revton@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.104.1",
+    "uvicorn[standard]==0.24.0",
+    "supabase==2.0.2",
+    "pydantic==2.5.3",
+    "python-dotenv==1.0.0",
+    "alembic",
+    "psycopg2-binary",
+]
 
 [project.optional-dependencies]
 backend = [
     "fastapi==0.104.1",
     "uvicorn[standard]==0.24.0",
     "supabase==2.0.2",
-    "psycopg2-binary==2.9.9",
-    "sqlalchemy==2.0.23",
+    "pydantic==2.5.3",
+    "python-dotenv==1.0.0",
     "alembic==1.13.1",
-    "pydantic==2.5.3"
+    "psycopg2-binary==2.9.9"
 ]
 docs = [
-    "mkdocs",
-    "mkdocs-material",
-    "mkdocs-git-revision-date-localized-plugin"
+    "mkdocs==1.5.3",
+    "mkdocs-material==9.4.8"
 ]
 dev = [
-    "invoke"
+    "invoke",
+    "python-dotenv==1.0.0",
+    "pytest==8.4.1",
+    "pytest-cov==6.2.1",
+    "alembic==1.13.1",
+    "psycopg2-binary==2.9.9"
 ]
-test = [
-    "pytest",
-    "httpx",
-    "pytest-cov"
-]
-security = [
-    "safety"
-] 
-quality = [
-    "ruff",
-    "radon",
-    "bandit"
-]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov-report=term-missing" 
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html:coverage",
+    "--cov-report=xml:coverage.xml"
+]
 
 [tool.coverage.run]
-relative_files = true 
 source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]
