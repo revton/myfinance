@@ -1,15 +1,11 @@
 README.md
 pyproject.toml
 src/__init__.py
-src/app.py
 src/config.py
 src/main.py
-src/models.py
-src/routes.py
 src/myfinance.egg-info/PKG-INFO
 src/myfinance.egg-info/SOURCES.txt
 src/myfinance.egg-info/dependency_links.txt
 src/myfinance.egg-info/requires.txt
 src/myfinance.egg-info/top_level.txt
-tests/test_flask_app.py
 tests/test_transactions.py

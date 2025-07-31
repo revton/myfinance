@@ -1,12 +1,28 @@
-from fastapi import FastAPI, status, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, status, HTTPException, Depends
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 from .config import settings
+from .models import TransactionCreate, Transaction, TransactionList, TransactionUpdate
+from .database_sqlalchemy import get_db, create_tables, test_connection
+from .database import Transaction as TransactionModel
 import uuid
 from datetime import datetime
+import logging
+import os
 
-app = FastAPI(title=settings.PROJECT_NAME)
+# Configuração de logging
+logging.basicConfig(
+    level=getattr(logging, settings.LOG_LEVEL),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    debug=settings.DEBUG
+)
 
 # Permitir CORS para facilitar o desenvolvimento
 app.add_middleware(
@@ -17,62 +33,189 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Transaction(BaseModel):
-    type: str  # 'income' ou 'expense'
-    amount: float
-    description: str
-
-class TransactionResponse(BaseModel):
-    id: str
-    type: str
-    amount: float
-    description: str
-    created_at: datetime
-    updated_at: datetime
-
-@app.post("/transactions/", status_code=status.HTTP_201_CREATED, response_model=TransactionResponse)
-async def create_transaction(transaction: Transaction):
+@app.on_event("startup")
+async def startup_event():
+    """Evento executado na inicialização da aplicação"""
     try:
-        supabase = settings.supabase_client
-        
-        # Validar tipo
-        if transaction.type not in ['income', 'expense']:
-            raise HTTPException(status_code=400, detail="Tipo deve ser 'income' ou 'expense'")
-        
-        # Validar valor
-        if transaction.amount <= 0:
-            raise HTTPException(status_code=400, detail="Valor deve ser maior que zero")
-        
-        # Inserir no Supabase
-        data = {
-            "id": str(uuid.uuid4()),
-            "type": transaction.type,
-            "amount": transaction.amount,
-            "description": transaction.description
-        }
-        
-        result = supabase.table("transactions").insert(data).execute()
-        
-        if result.data:
-            return TransactionResponse(**result.data[0])
+        # Testa conexão com banco
+        if test_connection():
+            logger.info("Conexão com banco estabelecida com sucesso")
         else:
-            raise HTTPException(status_code=500, detail="Erro ao criar transação")
-            
+            logger.error("Falha ao conectar com banco")
+        
+        # Cria tabelas se não existirem
+        create_tables()
+        logger.info("Aplicação inicializada com sucesso")
     except Exception as e:
+        logger.error(f"Erro na inicialização: {e}")
+        raise
+
+@app.post("/transactions/", status_code=status.HTTP_201_CREATED, response_model=Transaction)
+async def create_transaction(transaction: TransactionCreate, db: Session = Depends(get_db)):
+    try:
+        # Cria instância do modelo SQLAlchemy
+        db_transaction = TransactionModel(
+            id=uuid.uuid4(),
+            type=transaction.type.value,
+            amount=transaction.amount,
+            description=transaction.description
+        )
+        
+        # Adiciona e commita
+        db.add(db_transaction)
+        db.commit()
+        db.refresh(db_transaction)
+        
+        logger.info(f"Transação criada: {db_transaction.id}")
+        
+        # Converte para modelo Pydantic
+        return Transaction(
+            id=str(db_transaction.id),
+            type=db_transaction.type,
+            amount=db_transaction.amount,
+            description=db_transaction.description,
+            created_at=db_transaction.created_at,
+            updated_at=db_transaction.updated_at
+        )
+            
+    except HTTPException:
+        # Re-raise HTTPException para manter o status code correto
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Erro ao criar transação: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
-@app.get("/transactions/", response_model=List[TransactionResponse])
-async def list_transactions():
+@app.get("/transactions/", response_model=List[Transaction])
+async def list_transactions(db: Session = Depends(get_db)):
     try:
-        supabase = settings.supabase_client
+        # Busca todas as transações ordenadas por data de criação
+        db_transactions = db.query(TransactionModel).order_by(TransactionModel.created_at.desc()).all()
         
-        result = supabase.table("transactions").select("*").order("created_at", desc=True).execute()
+        logger.info(f"Listadas {len(db_transactions)} transações")
         
-        return [TransactionResponse(**transaction) for transaction in result.data]
+        # Converte para modelos Pydantic
+        return [
+            Transaction(
+                id=str(t.id),
+                type=t.type,
+                amount=t.amount,
+                description=t.description,
+                created_at=t.created_at,
+                updated_at=t.updated_at
+            ) for t in db_transactions
+        ]
         
+    except HTTPException:
+        # Re-raise HTTPException para manter o status code correto
+        raise
     except Exception as e:
+        logger.error(f"Erro ao listar transações: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+@app.get("/transactions/{transaction_id}", response_model=Transaction)
+async def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
+    try:
+        # Busca transação por ID
+        db_transaction = db.query(TransactionModel).filter(TransactionModel.id == transaction_id).first()
+        
+        if not db_transaction:
+            raise HTTPException(status_code=404, detail="Transação não encontrada")
+        
+        logger.info(f"Transação encontrada: {transaction_id}")
+        
+        # Converte para modelo Pydantic
+        return Transaction(
+            id=str(db_transaction.id),
+            type=db_transaction.type,
+            amount=db_transaction.amount,
+            description=db_transaction.description,
+            created_at=db_transaction.created_at,
+            updated_at=db_transaction.updated_at
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao buscar transação: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+@app.put("/transactions/{transaction_id}", response_model=Transaction)
+async def update_transaction(transaction_id: str, transaction: TransactionUpdate, db: Session = Depends(get_db)):
+    try:
+        # Busca transação existente
+        db_transaction = db.query(TransactionModel).filter(TransactionModel.id == transaction_id).first()
+        
+        if not db_transaction:
+            raise HTTPException(status_code=404, detail="Transação não encontrada")
+        
+        # Atualiza campos fornecidos
+        if transaction.type is not None:
+            db_transaction.type = transaction.type.value
+        if transaction.amount is not None:
+            db_transaction.amount = transaction.amount
+        if transaction.description is not None:
+            db_transaction.description = transaction.description
+        
+        # Commita as mudanças
+        db.commit()
+        db.refresh(db_transaction)
+        
+        logger.info(f"Transação atualizada: {transaction_id}")
+        
+        # Converte para modelo Pydantic
+        return Transaction(
+            id=str(db_transaction.id),
+            type=db_transaction.type,
+            amount=db_transaction.amount,
+            description=db_transaction.description,
+            created_at=db_transaction.created_at,
+            updated_at=db_transaction.updated_at
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Erro ao atualizar transação: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+@app.delete("/transactions/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_transaction(transaction_id: str, db: Session = Depends(get_db)):
+    try:
+        # Busca transação para deletar
+        db_transaction = db.query(TransactionModel).filter(TransactionModel.id == transaction_id).first()
+        
+        if not db_transaction:
+            raise HTTPException(status_code=404, detail="Transação não encontrada")
+        
+        # Remove e commita
+        db.delete(db_transaction)
+        db.commit()
+        
+        logger.info(f"Transação deletada: {transaction_id}")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Erro ao deletar transação: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "message": "MyFinance API is running"} 
+    return {
+        "status": "healthy", 
+        "message": "MyFinance API is running",
+        "environment": os.getenv("ENVIRONMENT", "development"),
+        "debug": settings.DEBUG
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "src.main:app",
+        host=settings.API_HOST,
+        port=settings.API_PORT,
+        reload=settings.DEBUG
+    ) 

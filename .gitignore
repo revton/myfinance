@@ -28,4 +28,9 @@ htmlcov/
 .DS_Store
 Thumbs.db 
 reports/ 
-.scannerwork/ 
+.scannerwork/
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local 
