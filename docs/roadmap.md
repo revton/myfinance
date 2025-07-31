@@ -61,7 +61,7 @@ Oferecer uma solução completa, gratuita e moderna para controle de finanças p
 ---
 
 ## 🔄 **Fase 2 - Categorias e Autenticação**
-> **Status**: 📋 **PLANEJADA** | **Duração**: 6 semanas | **Início**: Fevereiro 2025
+> **Status**: 📋 **PLANEJADA** | **Duração**: 6 semanas | **Início**: Agosto 2025
 
 ### 🎯 **Objetivos da Fase**
 Implementar sistema de categorias para melhor organização e autenticação de usuários para dados privados.
@@ -100,7 +100,7 @@ Implementar sistema de categorias para melhor organização e autenticação de 
 ---
 
 ## 📊 **Fase 3 - Analytics e Relatórios**
-> **Status**: 📋 **PLANEJADA** | **Duração**: 8 semanas | **Início**: Abril 2025
+> **Status**: 📋 **PLANEJADA** | **Duração**: 8 semanas | **Início**: Outubro 2025
 
 ### 🎯 **Objetivos da Fase**
 Transformar dados em insights com dashboards e relatórios avançados.
@@ -136,7 +136,7 @@ Transformar dados em insights com dashboards e relatórios avançados.
 ---
 
 ## 💰 **Fase 4 - Funcionalidades Financeiras Avançadas**
-> **Status**: 💭 **CONCEITUAL** | **Duração**: 10 semanas | **Início**: Julho 2025
+> **Status**: 💭 **CONCEITUAL** | **Duração**: 10 semanas | **Início**: Janeiro 2026
 
 ### 🎯 **Objetivos da Fase**
 Adicionar funcionalidades sofisticadas para gestão financeira completa.
@@ -170,7 +170,7 @@ Adicionar funcionalidades sofisticadas para gestão financeira completa.
 ---
 
 ## 🌟 **Fase 5 - Recursos Premium e Otimizações**
-> **Status**: 💭 **CONCEITUAL** | **Duração**: 12 semanas | **Início**: Outubro 2025
+> **Status**: 💭 **CONCEITUAL** | **Duração**: 12 semanas | **Início**: Abril 2026
 
 ### 🎯 **Objetivos da Fase**
 Refinar a experiência do usuário e implementar recursos diferenciados.
@@ -380,10 +380,10 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 | Fase | Período | Duração | Status | Principais Entregas |
 |------|---------|---------|--------|---------------------|
 | **Fase 1 - MVP** | Dez/24 - Jan/25 | 4 semanas | ✅ Concluída | CRUD Transações, Deploy, Testes |
-| **Fase 2 - Auth & Categories** | Fev/25 - Mar/25 | 6 semanas | 📋 Planejada | Login, Categorias, UX |
-| **Fase 3 - Analytics** | Abr/25 - Mai/25 | 8 semanas | 📋 Planejada | Dashboard, Relatórios |
-| **Fase 4 - Advanced Finance** | Jul/25 - Set/25 | 10 semanas | 💭 Conceitual | Contas, Recorrência, Import |
-| **Fase 5 - Premium** | Out/25 - Dez/25 | 12 semanas | 💭 Conceitual | PWA, AI, Performance |
+| **Fase 2 - Auth & Categories** | Ago/25 - Set/25 | 6 semanas | 📋 Planejada | Login, Categorias, UX |
+| **Fase 3 - Analytics** | Out/25 - Dez/25 | 8 semanas | 📋 Planejada | Dashboard, Relatórios |
+| **Fase 4 - Advanced Finance** | Jan/26 - Mar/26 | 10 semanas | 💭 Conceitual | Contas, Recorrência, Import |
+| **Fase 5 - Premium** | Abr/26 - Jul/26 | 12 semanas | 💭 Conceitual | PWA, AI, Performance |
 | **Fase 6 - Future** | 2026+ | Contínua | 💭 Visionária | Ecosystem, Emerging Tech |
 
 ---
@@ -575,9 +575,9 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 
 ---
 
-**📅 Última Atualização**: Janeiro 2025  
-**📍 Versão do Roadmap**: 2.0  
-**🔄 Próxima Revisão**: Março 2025  
+**📅 Última Atualização**: Agosto 2025  
+**📍 Versão do Roadmap**: 2.1  
+**🔄 Próxima Revisão**: Outubro 2025  
 
 ---
 

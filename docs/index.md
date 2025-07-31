@@ -53,7 +53,7 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 | Métrica | Valor |
 |---------|-------|
 | **Fase Atual** | ✅ Fase 1 - MVP (Concluída) |
-| **Próxima Fase** | 📋 Fase 2 - Categorias e Autenticação |
+| **Próxima Fase** | 📋 Fase 2 - Categorias e Autenticação (Ago/25) |
 | **Tecnologias** | FastAPI + React + Supabase |
 | **Deploy** | Vercel (Frontend) + Local (Backend) |
 
