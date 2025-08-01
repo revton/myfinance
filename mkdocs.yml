@@ -33,6 +33,28 @@ theme:
 nav:
   - Início: index.md
   - 🗺️ Roadmap: roadmap.md
+  - 🔄 Fase 2 - Detalhamento:
+    - fase2/README.md
+    - Sistema de Autenticação:
+      - fase2/autenticacao/especificacao-tecnica.md
+      - fase2/autenticacao/modelo-dados.md
+      - fase2/autenticacao/interface-usuario.md
+      - fase2/autenticacao/testes-validacao.md
+    - Sistema de Categorias:
+      - fase2/categorias/especificacao-tecnica.md
+      - fase2/categorias/modelo-dados.md
+      - fase2/categorias/interface-usuario.md
+      - fase2/categorias/categorias-padrao.md
+      - fase2/categorias/testes-validacao.md
+    - Melhorias de UX:
+      - fase2/ux/dashboard.md
+      - fase2/ux/filtros-avancados.md
+      - fase2/ux/loading-states.md
+      - fase2/ux/error-handling.md
+    - DevOps e Deploy:
+      - fase2/devops/configuracao-ambiente.md
+      - fase2/devops/deploy-monitoramento.md
+      - fase2/devops/testes-integracao.md
   - Desenvolvedor: 
     - dev/index.md
     - dev/env-setup.md

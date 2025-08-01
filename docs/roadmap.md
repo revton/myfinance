@@ -16,9 +16,11 @@ Oferecer uma solução completa, gratuita e moderna para controle de finanças p
 | **Fase Atual** | Fase 1 - MVP ✅ (Concluída) |
 | **Próxima Fase** | Fase 2 - Categorias e Autenticação |
 | **Tecnologias** | FastAPI + React + Supabase |
-| **Deploy** | Vercel (Frontend) + Local (Backend) |
+| **Deploy** | Vercel (Frontend) + Render (Backend) |
 | **Documentação** | GitHub Pages ✅ |
-| **CI/CD** | GitHub Actions ✅ |
+| **CI/CD** | GitHub Actions 🔄 (Parcial) |
+
+> **Nota sobre CI/CD**: Os workflows do GitHub Actions foram criados e configurados, mas ainda não foram totalmente testados em produção. Inclui testes automatizados, deploy da documentação e deploy do frontend via Vercel. Deploy do backend via Render ainda pendente.
 
 ---
 
@@ -46,11 +48,11 @@ Oferecer uma solução completa, gratuita e moderna para controle de finanças p
 - ✅ **Deploy**: Vercel configurado
 
 #### **DevOps & Infraestrutura**
-- ✅ **CI/CD**: GitHub Actions completo
+- 🔄 **CI/CD**: GitHub Actions (parcial - workflows criados, mas não totalmente testados)
 - ✅ **Testes Automatizados**: Backend + Frontend
-- ✅ **Deploy Automático**: Multi-environment
+- 🔄 **Deploy Automático**: Vercel configurado, Render pendente
 - ✅ **Documentação**: MkDocs + GitHub Pages
-- ✅ **Monitoramento**: Logs básicos
+- 🔄 **Monitoramento**: Logs básicos (pendente implementação completa)
 
 ### 🎯 **Objetivos Alcançados**
 - Sistema funcional de controle básico de receitas/despesas
@@ -288,7 +290,7 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 - ✅ **Validação de UX**: Testes com usuários reais
 
 #### **Qualidade**
-- ✅ **Code Review**: Aprovado por pelo menos 2 desenvolvedores
+- ✅ **Code Review**: Auto-review com checklist de qualidade
 - ✅ **Documentação**: Atualizada e completa
 - ✅ **Acessibilidade**: WCAG 2.1 AA compliance
 - ✅ **Segurança**: Scan de vulnerabilidades limpo
@@ -304,17 +306,18 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 ### 🎯 **DoD Específico por Fase**
 
 #### **Fase 2 - Auth & Categories**
-- ✅ 100+ usuários de teste registrados
-- ✅ Login/logout funcionando em todos os browsers
+- ✅ Sistema de autenticação funcionando para uso doméstico
+- ✅ Login/logout funcionando em todos os browsers da família
 - ✅ Categorias padrão criadas e funcionais
-- ✅ 80% das transações categorizadas automaticamente
+- ✅ Interface intuitiva para categorização manual
 - ✅ Tempo de autenticação < 3 segundos
+- ✅ Dados seguros e privados por usuário
 
 #### **Fase 3 - Analytics**
 - ✅ Dashboard carregando em < 2 segundos
-- ✅ Gráficos responsivos em mobile
+- ✅ Gráficos responsivos em mobile e desktop
 - ✅ Exportação de relatórios funcionando
-- ✅ 60% dos usuários acessam dashboard semanalmente
+- ✅ Insights úteis para gestão financeira pessoal
 - ✅ Métricas de performance sendo coletadas
 
 ---
@@ -326,52 +329,52 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 #### **Fase 2 - Auth & Categories**
 | KPI | Meta | Medição |
 |-----|------|---------|
-| **Usuários Registrados** | 100+ | Google Analytics |
-| **Taxa de Conversão** | > 30% | Funnel de registro |
-| **Transações Categorizadas** | > 80% | Database queries |
+| **Usuários Familiares** | 2-5 usuários | Contas criadas |
+| **Facilidade de Uso** | < 2 minutos para primeira transação | Teste de usabilidade |
+| **Transações Categorizadas** | > 90% | Database queries |
 | **Tempo de Login** | < 3s | Performance monitoring |
-| **Satisfação com UX** | > 4.0/5 | Survey pós-registro |
+| **Satisfação com UX** | > 4.5/5 | Feedback da família |
 
 #### **Fase 3 - Analytics**
 | KPI | Meta | Medição |
 |-----|------|---------|
-| **Acesso ao Dashboard** | > 60% | Google Analytics |
+| **Uso Regular do Dashboard** | > 80% dos usuários | Acesso semanal |
 | **Tempo de Carregamento** | < 2s | Lighthouse |
-| **Uso de Relatórios** | > 40% | Feature tracking |
-| **Exportação de Dados** | > 20% | User actions |
-| **Retenção Mensal** | > 70% | Cohort analysis |
+| **Uso de Relatórios** | > 60% | Feature tracking |
+| **Exportação de Dados** | > 30% | User actions |
+| **Retenção Mensal** | > 90% | Uso contínuo |
 
 #### **Fase 4 - Advanced Finance**
 | KPI | Meta | Medição |
 |-----|------|---------|
-| **Contas Múltiplas** | > 50% | Feature adoption |
-| **Transações Recorrentes** | > 30% | Usage tracking |
-| **Importação de Dados** | > 25% | File upload stats |
-| **Metas Financeiras** | > 40% | Goal setting |
-| **Satisfação Geral** | > 4.5/5 | NPS survey |
+| **Contas Múltiplas** | > 80% | Feature adoption |
+| **Transações Recorrentes** | > 50% | Usage tracking |
+| **Importação de Dados** | > 40% | File upload stats |
+| **Metas Financeiras** | > 60% | Goal setting |
+| **Satisfação Geral** | > 4.5/5 | Feedback da família |
 
 ### 📈 **Métricas de Produto**
 
 #### **Engagement**
-- **Daily Active Users (DAU)**: Crescimento 20% mensal
-- **Monthly Active Users (MAU)**: Retenção > 70%
-- **Session Duration**: > 5 minutos por sessão
-- **Pages per Session**: > 3 páginas
-- **Bounce Rate**: < 40%
+- **Daily Active Users (DAU)**: Uso regular da família
+- **Monthly Active Users (MAU)**: Retenção > 90%
+- **Session Duration**: > 3 minutos por sessão
+- **Pages per Session**: > 2 páginas
+- **Bounce Rate**: < 30%
 
 #### **Performance**
 - **Page Load Time**: < 2 segundos
 - **API Response Time**: < 500ms
-- **Uptime**: > 99.9%
+- **Uptime**: > 99.5%
 - **Error Rate**: < 0.1%
 - **Core Web Vitals**: Todos verdes
 
-#### **Business**
-- **Cost per User**: < $1/mês
-- **User Acquisition Cost**: < $5
-- **Lifetime Value**: > $50
-- **Churn Rate**: < 10% mensal
-- **Feature Adoption**: > 60% para novas features
+#### **Uso Doméstico**
+- **Cost per User**: $0/mês
+- **Facilidade de Uso**: Setup em < 10 minutos
+- **Value**: Economia de tempo na gestão financeira
+- **Adoção**: > 80% dos membros da família
+- **Feature Adoption**: > 70% para novas features
 
 ---
 
@@ -394,7 +397,7 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 - **Backend**: FastAPI + Python 3.11
 - **Frontend**: React 18 + TypeScript + Material-UI
 - **Database**: Supabase (PostgreSQL)
-- **Deploy**: Vercel (Frontend) + Local (Backend)
+- **Deploy**: Vercel (Frontend) + Render (Backend)
 - **CI/CD**: GitHub Actions
 - **Docs**: MkDocs + GitHub Pages
 
@@ -429,10 +432,10 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 - **User Satisfaction**: > 4.5/5 rating
 
 ### **Negócio**
-- **Cost per User**: < $1/mês
-- **Scalability**: Suporte a 10k+ usuários
-- **Revenue**: Modelo freemium sustentável
-- **Market Position**: Top 3 em ferramentas financeiras
+- **Cost per User**: $0/mês
+- **Scalability**: Suporte a uso doméstico
+- **Revenue**: Projeto gratuito
+- **Market Position**: Ferramenta financeira pessoal
 
 ---
 
@@ -459,66 +462,62 @@ Estabelecer o MyFinance como plataforma líder em gestão financeira pessoal.
 | **Export Features** | Full-stack | 1 semana | Reports |
 | **Mobile Optimization** | Frontend | 1 semana | Charts |
 
-### 🎯 **Equipe Necessária**
+### 🎯 **Recursos Necessários**
 
-#### **Mínimo (MVP)**
-- **1 Full-stack Developer**: Desenvolvimento principal
-- **1 DevOps**: Infraestrutura e deploy
-- **1 Product Manager**: Roadmap e priorização
+#### **Atual (MVP)**
+- **1 Full-stack Developer**: Desenvolvimento completo (você)
+- **Ferramentas DevOps**: GitHub Actions, Vercel, Render
+- **Gestão**: Roadmap e priorização própria
 
-#### **Recomendado (Fases 2-3)**
-- **1 Backend Developer**: API e banco de dados
-- **1 Frontend Developer**: UI/UX e performance
-- **1 DevOps Engineer**: Infraestrutura e monitoramento
-- **1 Product Manager**: Estratégia e validação
-- **1 QA Engineer**: Testes e qualidade
+#### **Futuro (Fases 2-3)**
+- **1 Full-stack Developer**: Desenvolvimento completo
+- **Ferramentas de Monitoramento**: Sentry, Analytics
+- **Automação**: CI/CD aprimorado
+- **Documentação**: Mantida atualizada
 
-#### **Ideal (Fases 4-6)**
-- **2 Backend Developers**: API e microsserviços
-- **2 Frontend Developers**: UI/UX e mobile
-- **1 DevOps Engineer**: Infraestrutura escalável
-- **1 Data Engineer**: Analytics e ML
-- **1 Product Manager**: Estratégia de produto
-- **1 UX Designer**: Experiência do usuário
+#### **Escalabilidade (Fases 4-6)**
+- **1 Full-stack Developer**: Foco em features avançadas
+- **Ferramentas de Analytics**: DataDog ou New Relic
+- **Automação Avançada**: Deploy automatizado completo
+- **Performance**: Otimizações contínuas
 
 ### 💰 **Estimativas de Custo**
 
 #### **Infraestrutura (Mensal)**
-- **Supabase Pro**: $25/mês (até 100k usuários)
-- **Render.com**: $7/mês (backend) - Não configurado
-- **Vercel Pro**: $20/mês (frontend)
-- **Monitoring**: $29/mês (Sentry)
-- **Total**: ~$81/mês
+- **Supabase**: $0/mês (plano gratuito)
+- **Render.com**: $0/mês (plano gratuito)
+- **Vercel**: $0/mês (plano gratuito)
+- **Monitoring**: $0/mês (logs básicos)
+- **Total**: $0/mês
 
 #### **Desenvolvimento**
-- **Fase 2**: 240 horas × $50/h = $12.000
-- **Fase 3**: 320 horas × $50/h = $16.000
-- **Fase 4**: 400 horas × $50/h = $20.000
+- **Fase 2**: 0 horas (desenvolvimento próprio)
+- **Fase 3**: 0 horas (desenvolvimento próprio)
+- **Fase 4**: 0 horas (desenvolvimento próprio)
 
 ---
 
 ## 🤝 **Como Contribuir**
 
-### 🛠️ **Para Desenvolvedores**
+### 🛠️ **Para Desenvolvimento Individual**
 
-#### **Processo de Contribuição**
-1. **Fork** do repositório
-2. **Feature branch** a partir da `develop`
+#### **Processo de Desenvolvimento**
+1. **Feature branch** a partir da `develop`
    ```bash
    git checkout develop
    git pull origin develop
    git checkout -b feature/nome-da-feature
    ```
-3. **Desenvolvimento** seguindo padrões
+2. **Desenvolvimento** seguindo padrões
    - Commits atômicos e descritivos
    - Testes obrigatórios (cobertura > 90%)
    - Documentação atualizada
-4. **Pull Request** para `develop`
+3. **Pull Request** para `develop`
    - Descrição detalhada da feature
    - Screenshots/vídeos se aplicável
    - Checklist de DoD preenchido
-5. **Code Review** pela equipe
-   - Aprovação de pelo menos 2 desenvolvedores
+4. **Auto-review** com checklist de qualidade
+   - Revisão própria do código
    - Testes passando em CI/CD
    - Deploy em staging aprovado
 
