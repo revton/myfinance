@@ -7,6 +7,7 @@ from .config import settings
 from .models import TransactionCreate, Transaction, TransactionList, TransactionUpdate
 from .database_sqlalchemy import get_db, create_tables, test_connection
 from .database import Transaction as TransactionModel
+from .auth import auth_router
 import uuid
 from datetime import datetime
 import logging
@@ -32,6 +33,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Incluir rotas de autenticação
+app.include_router(auth_router)
 
 @app.on_event("startup")
 async def startup_event():
