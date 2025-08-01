@@ -8,30 +8,57 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 - ✅ Categorização de transações
 - ✅ Relatórios financeiros detalhados
 - ✅ Interface web moderna e responsiva
-- ✅ Deploy gratuito no Render.com
+- ✅ Deploy automático no Vercel (Frontend)
 
 ## 📚 Navegação
 
-- [Guia do Usuário](user/) - Como usar o sistema
-- [Guia do Desenvolvedor](dev/) - Configuração e desenvolvimento
-- [Deploy](deploy/) - Instruções de implantação
+- [🗺️ Roadmap](roadmap.md) - Planejamento e fases do projeto
+- [Guia do Usuário](user/index.md) - Como usar o sistema
+- [Guia do Desenvolvedor](dev/index.md) - Configuração e desenvolvimento
+- [Deploy](deploy.md) - Instruções de implantação
 
 ## 🚀 Tecnologias
 
 - **Backend**: FastAPI + SQLAlchemy + Supabase
-- **Frontend**: HTML5 + CSS3 + JavaScript
+- **Frontend**: React 18 + TypeScript + Material-UI
 - **Documentação**: MkDocs + Material Theme
-- **Deploy**: Render.com (gratuito)
+- **Deploy**: Vercel (Frontend) + Local (Backend)
 
 ## 🔧 Status das Correções
 
-- ✅ **GitHub Actions**: Totalmente corrigidas
+- ⚠️ **GitHub Actions**: Problemas conhecidos (ver seção abaixo)
 - ✅ **Backend Tests**: Supabase mocking funcionando
 - ✅ **Frontend Tests**: Vitest + React funcionando
 - ✅ **GitHub Pages**: Deploy moderno configurado
+
+## ⚠️ Problemas Conhecidos
+
+### GitHub Actions
+- **Status**: ⚠️ **Parcialmente Funcionando**
+- **Problemas**: Alguns workflows com erros que foram ignorados para continuar o desenvolvimento
+- **Impacto**: Deploy e testes automatizados podem falhar
+- **Prioridade**: Baixa (funcionalidades core funcionando)
+- **Plano**: Corrigir em iteração futura
+
+### Deploy Automático
+- **Status**: ⚠️ **Parcialmente Funcionando**
+- **Frontend (Vercel)**: ✅ Funcionando - Deploy automático ativo
+- **Backend (Render)**: ❌ Não funcionando - Deploy manual necessário
+- **Impacto**: Backend precisa ser executado localmente para desenvolvimento
+- **Prioridade**: Média (funcionalidades core funcionando localmente)
+- **Plano**: Configurar deploy do backend em iteração futura
+
+## 📊 Status do Projeto
+
+| Métrica | Valor |
+|---------|-------|
+| **Fase Atual** | ✅ Fase 1 - MVP (Concluída) |
+| **Próxima Fase** | 📋 Fase 2 - Categorias e Autenticação (Ago/25) |
+| **Tecnologias** | FastAPI + React + Supabase |
+| **Deploy** | Vercel (Frontend) + Local (Backend) |
 
 ---
 
 *Documentação gerada automaticamente via GitHub Actions*
 
-<!-- Trigger para teste da pipeline - 2025-01-27 19:30 UTC -->
+<!-- Trigger para roadmap update - 2025-01-27 22:00 UTC -->
