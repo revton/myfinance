@@ -138,4 +138,40 @@ class UserResponse(BaseModel):
 
 class RefreshTokenRequest(BaseModel):
     """Modelo para requisição de refresh token"""
-    refresh_token: str 
+    refresh_token: str
+    
+    @field_validator('refresh_token')
+    @classmethod
+    def validate_refresh_token(cls, v):
+        """Valida se o refresh token não está vazio"""
+        if not v or not v.strip():
+            raise ValueError('Refresh token não pode estar vazio')
+        return v.strip() 
+
+class ForgotPasswordRequest(BaseModel):
+    """Modelo para solicitação de recuperação de senha"""
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    """Modelo para redefinição de senha"""
+    email: EmailStr
+    new_password: str
+    token: str
+    
+    @field_validator('new_password')
+    @classmethod
+    def validate_password(cls, v):
+        """Valida a força da senha"""
+        if len(v) < 8:
+            raise ValueError('A senha deve ter pelo menos 8 caracteres')
+        if len(v) > 128:
+            raise ValueError('A senha deve ter no máximo 128 caracteres')
+        if not any(c.isupper() for c in v):
+            raise ValueError('A senha deve conter pelo menos uma letra maiúscula')
+        if not any(c.islower() for c in v):
+            raise ValueError('A senha deve conter pelo menos uma letra minúscula')
+        if not any(c.isdigit() for c in v):
+            raise ValueError('A senha deve conter pelo menos um número')
+        if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in v):
+            raise ValueError('A senha deve conter pelo menos um caractere especial')
+        return v 

@@ -9,20 +9,25 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
 from .service import AuthService
+from .utils.jwt_handler import JWTHandler
 
 # Configurar HTTPBearer para autenticação
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 # Função para obter instância do serviço de autenticação (lazy loading)
 def get_auth_service_instance() -> AuthService:
     """Retorna uma instância do AuthService"""
     return AuthService()
 
+def get_jwt_handler() -> JWTHandler:
+    """Retorna uma instância do JWTHandler"""
+    return JWTHandler()
+
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> dict:
     """
-    Dependência para obter o usuário atual baseado no token
+    Dependência para obter o usuário atual baseado no token JWT
     
     Args:
         credentials: Credenciais de autorização
@@ -31,14 +36,21 @@ async def get_current_user(
         Dados do usuário atual
         
     Raises:
-        HTTPException: Se o token for inválido
+        HTTPException: Se o token for inválido ou ausente
     """
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de autenticação necessário",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     try:
         token = credentials.credentials
-        auth_service = get_auth_service_instance()
-        user = await auth_service.get_current_user(token)
-        return user
-    except HTTPException:
+        jwt_handler = get_jwt_handler()
+        user_data = jwt_handler.verify_token(token)
+        return user_data
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido",
@@ -62,10 +74,10 @@ async def get_current_user_optional(
     
     try:
         token = credentials.credentials
-        auth_service = get_auth_service_instance()
-        user = await auth_service.get_current_user(token)
-        return user
-    except HTTPException:
+        jwt_handler = get_jwt_handler()
+        user_data = jwt_handler.verify_token(token)
+        return user_data
+    except Exception:
         return None
 
 async def get_current_user_id(
@@ -80,7 +92,7 @@ async def get_current_user_id(
     Returns:
         ID do usuário atual
     """
-    return current_user["id"]
+    return current_user["user_id"]
 
 async def get_current_user_email(
     current_user: dict = Depends(get_current_user)
@@ -95,20 +107,6 @@ async def get_current_user_email(
         Email do usuário atual
     """
     return current_user["email"]
-
-async def get_current_user_profile(
-    current_user: dict = Depends(get_current_user)
-) -> Optional[dict]:
-    """
-    Dependência para obter o perfil do usuário atual
-    
-    Args:
-        current_user: Usuário atual
-        
-    Returns:
-        Perfil do usuário atual ou None se não existir
-    """
-    return current_user.get("profile")
 
 async def require_authenticated_user(
     current_user: dict = Depends(get_current_user)
@@ -140,7 +138,7 @@ async def get_auth_service() -> AuthService:
     Returns:
         Instância do AuthService
     """
-    return auth_service
+    return get_auth_service_instance()
 
 # Função para verificar se o usuário tem permissão específica
 def require_permission(permission: str):
@@ -227,7 +225,7 @@ def require_ownership(resource_user_id_field: str = "user_id"):
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
-        if resource and resource.get(resource_user_id_field) != current_user["id"]:
+        if resource and resource.get(resource_user_id_field) != current_user["user_id"]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Acesso negado: você não é o proprietário deste recurso"
@@ -270,8 +268,7 @@ def require_admin():
         # Verificar se o usuário é admin
         # Por enquanto, vamos considerar que não há admins
         # Em uma implementação real, você verificaria isso no perfil do usuário
-        profile = current_user.get("profile", {})
-        is_admin = profile.get("is_admin", False)
+        is_admin = current_user.get("is_admin", False)
         
         if not is_admin:
             raise HTTPException(

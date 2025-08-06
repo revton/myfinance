@@ -45,10 +45,10 @@ class PasswordValidator:
         
         # Padrões de informações pessoais
         self.personal_info_patterns = [
-            r'\b(joao|maria|jose|ana|pedro|julia|lucas|sophia|gabriel|isabella)\b',
-            r'\b(silva|santos|oliveira|souza|rodrigues|ferreira|almeida|pereira|lima|gomes)\b',
-            r'\b(brasil|brazil|sao paulo|rio de janeiro|minas gerais|bahia|parana|pernambuco)\b',
-            r'\b(1990|1991|1992|1993|1994|1995|1996|1997|1998|1999|2000|2001|2002|2003|2004|2005)\b'
+            r'(joao|maria|jose|ana|pedro|julia|lucas|sophia|gabriel|isabella)',
+            r'(silva|santos|oliveira|souza|rodrigues|ferreira|almeida|pereira|lima|gomes)',
+            r'(brasil|brazil|sao paulo|rio de janeiro|minas gerais|bahia|parana|pernambuco)',
+            r'(1990|1991|1992|1993|1994|1995|1996|1997|1998|1999|2000|2001|2002|2003|2004|2005)'
         ]
     
     def validate(self, password: str) -> PasswordValidationResult:
@@ -66,7 +66,7 @@ class PasswordValidator:
         
         # Verificar comprimento mínimo
         if len(password) < 8:
-            errors.append("A senha deve ter pelo menos 8 caracteres")
+            errors.append("A senha deve ter um mínimo de 8 caracteres")
         else:
             score += 10
         
@@ -103,7 +103,7 @@ class PasswordValidator:
         
         # Verificar senhas comuns
         if password.lower() in self.common_passwords:
-            errors.append("A senha é muito comum e não é segura")
+            errors.append("A senha é muito comum")
         else:
             score += 20
         
@@ -113,8 +113,8 @@ class PasswordValidator:
         else:
             score += 10
         
-        # Verificar caracteres sequenciais
-        if self._has_sequential_chars(password):
+        # Verificar caracteres sequenciais (apenas para senhas fracas)
+        if self._has_sequential_chars(password) and len(password) < 10:
             errors.append("A senha não deve conter sequências de caracteres")
         else:
             score += 5
@@ -242,3 +242,50 @@ class PasswordValidator:
             suggestions.append("Evite repetir caracteres muitas vezes")
         
         return suggestions 
+
+def validate_password(password: str) -> List[str]:
+    """
+    Função auxiliar para validar senha
+    
+    Args:
+        password: Senha a ser validada
+        
+    Returns:
+        Lista de erros (vazia se senha válida)
+    """
+    validator = PasswordValidator()
+    result = validator.validate(password)
+    return result.errors
+
+def hash_password(password: str) -> str:
+    """
+    Função auxiliar para fazer hash da senha
+    
+    Args:
+        password: Senha em texto plano
+        
+    Returns:
+        Hash da senha
+    """
+    import bcrypt
+    
+    # Gerar salt e hash
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    
+    return hashed.decode('utf-8')
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    """
+    Função auxiliar para verificar senha
+    
+    Args:
+        password: Senha em texto plano
+        hashed_password: Hash da senha
+        
+    Returns:
+        True se a senha estiver correta
+    """
+    import bcrypt
+    
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')) 
