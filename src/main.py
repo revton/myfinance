@@ -7,6 +7,7 @@ from .config import settings
 from .models import TransactionCreate, Transaction, TransactionList, TransactionUpdate
 from .database_sqlalchemy import get_db, create_tables, test_connection
 from .database import Transaction as TransactionModel
+from .auth import auth_router
 import uuid
 from datetime import datetime
 import logging
@@ -33,10 +34,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Incluir rotas de autenticação
+app.include_router(auth_router)
+
 @app.on_event("startup")
 async def startup_event():
     """Evento executado na inicialização da aplicação"""
     try:
+        # Pula a inicialização do banco se estiver em modo de teste
+        if os.getenv("TESTING") == "true":
+            logger.info("Modo de teste detectado - pulando inicialização do banco")
+            return
+            
         # Testa conexão com banco
         if test_connection():
             logger.info("Conexão com banco estabelecida com sucesso")

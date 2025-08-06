@@ -1,29 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Container,
-  Paper,
-  Box,
-  TextField,
-  Button,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  useMediaQuery
-} from '@mui/material';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import axios from 'axios';
-import { API_BASE_URL } from './config';
+import CssBaseline from '@mui/material/CssBaseline';
 
-// Configurar Axios com URL base
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
+// Componentes de autenticação
+import Login from './components/Login';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+
+// Componente principal da aplicação
+import Dashboard from './components/Dashboard';
 
 const theme = createTheme({
   palette: {
@@ -33,128 +19,52 @@ const theme = createTheme({
   },
 });
 
-interface Transaction {
-  type: 'income' | 'expense';
-  amount: number;
-  description: string;
-}
+// Componente para verificar se o usuário está autenticado
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('access_token');
+  
+  if (!token) {
+    return <Navigate to="/auth/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
 function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [form, setForm] = useState<Transaction>({ type: 'income', amount: 0, description: '' });
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    
-    const loadTransactions = async () => {
-      try {
-        const response = await api.get('/transactions/', {
-          signal: abortController.signal
-        });
-        
-        const data = Array.isArray(response.data) ? response.data : [];
-        setTransactions(data as Transaction[]);
-      } catch (error) {
-        // Se foi cancelado, não faz nada
-        if (axios.isCancel(error)) {
-          return;
-        }
-        setTransactions([]);
-      }
-    };
-
-    loadTransactions();
-    
-    // Cleanup function para cancelar requisições pendentes
-    return () => {
-      abortController.abort();
-    };
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.description || !form.amount) return;
-    const res = await api.post('/transactions/', { ...form, amount: Number(form.amount) });
-    setTransactions([...transactions, res.data]);
-    setForm({ ...form, amount: 0, description: '' });
-  };
-
   return (
     <ThemeProvider theme={theme}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            MyFinance
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Nova Transação
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={2}>
-            <TextField
-              select
-              label="Tipo"
-              name="type"
-              value={form.type}
-              onChange={handleChange}
-              sx={{ minWidth: 120 }}
-            >
-              <MenuItem value="income">Receita</MenuItem>
-              <MenuItem value="expense">Despesa</MenuItem>
-            </TextField>
-            <TextField
-              label="Valor"
-              name="amount"
-              type="number"
-              value={form.amount}
-              onChange={handleChange}
-              inputProps={{ min: 0, step: 0.01 }}
-              sx={{ minWidth: 120 }}
-            />
-            <TextField
-              label="Descrição"
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              sx={{ flex: 1 }}
-            />
-            <Button type="submit" variant="contained" color="primary">
-              Adicionar
-            </Button>
-          </Box>
-        </Paper>
-        <Paper elevation={3} sx={{ p: 2, mt: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            Transações
-          </Typography>
-          <List>
-            {transactions.map((t, i) => (
-              <React.Fragment key={i}>
-                <ListItem>
-                  <ListItemText
-                    primary={`${t.type === 'income' ? 'Receita' : 'Despesa'}: R$ ${t.amount.toFixed(2)}`}
-                    secondary={t.description}
-                  />
-                </ListItem>
-                {i < transactions.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-            {transactions.length === 0 && (
-              <Typography color="text.secondary" align="center" sx={{ mt: 2 }}>
-                Nenhuma transação cadastrada.
-              </Typography>
-            )}
-          </List>
-        </Paper>
-      </Container>
+      <CssBaseline />
+      <Router>
+        <Routes>
+          {/* Rotas públicas de autenticação */}
+          <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
+          
+          {/* Rota principal protegida */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            } 
+          />
+          
+          {/* Redirecionar raiz para dashboard ou login */}
+          <Route 
+            path="/" 
+            element={
+              localStorage.getItem('access_token') ? 
+                <Navigate to="/dashboard" replace /> : 
+                <Navigate to="/auth/login" replace />
+            } 
+          />
+          
+          {/* Rota 404 - redirecionar para login */}
+          <Route path="*" element={<Navigate to="/auth/login" replace />} />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }

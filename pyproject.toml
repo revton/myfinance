@@ -15,6 +15,11 @@ dependencies = [
     "python-dotenv==1.0.0",
     "alembic",
     "psycopg2-binary",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "httpx>=0.24.1",
+    "email-validator>=2.2.0",
+    "bcrypt>=4.3.0",
 ]
 
 [project.optional-dependencies]

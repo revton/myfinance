@@ -3,7 +3,7 @@ Modelos SQLAlchemy para o banco de dados
 Baseados nos modelos Pydantic para integração com Alembic
 """
 from datetime import datetime
-from sqlalchemy import Column, String, Float, Text, DateTime, CheckConstraint, Index
+from sqlalchemy import Column, String, Float, Text, DateTime, CheckConstraint, Index, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from .database_sqlalchemy import Base
@@ -35,4 +35,38 @@ class Transaction(Base):
     )
     
     def __repr__(self):
-        return f"<Transaction(id={self.id}, type={self.type}, amount={self.amount})>" 
+        return f"<Transaction(id={self.id}, type={self.type}, amount={self.amount})>"
+
+class UserProfile(Base):
+    """Modelo SQLAlchemy para perfis de usuário"""
+    __tablename__ = "user_profiles"
+    
+    # Campos baseados no modelo Pydantic
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), nullable=False, unique=True)
+    email = Column(String(255), nullable=False)
+    full_name = Column(String(255), nullable=True)
+    password_hash = Column(String(255), nullable=True)  # Hash da senha
+    avatar_url = Column(Text, nullable=True)
+    timezone = Column(String(50), nullable=False, default="America/Sao_Paulo")
+    currency = Column(String(3), nullable=False, default="BRL")
+    language = Column(String(5), nullable=False, default="pt-BR")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Constraints baseados na validação Pydantic
+    __table_args__ = (
+        CheckConstraint("timezone IN ('America/Sao_Paulo', 'UTC', 'America/New_York', 'Europe/London')", name="check_valid_timezone"),
+        CheckConstraint("currency IN ('BRL', 'USD', 'EUR', 'GBP')", name="check_valid_currency"),
+        CheckConstraint("language IN ('pt-BR', 'en-US', 'es-ES')", name="check_valid_language"),
+        CheckConstraint("length(email) >= 3", name="check_email_length"),
+        CheckConstraint("length(full_name) <= 255", name="check_full_name_length"),
+        
+        # Índices para performance
+        Index("idx_user_profiles_user_id", "user_id"),
+        Index("idx_user_profiles_email", "email"),
+        Index("idx_user_profiles_created_at", "created_at"),
+    )
+    
+    def __repr__(self):
+        return f"<UserProfile(id={self.id}, user_id={self.user_id}, email={self.email})>" 
