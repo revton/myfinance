@@ -162,9 +162,11 @@ class TestAuthEndpoints:
         assert response.status_code == 401
     
     @patch('src.auth.service.AuthService.logout_user')
-    def test_logout_endpoint_success(self, mock_logout):
+    @patch('src.auth.service.AuthService.get_current_user')
+    def test_logout_endpoint_success(self, mock_get_user, mock_logout):
         """Testa endpoint de logout com sucesso"""
         # Arrange
+        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
         mock_logout.return_value = {"message": "Logout realizado com sucesso"}
         
         headers = {"Authorization": "Bearer valid-token"}
@@ -185,9 +187,11 @@ class TestAuthEndpoints:
         assert response.status_code == 401
     
     @patch('src.auth.service.AuthService.get_user_profile')
-    def test_profile_endpoint_success(self, mock_get_profile):
+    @patch('src.auth.service.AuthService.get_current_user')
+    def test_profile_endpoint_success(self, mock_get_user, mock_get_profile):
         """Testa endpoint de perfil com sucesso"""
         # Arrange
+        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
         mock_get_profile.return_value = {
             "id": "profile-123",
             "user_id": "user-123",
@@ -210,9 +214,11 @@ class TestAuthEndpoints:
         assert result["full_name"] == "Test User"
     
     @patch('src.auth.service.AuthService.update_user_profile')
-    def test_profile_update_endpoint_success(self, mock_update_profile):
+    @patch('src.auth.service.AuthService.get_current_user')
+    def test_profile_update_endpoint_success(self, mock_get_user, mock_update_profile):
         """Testa endpoint de atualização de perfil com sucesso"""
         # Arrange
+        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
         update_data = {
             "full_name": "Updated Name",
             "timezone": "America/New_York",
@@ -241,9 +247,11 @@ class TestAuthEndpoints:
         assert result["timezone"] == "America/New_York"
         assert result["currency"] == "USD"
     
-    def test_profile_update_endpoint_invalid_data(self):
+    @patch('src.auth.service.AuthService.get_current_user')
+    def test_profile_update_endpoint_invalid_data(self, mock_get_user):
         """Testa endpoint de atualização de perfil com dados inválidos"""
         # Arrange
+        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
         update_data = {
             "timezone": "Invalid/Timezone"
         }
