@@ -10,7 +10,7 @@ load_dotenv()
 
 # Importa os modelos SQLAlchemy para autogenerate
 from src.database_sqlalchemy import Base
-from src.database import Transaction  # Importa o modelo Transaction
+from src.database import Transaction, UserProfile  # Importa os modelos SQLAlchemy
 from src.models import *  # Importa os modelos Pydantic também
 
 # this is the Alembic Config object, which provides
