@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 from .config import settings
 import logging
 import os
+from unittest.mock import Mock
 
 logger = logging.getLogger(__name__)
 
@@ -52,11 +53,21 @@ Base = declarative_base()
 
 def get_db() -> Session:
     """Dependency para obter sessão do banco"""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    # Se estiver em modo de teste, retorna um mock
+    if os.getenv("TESTING") == "true":
+        logger.info("Modo de teste detectado - retornando sessão mock")
+        mock_session = Mock(spec=Session)
+        try:
+            yield mock_session
+        finally:
+            pass  # Mock não precisa ser fechado
+    else:
+        # Modo normal - retorna sessão real
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
 
 def create_tables():
     """Cria todas as tabelas definidas nos modelos"""

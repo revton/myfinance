@@ -101,7 +101,7 @@ class JWTHandler:
                 detail="Token expirado",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        except jwt.JWTError as e:
+        except (jwt.InvalidSignatureError, jwt.InvalidAlgorithmError, jwt.DecodeError) as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Token inválido: {str(e)}",

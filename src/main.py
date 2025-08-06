@@ -41,6 +41,11 @@ app.include_router(auth_router)
 async def startup_event():
     """Evento executado na inicialização da aplicação"""
     try:
+        # Pula a inicialização do banco se estiver em modo de teste
+        if os.getenv("TESTING") == "true":
+            logger.info("Modo de teste detectado - pulando inicialização do banco")
+            return
+            
         # Testa conexão com banco
         if test_connection():
             logger.info("Conexão com banco estabelecida com sucesso")

@@ -8,10 +8,9 @@ incluindo registro, login, logout e gerenciamento de perfis de usuário.
 from .models import (
     UserRegister,
     UserLogin,
-    UserProfile,
     UserProfileUpdate,
-    Token,
-    UserResponse
+    ForgotPasswordRequest,
+    ResetPasswordRequest
 )
 from .service import AuthService
 from .dependencies import get_current_user
@@ -20,10 +19,9 @@ from .routes import router as auth_router
 __all__ = [
     "UserRegister",
     "UserLogin", 
-    "UserProfile",
     "UserProfileUpdate",
-    "Token",
-    "UserResponse",
+    "ForgotPasswordRequest",
+    "ResetPasswordRequest",
     "AuthService",
     "get_current_user",
     "auth_router"
