@@ -170,11 +170,15 @@ class TestAuthEndpoints:
         assert response.status_code == 401
     
     @patch('src.auth.service.AuthService.logout_user')
-    @patch('src.auth.dependencies.get_current_user')
-    def test_logout_endpoint_success(self, mock_get_user, mock_logout):
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_logout_endpoint_success(self, mock_jwt_handler, mock_logout):
         """Testa endpoint de logout com sucesso"""
         # Arrange
-        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
         mock_logout.return_value = {"message": "Logout realizado com sucesso"}
         
         headers = {"Authorization": "Bearer valid-token"}

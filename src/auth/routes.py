@@ -58,6 +58,14 @@ async def reset_password(request_data: ResetPasswordRequest):
     auth_service = AuthService()
     return await auth_service.reset_password(request_data)
 
+@router.post("/logout")
+async def logout_user(current_user: dict = Depends(get_current_user)):
+    """
+    Realiza logout do usuário
+    """
+    auth_service = AuthService()
+    return await auth_service.logout_user(current_user["user_id"])
+
 @router.get("/me")
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     """
