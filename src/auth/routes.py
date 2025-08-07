@@ -58,6 +58,20 @@ async def reset_password(request_data: ResetPasswordRequest):
     auth_service = AuthService()
     return await auth_service.reset_password(request_data)
 
+@router.get("/me")
+async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    """
+    Obtém informações do usuário atual
+    """
+    auth_service = AuthService()
+    profile = await auth_service.get_user_profile(current_user["user_id"])
+    
+    return {
+        "id": current_user["user_id"],
+        "email": current_user.get("email"),
+        "profile": profile
+    }
+
 @router.get("/profile")
 async def get_user_profile(current_user: dict = Depends(get_current_user)):
     """
