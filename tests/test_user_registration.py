@@ -73,8 +73,8 @@ def test_user_registration_invalid_password(client):
     print(f"Senha inválida - Status: {response.status_code}")
     print(f"Senha inválida - Response: {response.json()}")
     
-    # Deve retornar erro de validação de senha
-    assert response.status_code == 400
+    # Deve retornar erro de validação de senha (422 para validação de modelo Pydantic)
+    assert response.status_code == 422
 
 def test_user_registration_missing_fields(client):
     """Teste de registro com campos obrigatórios faltando"""

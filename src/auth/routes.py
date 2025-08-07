@@ -14,7 +14,8 @@ from .models import (
     UserLogin,
     UserProfileUpdate,
     ForgotPasswordRequest,
-    ResetPasswordRequest
+    ResetPasswordRequest,
+    RefreshTokenRequest
 )
 from .service import AuthService
 from .dependencies import (
@@ -65,6 +66,14 @@ async def logout_user(current_user: dict = Depends(get_current_user)):
     """
     auth_service = AuthService()
     return await auth_service.logout_user(current_user["user_id"])
+
+@router.post("/refresh")
+async def refresh_token(request_data: RefreshTokenRequest):
+    """
+    Atualiza o token de acesso usando refresh token
+    """
+    auth_service = AuthService()
+    return await auth_service.refresh_token(request_data)
 
 @router.get("/me")
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
