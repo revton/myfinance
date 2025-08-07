@@ -6,7 +6,7 @@ Este sistema permite o cadastro e visualização de receitas e despesas de forma
 
 ## Como Usar
 
-1. Acesse a interface web em http://localhost:5173
+1. Acesse a interface web em https://myfinance-three.vercel.app/
 2. Preencha o formulário para cadastrar uma nova receita ou despesa:
    - Selecione o tipo (Receita ou Despesa)
    - Informe o valor
