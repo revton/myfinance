@@ -117,18 +117,25 @@ class TestAuthEndpoints:
         assert response.status_code == 401
         assert "credenciais inválidas" in response.json()["detail"].lower()
     
-    @patch('src.auth.service.AuthService.get_current_user')
-    def test_me_endpoint_success(self, mock_get_user):
+    @patch('src.auth.service.AuthService.get_user_profile')
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_me_endpoint_success(self, mock_jwt_handler, mock_get_profile):
         """Testa endpoint /me com token válido"""
         # Arrange
-        mock_get_user.return_value = {
-            "id": "user-123",
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
+        
+        mock_get_profile.return_value = {
+            "id": "profile-123",
+            "user_id": "user-123",
             "email": "test@example.com",
-            "profile": {
-                "full_name": "Test User",
-                "timezone": "America/Sao_Paulo",
-                "currency": "BRL"
-            }
+            "full_name": "Test User",
+            "timezone": "America/Sao_Paulo",
+            "currency": "BRL",
+            "language": "pt-BR"
         }
         
         headers = {"Authorization": "Bearer valid-token"}
@@ -140,6 +147,7 @@ class TestAuthEndpoints:
         assert response.status_code == 200
         result = response.json()
         assert result["email"] == "test@example.com"
+        assert result["id"] == "user-123"
         assert result["profile"]["full_name"] == "Test User"
     
     def test_me_endpoint_no_token(self):
@@ -162,11 +170,15 @@ class TestAuthEndpoints:
         assert response.status_code == 401
     
     @patch('src.auth.service.AuthService.logout_user')
-    @patch('src.auth.service.AuthService.get_current_user')
-    def test_logout_endpoint_success(self, mock_get_user, mock_logout):
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_logout_endpoint_success(self, mock_jwt_handler, mock_logout):
         """Testa endpoint de logout com sucesso"""
         # Arrange
-        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
         mock_logout.return_value = {"message": "Logout realizado com sucesso"}
         
         headers = {"Authorization": "Bearer valid-token"}
@@ -187,7 +199,7 @@ class TestAuthEndpoints:
         assert response.status_code == 401
     
     @patch('src.auth.service.AuthService.get_user_profile')
-    @patch('src.auth.service.AuthService.get_current_user')
+    @patch('src.auth.dependencies.get_current_user')
     def test_profile_endpoint_success(self, mock_get_user, mock_get_profile):
         """Testa endpoint de perfil com sucesso"""
         # Arrange
@@ -214,7 +226,7 @@ class TestAuthEndpoints:
         assert result["full_name"] == "Test User"
     
     @patch('src.auth.service.AuthService.update_user_profile')
-    @patch('src.auth.service.AuthService.get_current_user')
+    @patch('src.auth.dependencies.get_current_user')
     def test_profile_update_endpoint_success(self, mock_get_user, mock_update_profile):
         """Testa endpoint de atualização de perfil com sucesso"""
         # Arrange
@@ -247,7 +259,7 @@ class TestAuthEndpoints:
         assert result["timezone"] == "America/New_York"
         assert result["currency"] == "USD"
     
-    @patch('src.auth.service.AuthService.get_current_user')
+    @patch('src.auth.dependencies.get_current_user')
     def test_profile_update_endpoint_invalid_data(self, mock_get_user):
         """Testa endpoint de atualização de perfil com dados inválidos"""
         # Arrange
