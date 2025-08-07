@@ -4,10 +4,14 @@ Bem-vindo à documentação do MyFinance, um sistema completo para controle de f
 
 ## 📋 Funcionalidades
 
-- ✅ **Backend (FastAPI)**: API REST para transações (CRUD), modelos de dados, validações e testes.
-- ✅ **Frontend (React)**: Interface principal para registro e listagem de transações (receitas e despesas), responsiva e com Material Design.
-- ✅ **Testes Automatizados**: Cobertura abrangente para backend e frontend.
-- ✅ **Deploy Automatizado**: Frontend no Vercel.
+O MyFinance oferece as seguintes funcionalidades principais para gerenciar suas finanças pessoais:
+
+- ✅ **Registro de Transações**: Adicione facilmente suas receitas e despesas, com campos para tipo (receita/despesa), valor e descrição.
+- ✅ **Listagem e Visualização**: Visualize todas as suas transações de forma clara e organizada, permitindo um acompanhamento rápido do seu fluxo financeiro.
+- ✅ **Interface Intuitiva e Responsiva**: Acesse o sistema de qualquer dispositivo (desktop, tablet, celular) com uma interface moderna e fácil de usar, baseada no Material Design.
+- ✅ **Validação de Dados**: Garanta a integridade dos seus dados com validações tanto no frontend quanto no backend.
+- ✅ **Testes Abrangentes**: O projeto conta com uma suíte de testes automatizados para garantir a estabilidade e confiabilidade das funcionalidades.
+- ✅ **Deploy Simplificado**: O frontend da aplicação é automaticamente implantado no Vercel, facilitando o acesso e a atualização.
 
 ## 📚 Navegação
 
