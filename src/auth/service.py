@@ -612,6 +612,34 @@ class AuthService:
                 detail=f"Erro interno do servidor: {str(e)}"
             )
     
+    async def logout_user(self, user_id: str) -> Dict[str, str]:
+        """
+        Realiza logout do usuário
+        
+        Args:
+            user_id: ID do usuário
+            
+        Returns:
+            Mensagem de confirmação
+            
+        Raises:
+            HTTPException: Se houver erro no logout
+        """
+        try:
+            # Em um sistema real, aqui você poderia:
+            # 1. Invalidar tokens no banco de dados
+            # 2. Adicionar tokens à blacklist
+            # 3. Limpar sessões ativas
+            
+            # Por enquanto, apenas retorna sucesso
+            return {"message": "Logout realizado com sucesso"}
+            
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Erro interno do servidor: {str(e)}"
+            )
+    
     async def delete_user(self, user_id: str) -> Dict[str, str]:
         """
         Deleta um usuário
