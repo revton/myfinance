@@ -3,7 +3,6 @@ name: Deploy Documentation
 on:
   push:
     branches: [ main, develop, feature/deploy-gratuito ]
-    paths: [ 'docs/**', 'mkdocs.yml' ]
   pull_request:
     branches: [ main ]
     paths: [ 'docs/**', 'mkdocs.yml' ]
