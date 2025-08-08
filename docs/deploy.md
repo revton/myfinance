@@ -5,7 +5,8 @@ Este documento descreve como fazer o deploy gratuito do MyFinance usando platafo
 ## 🚀 Arquitetura de Deploy
 
 ### Plataformas Utilizadas:
-- **Backend (FastAPI)**: Render
+- **Backend (FastAPI)**: Local (para desenvolvimento)
+- **Backend (FastAPI)**: Render (deploy futuro)
 - **Frontend (React)**: Vercel
 - **Database**: Supabase
 - **Documentação**: GitHub Pages
