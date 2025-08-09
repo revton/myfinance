@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Login from './components/Login';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import Register from './components/Register';
 
 // Componente principal da aplicação
 import Dashboard from './components/Dashboard';
@@ -37,7 +38,9 @@ function App() {
       <Router>
         <Routes>
           {/* Rotas públicas de autenticação */}
+          {/* Rotas públicas de autenticação */}
           <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
           
