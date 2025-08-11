@@ -16,6 +16,17 @@ Este sistema permite o cadastro e visualização de receitas e despesas de forma
 
 > **Observação:** Os dados são armazenados temporariamente enquanto o sistema está em execução. Ao reiniciar o backend, os dados são perdidos.
 
+### Screenshots da Aplicação
+
+#### Página Inicial (Login)
+![Página Inicial](../screenshot_01_initial_page.png)
+
+#### Esqueci Minha Senha
+![Esqueci Minha Senha](../screenshot_04_forgot_password.png)
+
+#### Tela Principal da Aplicação
+![Tela Principal](../screenshot_05_main_application_screen.png)
+
 ## Como Usar
 
 ### Cadastrar Receita ou Despesa
