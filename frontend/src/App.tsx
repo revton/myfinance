@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 // Componentes de autenticação
 import Login from './components/Login';
+import Register from './components/Register';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 
@@ -38,6 +39,7 @@ function App() {
         <Routes>
           {/* Rotas públicas de autenticação */}
           <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
           

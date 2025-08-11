@@ -12,13 +12,17 @@ O MyFinance agora possui um sistema de autenticação seguro que permite que cad
 
 Para começar a usar o MyFinance, você precisa criar uma conta:
 
-1. **Acesse a página de registro** (`/register`)
+1. **Acesse a página de registro** (`/register`). Você pode encontrar o link para registro na **Página Inicial (Login)**.
 2. **Preencha os dados**:
    - **Nome completo**: Seu nome completo
    - **Email**: Um email válido que você usa regularmente
    - **Senha**: Uma senha segura (veja requisitos abaixo)
 
 3. **Clique em "Criar Conta"**
+
+#### Formulário de Registro
+Este é o formulário que você usará para criar sua nova conta. Preencha todos os campos com atenção.
+![Formulário de Registro](screenshot_02_registration_form.png)
 
 ### **2. Requisitos de Senha**
 
@@ -46,17 +50,25 @@ Para garantir a segurança da sua conta, sua senha deve ter:
 
 ### **Login Diário**
 
-1. **Acesse a página de login** (`/login`)
+1. **Acesse a página de login** (`/login`). Esta é a **Página Inicial (Login)** mostrada na documentação geral.
 2. **Digite suas credenciais**:
    - Email registrado
    - Senha
 3. **Clique em "Entrar"**
+
+#### Página Inicial (Login)
+Esta é a tela de entrada do MyFinance. Aqui você pode inserir suas credenciais para acessar sua conta. Se você ainda não tem uma conta, procure pelo link de "Criar Conta" ou "Registrar" nesta página.
+![Página Inicial](screenshot_01_initial_page.png)
 
 ### **Mantendo-se Conectado**
 
 - O sistema mantém você conectado por 30 minutos
 - Após esse tempo, você será automaticamente desconectado
 - Para continuar usando, faça login novamente
+
+#### Tela Principal da Aplicação
+Após fazer login com sucesso, você será direcionado para esta tela. Aqui você pode visualizar suas transações, adicionar novas receitas e despesas, e gerenciar suas finanças. Explore os menus e opções disponíveis para começar a organizar suas finanças.
+![Tela Principal da Aplicação](screenshot_05_main_application_screen.png)
 
 ---
 
@@ -129,10 +141,14 @@ O sistema faz logout automático quando:
 
 ### **Esqueci minha senha**
 
-1. **Na página de login**, clique em "Esqueci minha senha"
+1. **Na página de login**, clique em "Esqueci minha senha". Você será direcionado para a tela **Esqueci Minha Senha**.
 2. **Digite seu email** registrado
 3. **Verifique seu email** para instruções de recuperação
 4. **Siga o link** enviado para redefinir a senha
+
+#### Esqueci Minha Senha
+Se você esqueceu sua senha, esta tela permite que você inicie o processo de recuperação. Insira o e-mail associado à sua conta e siga as instruções que serão enviadas para redefinir sua senha.
+![Esqueci Minha Senha](screenshot_04_forgot_password.png)
 
 ### **Não consigo fazer login**
 
