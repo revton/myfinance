@@ -6,8 +6,9 @@ from src.main import app
 client = TestClient(app)
 
 class TestAuthEndpoints:
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.register_user')
-    def test_register_endpoint_success(self, mock_register):
+    def test_register_endpoint_success(self, mock_register, mock_create_client):
         """Testa endpoint de registro com sucesso"""
         # Arrange
         user_data = {
@@ -15,6 +16,9 @@ class TestAuthEndpoints:
             "password": "SecurePass123!",
             "full_name": "Test User"
         }
+        
+        # Mock do cliente Supabase
+        mock_supabase = mock_create_client.return_value
         
         mock_register.return_value = {
             "user_id": "user-123",
@@ -57,8 +61,9 @@ class TestAuthEndpoints:
         # Assert
         assert response.status_code == 422
     
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.login_user')
-    def test_login_endpoint_success(self, mock_login):
+    def test_login_endpoint_success(self, mock_login, mock_create_client):
         """Testa endpoint de login com sucesso"""
         # Arrange
         login_data = {
@@ -98,8 +103,9 @@ class TestAuthEndpoints:
         # Assert
         assert response.status_code == 422
     
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.login_user')
-    def test_login_endpoint_invalid_credentials(self, mock_login):
+    def test_login_endpoint_invalid_credentials(self, mock_login, mock_create_client):
         """Testa endpoint de login com credenciais inválidas"""
         # Arrange
         login_data = {
@@ -117,18 +123,26 @@ class TestAuthEndpoints:
         assert response.status_code == 401
         assert "credenciais inválidas" in response.json()["detail"].lower()
     
-    @patch('src.auth.service.AuthService.get_current_user')
-    def test_me_endpoint_success(self, mock_get_user):
+    @patch('src.auth.service.create_client')
+    @patch('src.auth.service.AuthService.get_user_profile')
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_me_endpoint_success(self, mock_jwt_handler, mock_get_profile, mock_create_client):
         """Testa endpoint /me com token válido"""
         # Arrange
-        mock_get_user.return_value = {
-            "id": "user-123",
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
+        
+        mock_get_profile.return_value = {
+            "id": "profile-123",
+            "user_id": "user-123",
             "email": "test@example.com",
-            "profile": {
-                "full_name": "Test User",
-                "timezone": "America/Sao_Paulo",
-                "currency": "BRL"
-            }
+            "full_name": "Test User",
+            "timezone": "America/Sao_Paulo",
+            "currency": "BRL",
+            "language": "pt-BR"
         }
         
         headers = {"Authorization": "Bearer valid-token"}
@@ -140,6 +154,7 @@ class TestAuthEndpoints:
         assert response.status_code == 200
         result = response.json()
         assert result["email"] == "test@example.com"
+        assert result["id"] == "user-123"
         assert result["profile"]["full_name"] == "Test User"
     
     def test_me_endpoint_no_token(self):
@@ -161,12 +176,17 @@ class TestAuthEndpoints:
         # Assert
         assert response.status_code == 401
     
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.logout_user')
-    @patch('src.auth.service.AuthService.get_current_user')
-    def test_logout_endpoint_success(self, mock_get_user, mock_logout):
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_logout_endpoint_success(self, mock_jwt_handler, mock_logout, mock_create_client):
         """Testa endpoint de logout com sucesso"""
         # Arrange
-        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
         mock_logout.return_value = {"message": "Logout realizado com sucesso"}
         
         headers = {"Authorization": "Bearer valid-token"}
@@ -186,12 +206,17 @@ class TestAuthEndpoints:
         # Assert
         assert response.status_code == 401
     
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.get_user_profile')
-    @patch('src.auth.service.AuthService.get_current_user')
-    def test_profile_endpoint_success(self, mock_get_user, mock_get_profile):
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_profile_endpoint_success(self, mock_jwt_handler, mock_get_profile, mock_create_client):
         """Testa endpoint de perfil com sucesso"""
         # Arrange
-        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
         mock_get_profile.return_value = {
             "id": "profile-123",
             "user_id": "user-123",
@@ -213,12 +238,18 @@ class TestAuthEndpoints:
         assert result["email"] == "test@example.com"
         assert result["full_name"] == "Test User"
     
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.update_user_profile')
-    @patch('src.auth.service.AuthService.get_current_user')
-    def test_profile_update_endpoint_success(self, mock_get_user, mock_update_profile):
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_profile_update_endpoint_success(self, mock_jwt_handler, mock_update_profile, mock_create_client):
         """Testa endpoint de atualização de perfil com sucesso"""
         # Arrange
-        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
+        
         update_data = {
             "full_name": "Updated Name",
             "timezone": "America/New_York",
@@ -247,11 +278,16 @@ class TestAuthEndpoints:
         assert result["timezone"] == "America/New_York"
         assert result["currency"] == "USD"
     
-    @patch('src.auth.service.AuthService.get_current_user')
-    def test_profile_update_endpoint_invalid_data(self, mock_get_user):
+    @patch('src.auth.dependencies.get_jwt_handler')
+    def test_profile_update_endpoint_invalid_data(self, mock_jwt_handler):
         """Testa endpoint de atualização de perfil com dados inválidos"""
         # Arrange
-        mock_get_user.return_value = {"id": "user-123", "email": "test@example.com"}
+        mock_jwt = mock_jwt_handler.return_value
+        mock_jwt.verify_token.return_value = {
+            "user_id": "user-123",
+            "email": "test@example.com"
+        }
+        
         update_data = {
             "timezone": "Invalid/Timezone"
         }
@@ -277,8 +313,9 @@ class TestAuthEndpoints:
         # Assert
         assert response.status_code == 401
     
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.refresh_token')
-    def test_refresh_token_endpoint_success(self, mock_refresh):
+    def test_refresh_token_endpoint_success(self, mock_refresh, mock_create_client):
         """Testa endpoint de refresh token com sucesso"""
         # Arrange
         refresh_data = {
@@ -313,8 +350,9 @@ class TestAuthEndpoints:
         # Assert
         assert response.status_code == 422
     
+    @patch('src.auth.service.create_client')
     @patch('src.auth.service.AuthService.refresh_token')
-    def test_refresh_token_endpoint_invalid_token(self, mock_refresh):
+    def test_refresh_token_endpoint_invalid_token(self, mock_refresh, mock_create_client):
         """Testa endpoint de refresh token com token inválido"""
         # Arrange
         refresh_data = {

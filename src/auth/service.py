@@ -10,7 +10,7 @@ import uuid
 from typing import Dict, Any, Optional
 from fastapi import HTTPException, status
 from supabase import create_client, Client
-from .models import UserRegister, UserLogin, UserProfileUpdate, ForgotPasswordRequest, ResetPasswordRequest
+from .models import UserRegister, UserLogin, UserProfileUpdate, ForgotPasswordRequest, ResetPasswordRequest, RefreshTokenRequest
 from .utils.password_validator import PasswordValidator
 from .utils.jwt_handler import JWTHandler
 from src.database import UserProfile
@@ -611,6 +611,61 @@ class AuthService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Erro interno do servidor: {str(e)}"
             )
+    
+    async def logout_user(self, user_id: str) -> Dict[str, str]:
+        """
+        Realiza logout do usuário
+        
+        Args:
+            user_id: ID do usuário
+            
+        Returns:
+            Mensagem de confirmação
+            
+        Raises:
+            HTTPException: Se houver erro no logout
+        """
+        try:
+            # Em um sistema real, aqui você poderia:
+            # 1. Invalidar tokens no banco de dados
+            # 2. Adicionar tokens à blacklist
+            # 3. Limpar sessões ativas
+            
+            # Por enquanto, apenas retorna sucesso
+            return {"message": "Logout realizado com sucesso"}
+            
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Erro interno do servidor: {str(e)}"
+            )
+    
+    async def refresh_token(self, request_data: RefreshTokenRequest) -> Dict[str, str]:
+        """
+        Atualiza o token de acesso usando refresh token
+        
+        Args:
+            request_data: Dados da requisição contendo refresh token
+            
+        Returns:
+            Novos tokens de acesso e refresh
+            
+        Raises:
+            HTTPException: Se o refresh token for inválido
+        """
+        try:
+            # TODO: Implementar validação real do refresh token
+            # Por enquanto, apenas simula a renovação
+            new_access_token = "new-access-token-123"
+            new_refresh_token = "new-refresh-token-123"
+            
+            return {
+                "access_token": new_access_token,
+                "refresh_token": new_refresh_token,
+                "token_type": "bearer"
+            }
+        except Exception as e:
+            raise HTTPException(status_code=401, detail="Token de refresh inválido")
     
     async def delete_user(self, user_id: str) -> Dict[str, str]:
         """

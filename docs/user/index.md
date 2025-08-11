@@ -6,49 +6,29 @@ Este sistema permite o cadastro e visualização de receitas e despesas de forma
 
 ## Como Usar
 
-1. Acesse a interface web em http://localhost:5173
-2. Preencha o formulário para cadastrar uma nova receita ou despesa:
-   - Selecione o tipo (Receita ou Despesa)
-   - Informe o valor
-   - Descreva a transação
-   - Clique em "Adicionar"
-3. Veja a lista de receitas e despesas cadastradas logo abaixo do formulário.
+### Acessando o MyFinance
 
-> **Observação:** Os dados são armazenados temporariamente enquanto o sistema está em execução. Ao reiniciar o backend, os dados são perdidos.
+Para começar a usar o MyFinance, abra seu navegador e acesse: [https://myfinance-three.vercel.app/](https://myfinance-three.vercel.app/).
 
-### Screenshots da Aplicação
+<img src="img/screenshot_01_initial_page.png" alt="Tela de Login" width="400px" style="max-width: 100%; height: auto;" />
 
-#### Página Inicial (Login)
-![Página Inicial](../screenshot_01_initial_page.png)
+Você será recebido pela tela de Login, que oferece as seguintes opções:
 
-#### Esqueci Minha Senha
-![Esqueci Minha Senha](../screenshot_04_forgot_password.png)
+*   **Entrar**: Se você já possui uma conta, insira seu **Email** e **Senha** nos campos correspondentes e clique no botão **"ENTRAR"**. Isso o levará diretamente para a área principal do MyFinance.
+*   **Criar Conta**: Se você é um novo usuário, clique no botão **"CRIAR CONTA"**. Você será guiado por um processo simples para registrar-se e começar a organizar suas finanças.
+*   **Esqueceu sua senha?**: Caso não se lembre da sua senha, clique neste link. Siga as instruções para redefini-la e recuperar o acesso à sua conta.
 
-#### Tela Principal da Aplicação
-![Tela Principal](../screenshot_05_main_application_screen.png)
+### Registrando suas Transações
 
-## Como Usar
+Após fazer login (ou criar sua conta), você estará pronto para registrar suas receitas e despesas:
 
-### Cadastrar Receita ou Despesa
+*   **Tipo**: Selecione se a transação é uma **Receita** (dinheiro que entra) ou uma **Despesa** (dinheiro que sai).
+*   **Valor**: Informe o valor numérico da transação.
+*   **Descrição**: Descreva brevemente do que se trata a transação (ex: "Salário", "Conta de Luz", "Compras no Supermercado").
+*   **Adicionar**: Clique no botão **"Adicionar"** para salvar a transação.
 
-1. Acesse o endpoint `/transactions/` usando um cliente HTTP (ex: Postman, Insomnia) ou a interface interativa do FastAPI (`/docs`).
-2. Envie uma requisição POST com os dados:
-   - `type`: "income" para receita ou "expense" para despesa
-   - `amount`: valor numérico
-   - `description`: descrição da transação
+### Visualizando suas Finanças
 
-Exemplo:
-```json
-{
-  "type": "income",
-  "amount": 100.0,
-  "description": "Salário"
-}
-```
-
-### Visualizar Receitas e Despesas
-
-1. Acesse o endpoint `/transactions/` com uma requisição GET.
-2. Você verá a lista de todas as receitas e despesas cadastradas.
+Todas as transações que você adicionar aparecerão em uma lista logo abaixo do formulário, permitindo que você acompanhe seu fluxo financeiro de forma clara.
 
 A documentação será atualizada conforme novas funcionalidades forem implementadas. 
