@@ -1,3 +1,4 @@
+
 from pydantic import BaseModel, validator
 from typing import Optional
 from datetime import datetime
@@ -95,3 +96,17 @@ class CategoryList(BaseModel):
     page: int
     per_page: int
     total_pages: int
+
+class CategoryResponse(CategoryBase):
+    id: UUID
+    user_id: UUID
+    is_default: bool
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class CategoryWithTransactionCount(CategoryResponse):
+    transaction_count: int
