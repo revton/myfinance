@@ -40,7 +40,8 @@ class CategoryService:
         return self.db.query(Category).filter(
             and_(
                 Category.id == category_id,
-                Category.user_id == self.user_id
+                Category.user_id == self.user_id,
+                Category.is_active == True
             )
         ).first()
     
