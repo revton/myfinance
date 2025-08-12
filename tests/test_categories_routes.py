@@ -53,8 +53,8 @@ class TestCategoriesRoutes:
         # Assert
         assert response.status_code == 422
 
-    def test_delete_category_success(self, authenticated_client, test_db: Session):
-        """Testa o sucesso na exclusão de uma categoria"""
+    def test_restore_category_success(self, authenticated_client, test_db: Session):
+        """Testa o sucesso na restauração de uma categoria"""
         # Arrange
         client, user_id = authenticated_client
         test_user = UserProfile(id=user_id, user_id=user_id, email="test@example.com", password_hash="hashedpassword")
@@ -71,13 +71,16 @@ class TestCategoriesRoutes:
         response = client.post(f"/categories/", json=category_data)
         category_id = response.json()["id"]
 
+        client.delete(f"/categories/{category_id}")
+
         # Act
-        response = client.delete(f"/categories/{category_id}")
+        response = client.post(f"/categories/{category_id}/restore")
 
         # Assert
         assert response.status_code == 200
-        assert response.json()["message"] == "Categoria deletada com sucesso"
+        data = response.json()
+        assert data["is_active"] == True
 
-        # Verify that the category is inactive
+        # Verify that the category is active again
         response = client.get(f"/categories/{category_id}")
-        assert response.status_code == 404
+        assert response.status_code == 200
