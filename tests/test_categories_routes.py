@@ -53,37 +53,29 @@ class TestCategoriesRoutes:
         # Assert
         assert response.status_code == 422
 
-    def test_get_categories_success(self, authenticated_client, test_db: Session):
-        """Testa o sucesso na listagem de categorias"""
+    def test_get_category_success(self, authenticated_client, test_db: Session):
+        """Testa o sucesso na obtenção de uma categoria específica"""
         # Arrange
         client, user_id = authenticated_client
         test_user = UserProfile(id=user_id, user_id=user_id, email="test@example.com", password_hash="hashedpassword")
         test_db.add(test_user)
         test_db.commit()
 
-        category_data1 = {
+        category_data = {
             "name": "Alimentação",
             "description": "Gastos com comida",
             "icon": "food",
             "color": "#FF5733",
             "type": "expense"
         }
-        category_data2 = {
-            "name": "Salário",
-            "description": "Recebimento de salário",
-            "icon": "work",
-            "color": "#00FF00",
-            "type": "income"
-        }
-        client.post(f"/categories/", json=category_data1)
-        client.post(f"/categories/", json=category_data2)
+        response = client.post(f"/categories/", json=category_data)
+        category_id = response.json()["id"]
 
         # Act
-        response = client.get(f"/categories/")
+        response = client.get(f"/categories/{category_id}")
 
         # Assert
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 2
-        assert data[0]["name"] == category_data1["name"]
-        assert data[1]["name"] == category_data2["name"]
+        assert data["name"] == category_data["name"]
+        assert data["id"] == category_id
