@@ -1,11 +1,12 @@
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.auth.dependencies import get_current_user
 from src.database import get_db
-from .models import CategoryCreate, CategoryUpdate, CategoryResponse, CategoryWithTransactionCount
-from .services import CategoryService
+from src.categories.models import CategoryCreate, CategoryUpdate, CategoryResponse, CategoryWithTransactionCount
+from src.categories.services import CategoryService
+from uuid import UUID
+from src.auth.models import User
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/categories", tags=["categories"])
 async def get_categories(
     include_inactive: bool = Query(False, description="Include inactive categories"),
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Lista todas as categorias do usuário"""
     service = CategoryService(db, current_user.id)
@@ -23,7 +24,7 @@ async def get_categories(
 async def get_category(
     category_id: UUID,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Obtém uma categoria específica"""
     service = CategoryService(db, current_user.id)
@@ -36,7 +37,7 @@ async def get_category(
 async def create_category(
     category_data: CategoryCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Cria uma nova categoria"""
     service = CategoryService(db, current_user.id)
@@ -47,7 +48,7 @@ async def update_category(
     category_id: UUID,
     category_data: CategoryUpdate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Atualiza uma categoria"""
     service = CategoryService(db, current_user.id)
@@ -60,7 +61,7 @@ async def update_category(
 async def delete_category(
     category_id: UUID,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Deleta uma categoria (soft delete)"""
     service = CategoryService(db, current_user.id)
@@ -73,7 +74,7 @@ async def delete_category(
 async def restore_category(
     category_id: UUID,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Restaura uma categoria deletada"""
     service = CategoryService(db, current_user.id)
