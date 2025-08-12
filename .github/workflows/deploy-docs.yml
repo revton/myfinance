@@ -3,20 +3,23 @@ name: Deploy Documentation
 on:
   push:
     branches: [ main, develop, feature/deploy-gratuito ]
-    paths: [ 'docs/**', 'mkdocs.yml' ]
   pull_request:
     branches: [ main ]
     paths: [ 'docs/**', 'mkdocs.yml' ]
   workflow_dispatch:  # Permite execução manual
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 jobs:
   build-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
