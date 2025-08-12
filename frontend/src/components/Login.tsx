@@ -9,8 +9,9 @@ import {
   Alert,
   CircularProgress,
   useTheme,
-  Link
+  Link as MuiLink
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
@@ -134,20 +135,21 @@ const Login: React.FC = () => {
           />
 
           <Box sx={{ mt: 2, textAlign: 'right' }}>
-            <Link
-              href="/auth/forgot-password"
+            <MuiLink
+              component={Link}
+              to="/auth/forgot-password"
               variant="body2"
               sx={{ cursor: 'pointer' }}
             >
               Esqueceu sua senha?
-            </Link>
+            </MuiLink>
           </Box>
 
           <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'center' }}>
             <Button
-              type="button"
+              component={Link}
+              to="/auth/register"
               variant="outlined"
-              onClick={() => window.location.href = '/auth/register'}
               disabled={loading}
             >
               Criar Conta

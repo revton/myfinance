@@ -1,34 +1,45 @@
-# Manual do Usuário
+# Manual do Usuário MyFinance
 
-Bem-vindo ao MyFinance!
+Bem-vindo ao MyFinance! Este guia irá ajudá-lo a usar o sistema de forma eficiente para gerenciar suas finanças.
 
-Este sistema permite o cadastro e visualização de receitas e despesas de forma simples e eficiente.
+## Acessando o Sistema
 
-## Como Usar
+Para começar, acesse a aplicação através do seguinte link:
+[https://myfinance-three.vercel.app/](https://myfinance-three.vercel.app/)
 
-### Acessando o MyFinance
+Você será apresentado à tela de login inicial.
 
-Para começar a usar o MyFinance, abra seu navegador e acesse: [https://myfinance-three.vercel.app/](https://myfinance-three.vercel.app/).
+### Tela Inicial (Login)
+Esta é a primeira tela que você verá. Se você já possui uma conta, pode fazer o login aqui. Caso contrário, você pode se registrar para criar uma nova conta.
 
-<img src="img/screenshot_01_initial_page.png" alt="Tela de Login" width="400px" style="max-width: 100%; height: auto;" />
+![Página Inicial](screenshot_01_initial_page.png)
 
-Você será recebido pela tela de Login, que oferece as seguintes opções:
+Para mais detalhes sobre como criar uma conta, fazer login ou recuperar sua senha, consulte o [Guia de Autenticação do Usuário](autenticacao-guia-usuario.md).
 
-*   **Entrar**: Se você já possui uma conta, insira seu **Email** e **Senha** nos campos correspondentes e clique no botão **"ENTRAR"**. Isso o levará diretamente para a área principal do MyFinance.
-*   **Criar Conta**: Se você é um novo usuário, clique no botão **"CRIAR CONTA"**. Você será guiado por um processo simples para registrar-se e começar a organizar suas finanças.
-*   **Esqueceu sua senha?**: Caso não se lembre da sua senha, clique neste link. Siga as instruções para redefini-la e recuperar o acesso à sua conta.
+## Tela Principal da Aplicação
 
-### Registrando suas Transações
+Após o login, você será direcionado para a tela principal, onde poderá gerenciar suas transações financeiras.
 
-Após fazer login (ou criar sua conta), você estará pronto para registrar suas receitas e despesas:
+### Visão Geral da Tela Principal
+A tela principal permite que você adicione novas receitas e despesas, visualize seu histórico de transações e acompanhe seu saldo.
 
-*   **Tipo**: Selecione se a transação é uma **Receita** (dinheiro que entra) ou uma **Despesa** (dinheiro que sai).
-*   **Valor**: Informe o valor numérico da transação.
-*   **Descrição**: Descreva brevemente do que se trata a transação (ex: "Salário", "Conta de Luz", "Compras no Supermercado").
-*   **Adicionar**: Clique no botão **"Adicionar"** para salvar a transação.
+![Tela Principal da Aplicação](screenshot_05_main_application_screen.png)
 
-### Visualizando suas Finanças
+### Funcionalidades Principais
 
-Todas as transações que você adicionar aparecerão em uma lista logo abaixo do formulário, permitindo que você acompanhe seu fluxo financeiro de forma clara.
+- **Adicionar Transação**: Use o formulário para adicionar novas receitas ou despesas.
+  - **Tipo**: Selecione "Receita" ou "Despesa".
+  - **Valor**: Insira o valor da transação.
+  - **Descrição**: Forneça uma breve descrição.
+- **Visualizar Histórico**: A lista de transações mostra todas as suas receitas e despesas registradas.
+- **Saldo**: O sistema exibe o saldo atual com base em suas transações.
 
-A documentação será atualizada conforme novas funcionalidades forem implementadas. 
+> **Observação:** Atualmente, os dados são armazenados de forma temporária. Se o sistema for reiniciado, os dados serão perdidos. Estamos trabalhando para implementar a persistência de dados em breve.
+
+## Guia Detalhado de Autenticação
+
+Para informações detalhadas sobre o processo de criação de conta, login, recuperação de senha e gerenciamento de perfil, consulte nosso guia completo:
+
+- **[Guia de Autenticação do Usuário](autenticacao-guia-usuario.md)**
+
+Este guia contém tudo o que você precisa saber para gerenciar sua conta com segurança.

@@ -10,6 +10,7 @@ import {
   CircularProgress,
   useTheme
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
@@ -110,9 +111,9 @@ const ForgotPassword: React.FC = () => {
 
           <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'center' }}>
             <Button
-              type="button"
+              component={Link}
+              to="/auth/login"
               variant="outlined"
-              onClick={() => window.location.href = '/auth/login'}
               disabled={loading}
             >
               Voltar ao Login
@@ -152,9 +153,10 @@ const ForgotPassword: React.FC = () => {
           <Typography variant="body2" color="text.secondary">
             Não tem uma conta?{' '}
             <Button
+              component={Link}
+              to="/auth/register"
               variant="text"
               size="small"
-              onClick={() => window.location.href = '/auth/register'}
             >
               Criar Conta
             </Button>
