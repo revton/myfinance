@@ -1,21 +1,42 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { act } from 'react';
 import App from './App';
 import axios from 'axios';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import Dashboard from './components/Dashboard';
+import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('axios');
-const mockedAxios = axios as unknown as { get: typeof axios.get; post: typeof axios.post };
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('MyFinance App', () => {
   beforeEach(() => {
-    (mockedAxios.get as any).mockResolvedValue({ data: [] });
-    (mockedAxios.post as any).mockImplementation(async (_url: string, data: any) => ({ data }));
+    localStorage.setItem('access_token', 'fake-token');
+
+    // Mock da instância do Axios e seus interceptors
+    const mockApi = {
+      get: vi.fn(),
+      post: vi.fn(),
+      interceptors: {
+        request: {
+          use: vi.fn((config) => config),
+        },
+      },
+    };
+
+    mockedAxios.create.mockReturnValue(mockApi as any);
+
+    mockApi.get.mockResolvedValue({ data: [] });
+    mockApi.post.mockImplementation(async (url: string, data: any) => ({ data }));
+  });
+
+  afterEach(() => {
+    localStorage.removeItem('access_token');
   });
 
   it('renderiza o formulário e a lista', async () => {
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     expect(screen.getByText(/Nova Transação/i)).toBeTruthy();
@@ -25,7 +46,7 @@ describe('MyFinance App', () => {
 
   it('cadastra uma nova receita e exibe na lista', async () => {
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     await act(async () => {
@@ -35,14 +56,14 @@ describe('MyFinance App', () => {
     });
     
     await waitFor(() => {
-      expect(screen.getByText(/Receita: R\$ 123.45/)).toBeTruthy();
+            expect(screen.getByText(/^\+\s*R\$\s*123,45$/)).toBeTruthy();
       expect(screen.getByText(/Salário/)).toBeTruthy();
     });
   });
 
   it('cadastra uma nova despesa e exibe na lista', async () => {
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     // Aguardar o componente carregar completamente
@@ -58,7 +79,7 @@ describe('MyFinance App', () => {
     
     // Clicar na opção Despesa
     await act(async () => {
-      const despesaOption = await screen.findByText('Despesa');
+      const despesaOption = await screen.findByText('💸 Despesa');
       fireEvent.click(despesaOption);
     });
     
@@ -71,8 +92,10 @@ describe('MyFinance App', () => {
     
     // Verificar se a despesa foi adicionada (usando regex mais flexível)
     await waitFor(() => {
-      expect(screen.getByText(/Despesa.*R\$.*50\.00/)).toBeTruthy();
-      expect(screen.getByText(/Mercado/)).toBeTruthy();
+      const list = screen.getByRole('list');
+      const listItem = within(list).getByText(/Mercado/);
+      expect(listItem).toBeTruthy();
+      expect(within(list).getByText(/-\s*R\$\s*50,00/)).toBeTruthy();
     }, { timeout: 3000 });
   });
 
@@ -80,7 +103,7 @@ describe('MyFinance App', () => {
     (mockedAxios.get as any).mockRejectedValueOnce(new Error('fail'));
     
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     await waitFor(() => {
@@ -92,7 +115,7 @@ describe('MyFinance App', () => {
     (mockedAxios.get as any).mockResolvedValueOnce({ data: { foo: 'bar' } });
     
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     await waitFor(() => {
@@ -102,7 +125,7 @@ describe('MyFinance App', () => {
 
   it('renderiza Divider entre múltiplas transações', async () => {
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     // Primeira transação
@@ -127,7 +150,7 @@ describe('MyFinance App', () => {
 
   it('renderiza dois Dividers entre três transações', async () => {
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     // Primeira transação
@@ -152,14 +175,13 @@ describe('MyFinance App', () => {
     });
     
     await waitFor(() => {
-      // Divider: role="separator" in MUI, should be 2 for 3 items
       expect(screen.getAllByRole('separator').length).toBe(2);
     });
   });
 
   it('não cadastra se descrição ou valor estiverem vazios', async () => {
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     // Valor e descrição vazios
@@ -186,7 +208,7 @@ describe('MyFinance App', () => {
 
   it('não renderiza Divider quando há apenas uma transação', async () => {
     await act(async () => {
-      render(<App />);
+      render(<MemoryRouter initialEntries={['/dashboard']}><Dashboard /></MemoryRouter>);
     });
     
     const initialSeparators = screen.queryAllByRole('separator').length;
@@ -201,4 +223,4 @@ describe('MyFinance App', () => {
       expect(screen.queryAllByRole('separator').length).toBe(initialSeparators);
     });
   });
-}); 
+});
