@@ -15,8 +15,8 @@ class CategoryService:
         """Lista categorias com contagem de transações"""
         query = self.db.query(
             Category,
-            func.count(None).label('transaction_count')
-        ).outerjoin(None, Category.id == None)
+            func.count(Transaction.id).label('transaction_count')
+        ).outerjoin(Transaction, Category.id == Transaction.category_id)
         
         if not include_inactive:
             query = query.filter(Category.is_active == True)
