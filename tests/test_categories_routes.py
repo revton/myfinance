@@ -53,8 +53,8 @@ class TestCategoriesRoutes:
         # Assert
         assert response.status_code == 422
 
-    def test_get_category_success(self, authenticated_client, test_db: Session):
-        """Testa o sucesso na obtenção de uma categoria específica"""
+    def test_update_category_success(self, authenticated_client, test_db: Session):
+        """Testa o sucesso na atualização de uma categoria"""
         # Arrange
         client, user_id = authenticated_client
         test_user = UserProfile(id=user_id, user_id=user_id, email="test@example.com", password_hash="hashedpassword")
@@ -71,11 +71,20 @@ class TestCategoriesRoutes:
         response = client.post(f"/categories/", json=category_data)
         category_id = response.json()["id"]
 
+        update_data = {
+            "name": "Alimentação Editado",
+            "description": "Nova descrição",
+            "icon": "home",
+            "color": "#000000"
+        }
+
         # Act
-        response = client.get(f"/categories/{category_id}")
+        response = client.put(f"/categories/{category_id}", json=update_data)
 
         # Assert
         assert response.status_code == 200
         data = response.json()
-        assert data["name"] == category_data["name"]
-        assert data["id"] == category_id
+        assert data["name"] == update_data["name"]
+        assert data["description"] == update_data["description"]
+        assert data["icon"] == update_data["icon"]
+        assert data["color"] == update_data["color"]
