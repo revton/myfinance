@@ -4,7 +4,7 @@ from sqlalchemy import and_, func
 from typing import List, Optional
 from uuid import UUID
 from src.categories.models import CategoryCreate, CategoryUpdate, CategoryWithTransactionCount
-from src.models import Category
+from src.database import Category, Transaction
 
 class CategoryService:
     def __init__(self, db: Session, user_id: UUID):
@@ -104,8 +104,8 @@ class CategoryService:
             return False
         
         # Verificar se há transações usando esta categoria
-        transaction_count = self.db.query(None).filter(
-            None.category_id == category_id
+        transaction_count = self.db.query(Transaction).filter(
+            Transaction.category_id == category_id
         ).count()
         
         if transaction_count > 0:
