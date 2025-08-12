@@ -1,9 +1,10 @@
+
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
 from typing import List, Optional
 from uuid import UUID
-from .models import Category, CategoryCreate, CategoryUpdate, CategoryWithTransactionCount
-from src.transactions.models import Transaction
+from src.categories.models import CategoryCreate, CategoryUpdate, CategoryWithTransactionCount
+from src.models import Category
 
 class CategoryService:
     def __init__(self, db: Session, user_id: UUID):
@@ -14,8 +15,8 @@ class CategoryService:
         """Lista categorias com contagem de transações"""
         query = self.db.query(
             Category,
-            func.count(Transaction.id).label('transaction_count')
-        ).outerjoin(Transaction, Category.id == Transaction.category_id)
+            func.count(None).label('transaction_count')
+        ).outerjoin(None, Category.id == None)
         
         if not include_inactive:
             query = query.filter(Category.is_active == True)
@@ -103,8 +104,8 @@ class CategoryService:
             return False
         
         # Verificar se há transações usando esta categoria
-        transaction_count = self.db.query(Transaction).filter(
-            Transaction.category_id == category_id
+        transaction_count = self.db.query(None).filter(
+            None.category_id == category_id
         ).count()
         
         if transaction_count > 0:
