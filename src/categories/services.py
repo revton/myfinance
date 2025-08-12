@@ -1,62 +1,134 @@
+from sqlalchemy.orm import Session
+from sqlalchemy import and_, func
 from typing import List, Optional
 from uuid import UUID
-from .models import Category, CategoryCreate, CategoryUpdate
-from src.database_sqlalchemy import get_supabase_client
+from .models import Category, CategoryCreate, CategoryUpdate, CategoryWithTransactionCount
+from src.transactions.models import Transaction
 
 class CategoryService:
-    def __init__(self):
-        self.supabase = get_supabase_client()
-
+    def __init__(self, db: Session, user_id: UUID):
+        self.db = db
+        self.user_id = user_id
+    
+    def get_categories(self, include_inactive: bool = False) -> List[CategoryWithTransactionCount]:
+        """Lista categorias com contagem de transações"""
+        query = self.db.query(
+            Category,
+            func.count(Transaction.id).label('transaction_count')
+        ).outerjoin(Transaction, Category.id == Transaction.category_id)
+        
+        if not include_inactive:
+            query = query.filter(Category.is_active == True)
+        
+        query = query.filter(Category.user_id == self.user_id)
+        query = query.group_by(Category.id)
+        query = query.order_by(Category.name)
+        
+        results = query.all()
+        
+        categories = []
+        for category, transaction_count in results:
+            category_dict = category.__dict__.copy()
+            category_dict['transaction_count'] = transaction_count
+            categories.append(CategoryWithTransactionCount(**category_dict))
+        
+        return categories
+    
+    def get_category(self, category_id: UUID) -> Optional[Category]:
+        """Obtém uma categoria específica"""
+        return self.db.query(Category).filter(
+            and_(
+                Category.id == category_id,
+                Category.user_id == self.user_id
+            )
+        ).first()
+    
     def create_category(self, category_data: CategoryCreate) -> Category:
         """Cria uma nova categoria"""
-        data = category_data.dict()
+        # Verificar se já existe categoria com mesmo nome
+        existing = self.db.query(Category).filter(
+            and_(
+                Category.name == category_data.name,
+                Category.user_id == self.user_id
+            )
+        ).first()
         
-        result = self.supabase.table('categories').insert(data).execute()
+        if existing:
+            raise ValueError(f"Já existe uma categoria com o nome '{category_data.name}'")
         
-        if result.error:
-            raise Exception(f"Erro ao criar categoria: {result.error.message}")
+        category = Category(
+            user_id=self.user_id,
+            **category_data.dict()
+        )
         
-        return Category(**result.data[0])
-
-    def get_categories_by_user(self, user_id: UUID, include_default: bool = True) -> List[Category]:
-        """Busca categorias de um usuário"""
-        query = self.supabase.table('categories').select('*').eq('user_id', str(user_id))
+        self.db.add(category)
+        self.db.commit()
+        self.db.refresh(category)
         
-        if not include_default:
-            query = query.eq('is_default', False)
-        
-        result = query.execute()
-        
-        if result.error:
-            raise Exception(f"Erro ao buscar categorias: {result.error.message}")
-        
-        return [Category(**category) for category in result.data]
-
+        return category
+    
     def update_category(self, category_id: UUID, category_data: CategoryUpdate) -> Optional[Category]:
         """Atualiza uma categoria"""
-        update_data = category_data.dict(exclude_unset=True)
+        category = self.get_category(category_id)
+        if not category:
+            return None
         
-        result = self.supabase.table('categories').update(update_data).eq('id', str(category_id)).select().single().execute()
-        
-        if result.error:
-            raise Exception(f"Erro ao atualizar categoria: {result.error.message}")
+        # Verificar se o novo nome já existe (se estiver sendo alterado)
+        if category_data.name and category_data.name != category.name:
+            existing = self.db.query(Category).filter(
+                and_(
+                    Category.name == category_data.name,
+                    Category.user_id == self.user_id,
+                    Category.id != category_id
+                )
+            ).first()
             
-        return Category(**result.data) if result.data else None
-
+            if existing:
+                raise ValueError(f"Já existe uma categoria com o nome '{category_data.name}'")
+        
+        # Atualizar campos
+        update_data = category_data.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(category, field, value)
+        
+        self.db.commit()
+        self.db.refresh(category)
+        
+        return category
+    
     def delete_category(self, category_id: UUID) -> bool:
         """Soft delete de uma categoria"""
-        result = self.supabase.table('categories').update({'is_active': False}).eq('id', str(category_id)).execute()
+        category = self.get_category(category_id)
+        if not category:
+            return False
         
-        if result.error:
-            raise Exception(f"Erro ao deletar categoria: {result.error.message}")
-            
+        # Verificar se há transações usando esta categoria
+        transaction_count = self.db.query(Transaction).filter(
+            Transaction.category_id == category_id
+        ).count()
+        
+        if transaction_count > 0:
+            raise ValueError(f"Não é possível deletar categoria com {transaction_count} transações")
+        
+        category.is_active = False
+        self.db.commit()
+        
         return True
-
-    def restore_category(self, category_id: UUID) -> bool:
+    
+    def restore_category(self, category_id: UUID) -> Optional[Category]:
         """Restaura uma categoria deletada"""
-        result = self.supabase.table('categories').update({'is_active': True}).eq('id', str(category_id)).execute()
+        category = self.db.query(Category).filter(
+            and_(
+                Category.id == category_id,
+                Category.user_id == self.user_id
+            )
+        ).first()
         
-        if result.error:
-            raise Exception(f"Erro ao restaurar categoria: {result.error.message}")
-            
-        return True
+        if not category:
+            return None
+        
+        category.is_active = True
+        self.db.commit()
+        self.db.refresh(category)
+        
+        return category
