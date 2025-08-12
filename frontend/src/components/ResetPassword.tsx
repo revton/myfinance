@@ -10,7 +10,7 @@ import {
   CircularProgress,
   useTheme
 } from '@mui/material';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
@@ -210,9 +210,9 @@ const ResetPassword: React.FC = () => {
 
           <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'center' }}>
             <Button
-              type="button"
+              component={Link}
+              to="/auth/login"
               variant="outlined"
-              onClick={() => window.location.href = '/auth/login'}
               disabled={loading}
             >
               Cancelar
@@ -237,9 +237,10 @@ const ResetPassword: React.FC = () => {
           <Typography variant="body2" color="text.secondary">
             Lembrou sua senha?{' '}
             <Button
+              component={Link}
+              to="/auth/login"
               variant="text"
               size="small"
-              onClick={() => window.location.href = '/auth/login'}
             >
               Fazer Login
             </Button>
