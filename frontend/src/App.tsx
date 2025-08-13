@@ -11,6 +11,7 @@ import ResetPassword from './components/ResetPassword';
 
 // Componente principal da aplicação
 import Dashboard from './components/Dashboard';
+import CategoriesPage from './pages/CategoriesPage';
 
 const theme = createTheme({
   palette: {
@@ -38,19 +39,25 @@ function App() {
       <Router>
         <Routes>
           {/* Rotas públicas de autenticação */}
-          {/* Rotas públicas de autenticação */}
-          {/* Rotas públicas de autenticação */}
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
           
-          {/* Rota principal protegida */}
+          {/* Rotas protegidas */}
           <Route 
             path="/dashboard" 
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/categories" 
+            element={
+              <PrivateRoute>
+                <CategoriesPage />
               </PrivateRoute>
             } 
           />

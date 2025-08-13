@@ -18,4 +18,9 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/setupTests.ts',
   },
+  build: {
+    rollupOptions: {
+      external: ['@supabase/supabase-js'],
+    },
+  },
 })
