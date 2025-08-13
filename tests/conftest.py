@@ -1,60 +1,62 @@
-"""
-Configuração de fixtures para testes
-"""
+
 import pytest
-import os
 from fastapi.testclient import TestClient
+from unittest.mock import patch, AsyncMock
 from src.main import app
-from src.database_sqlalchemy import Base, get_db, test_engine
-from sqlalchemy.orm import Session
-from src.database import UserProfile
+from src.database_sqlalchemy import get_db, Base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from src.auth.models import User
 from src.auth.dependencies import get_current_user
 from uuid import uuid4
 
-# Configurar ambiente de teste
-os.environ["TESTING"] = "true"
+SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_database():
+    with patch('src.main.create_tables'):
+        Base.metadata.create_all(bind=engine)
+        yield
+        Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="function")
-def test_db():
-    Base.metadata.create_all(bind=test_engine)
-    db = next(get_db())
-    yield db
-    Base.metadata.drop_all(bind=test_engine)
+def db_session():
+    """Create a new database session for a test."""
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = TestingSessionLocal(bind=connection)
+    yield session
+    session.close()
+    transaction.rollback()
+    connection.close()
 
 @pytest.fixture(scope="function")
-def client(test_db: Session):
-    """
-    Fixture que fornece um cliente de teste para a aplicação FastAPI
-    
-    Returns:
-        TestClient: Cliente de teste configurado
-    """
+def test_client(db_session):
+    """Create a test client that uses the override_get_db fixture."""
+
     def override_get_db():
         try:
-            yield test_db
+            yield db_session
         finally:
-            test_db.close()
+            db_session.close()
 
     app.dependency_overrides[get_db] = override_get_db
-    return TestClient(app)
+    with TestClient(app) as test_client:
+        yield test_client
 
 @pytest.fixture(scope="function")
-def authenticated_client(client: TestClient, test_db: Session):
-    """
-    Fixture that provides an authenticated test client.
-    """
-    # Create a user in the test database
-    user_id = uuid4()
-    test_user = UserProfile(id=user_id, user_id=user_id, email="test@example.com", password_hash="hashedpassword")
-    test_db.add(test_user)
-    test_db.commit()
-
-    from unittest.mock import MagicMock
+def authenticated_client(test_client: TestClient):
+    """Create a test client with an authenticated user."""
+    test_user = User(id=uuid4(), email="test@example.com")
 
     async def override_get_current_user():
-        mock_user = MagicMock()
-        mock_user.id = test_user.user_id
-        return mock_user
+        return test_user
 
     app.dependency_overrides[get_current_user] = override_get_current_user
-    return client
+    yield test_client, test_user.id
+    app.dependency_overrides.pop(get_current_user)
