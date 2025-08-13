@@ -15,7 +15,8 @@ from .models import (
     UserProfileUpdate,
     ForgotPasswordRequest,
     ResetPasswordRequest,
-    RefreshTokenRequest
+    RefreshTokenRequest,
+    User # Import the User model
 )
 from .service import AuthService
 from .dependencies import (
@@ -65,11 +66,11 @@ async def reset_password(request_data: ResetPasswordRequest, auth_service: AuthS
     return await auth_service.reset_password(request_data)
 
 @router.post("/logout")
-async def logout_user(current_user: dict = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
+async def logout_user(current_user: User = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
     """
     Realiza logout do usuário
     """
-    return await auth_service.logout_user(current_user["user_id"])
+    return await auth_service.logout_user(current_user.id)
 
 @router.post("/refresh")
 async def refresh_token(request_data: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)):
@@ -79,39 +80,40 @@ async def refresh_token(request_data: RefreshTokenRequest, auth_service: AuthSer
     return await auth_service.refresh_token(request_data)
 
 @router.get("/me")
-async def get_current_user_info(current_user: dict = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
+async def get_current_user_info(current_user: User = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
     """
     Obtém informações do usuário atual
     """
-    profile = await auth_service.get_user_profile(current_user["user_id"])
+    profile = await auth_service.get_user_profile(current_user.id)
     
     return {
-        "id": current_user["user_id"],
-        "email": current_user.get("email"),
+        "id": current_user.id,
+        "email": current_user.email,
         "profile": profile
     }
 
 @router.get("/profile")
-async def get_user_profile(current_user: dict = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
+async def get_user_profile(current_user: User = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
     """
     Obtém o perfil do usuário atual
     """
-    return await auth_service.get_user_profile(current_user["user_id"])
+    return await auth_service.get_user_profile(current_user.id)
 
 @router.put("/profile")
 async def update_user_profile(
     profile_data: UserProfileUpdate,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Atualiza o perfil do usuário atual
     """
-    return await auth_service.update_user_profile(current_user["user_id"], profile_data)
+    return await auth_service.update_user_profile(current_user.id, profile_data)
 
 @router.delete("/profile")
-async def delete_user_profile(current_user: dict = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
+async def delete_user_profile(current_user: User = Depends(get_current_user), auth_service: AuthService = Depends(get_auth_service)):
     """
     Deleta o perfil do usuário atual
     """
-    return await auth_service.delete_user(current_user["user_id"]) 
+    return await auth_service.delete_user(current_user.id)
+ 
