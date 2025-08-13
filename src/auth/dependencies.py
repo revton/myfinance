@@ -48,10 +48,16 @@ async def get_current_user(
     
     try:
         token = credentials.credentials
+        print(f"Token recebido: {token}")  # Log do token recebido
         jwt_handler = get_jwt_handler()
+        print(f"JWT Handler: {jwt_handler}")  # Log do JWT Handler
         user_data = jwt_handler.verify_token(token)
+        print(f"Dados do usuário decodificados: {user_data}")  # Log dos dados do usuário
+        # Renomear 'user_id' para 'id' para corresponder ao modelo Pydantic User
+        user_data['id'] = user_data.pop('user_id')
         return User(**user_data)
     except Exception as e:
+        print(f"Erro ao verificar token: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido",
