@@ -51,16 +51,23 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base para modelos
 Base = declarative_base()
 
+# Engine para o banco de dados de teste em memória (SQLite)
+test_engine = create_engine(
+    "sqlite:///:memory:",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
+TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+
 def get_db() -> Session:
     """Dependency para obter sessão do banco"""
-    # Se estiver em modo de teste, retorna um mock
     if os.getenv("TESTING") == "true":
-        logger.info("Modo de teste detectado - retornando sessão mock")
-        mock_session = Mock(spec=Session)
+        logger.info("Modo de teste detectado - usando banco de dados em memória")
+        db = TestSessionLocal()
         try:
-            yield mock_session
+            yield db
         finally:
-            pass  # Mock não precisa ser fechado
+            db.close()
     else:
         # Modo normal - retorna sessão real
         db = SessionLocal()

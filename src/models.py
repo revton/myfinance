@@ -16,6 +16,7 @@ class TransactionBase(BaseModel):
     type: TransactionType = Field(..., description="Tipo da transação: income ou expense")
     amount: float = Field(..., gt=0, description="Valor da transação (sempre positivo)")
     description: str = Field(..., min_length=1, max_length=500, description="Descrição da transação")
+    category_id: Optional[str] = Field(None, description="ID da categoria")
 
 class TransactionCreate(TransactionBase):
     """Modelo para criação de transações"""
@@ -72,4 +73,4 @@ class TransactionList(BaseModel):
                 "per_page": 10
             }
         }
-    ) 
+    )
