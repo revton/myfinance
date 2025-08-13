@@ -17,7 +17,7 @@ class JWTHandler:
     def __init__(self):
         self.secret_key = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
         self.algorithm = "HS256"
-        self.access_token_expire_minutes = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+        self.access_token_expire_minutes = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
         self.refresh_token_expire_days = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
     
     def create_token(self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
