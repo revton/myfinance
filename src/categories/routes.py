@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.auth.dependencies import get_current_user
-from src.database import get_db
+from src.database_sqlalchemy import get_db
 from src.categories.models import CategoryCreate, CategoryUpdate, CategoryResponse, CategoryWithTransactionCount
 from src.categories.services import CategoryService
 from uuid import UUID
@@ -33,7 +33,7 @@ async def get_category(
         raise HTTPException(status_code=404, detail="Categoria não encontrada")
     return category
 
-@router.post("/", response_model=CategoryResponse)
+@router.post("/", response_model=CategoryResponse, status_code=201)
 async def create_category(
     category_data: CategoryCreate,
     db: Session = Depends(get_db),
