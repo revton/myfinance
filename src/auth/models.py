@@ -175,3 +175,7 @@ class ResetPasswordRequest(BaseModel):
         if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in v):
             raise ValueError('A senha deve conter pelo menos um caractere especial')
         return v 
+
+class User(BaseModel):
+    id: UUID
+    email: EmailStr
