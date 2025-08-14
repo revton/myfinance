@@ -14,7 +14,8 @@ import {
   Delete as DeleteIcon,
   Lock as LockIcon
 } from '@mui/icons-material';
-import { Category } from '../../types/category';
+import type { Category } from '../../types/category';
+import { getIconComponent } from '../../utils/iconUtils';
 
 interface CategoryCardProps {
   category: Category;
@@ -23,6 +24,7 @@ interface CategoryCardProps {
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete }) => {
+  const IconComponent = getIconComponent(category.icon); 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardContent sx={{ flexGrow: 1 }}>
@@ -39,9 +41,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
               mr: 2
             }}
           >
-            <Typography variant="h6" color="white">
-              {category.icon}
-            </Typography>
+            <IconComponent sx={{ color: 'white', fontSize: 30 }} /> 
           </Box>
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="h6" gutterBottom>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../lib/api';
-import { Category, CategoryCreate, CategoryUpdate } from '../types/category';
+import type { Category, CategoryCreate, CategoryUpdate } from '../types/category';
 
 interface CategoryContextType {
   categories: Category[];
@@ -37,7 +37,12 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/categories?include_inactive=true');
+      const token = localStorage.getItem('access_token'); // Get token here
+      const response = await api.get('/categories?include_inactive=true', {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '' // Set header explicitly
+        }
+      });
       setCategories(response.data || []);
     } catch (err) {
       setError('Erro ao carregar categorias');
@@ -48,8 +53,11 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
   };
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      fetchCategories();
+    }
+  }, [localStorage.getItem('access_token')]);
 
   const createCategory = async (categoryData: CategoryCreate) => {
     try {

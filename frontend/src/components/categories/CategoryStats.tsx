@@ -7,7 +7,7 @@ import {
   CardContent,
   LinearProgress
 } from '@mui/material';
-import { Category } from '../../types/category';
+import type { Category } from '../../types/category';
 
 interface CategoryStatsProps {
   categories: Category[];

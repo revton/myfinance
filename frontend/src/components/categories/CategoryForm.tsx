@@ -8,9 +8,11 @@ import {
   MenuItem,
   Button,
   Grid,
-  FormHelperText
+  FormHelperText,
+  Typography
 } from '@mui/material';
-import { Category, CategoryType } from '../../types/category';
+import { getIconComponent } from '../../utils/iconUtils';
+import { CategoryType } from '../../types/category';
 
 interface CategoryFormProps {
   category?: Category | null;
@@ -193,29 +195,30 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
               label="Ícone"
               onChange={(e) => handleChange('icon', e.target.value)}
             >
-              {iconOptions.map((icon) => (
-                <MenuItem key={icon.value} value={icon.value}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box
-                      sx={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        backgroundColor: formData.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mr: 1
-                      }}
-                    >
-                      <Typography variant="caption" color="white">
-                        {icon.value}
-                      </Typography>
+              {iconOptions.map((icon) => {
+                const IconComponent = getIconComponent(icon.value);
+                return (
+                  <MenuItem key={icon.value} value={icon.value}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          backgroundColor: formData.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mr: 1
+                        }}
+                      >
+                        <IconComponent sx={{ color: 'white' }} />
+                      </Box>
+                      {icon.label}
                     </Box>
-                    {icon.label}
-                  </Box>
-                </MenuItem>
-              ))}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         </Grid>
