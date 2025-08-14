@@ -1,0 +1,6 @@
+fix(frontend): Resolve 401 Unauthorized error in CategoryContext
+
+Ensures that API requests from CategoryContext always include the
+authentication token by explicitly setting the Authorization header
+for each request. This bypasses potential timing issues with Axios
+interceptors and resolves the 401 Unauthorized error when fetching categories.

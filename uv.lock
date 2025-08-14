@@ -627,9 +627,12 @@ dependencies = [
     { name = "httpx" },
     { name = "psycopg2-binary" },
     { name = "pydantic" },
+    { name = "pyjwt" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
     { name = "python-dotenv" },
+    { name = "pytz" },
     { name = "supabase" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -675,13 +678,16 @@ requires-dist = [
     { name = "psycopg2-binary", marker = "extra == 'dev'", specifier = "==2.9.9" },
     { name = "pydantic", specifier = "==2.5.3" },
     { name = "pydantic", marker = "extra == 'backend'", specifier = "==2.5.3" },
+    { name = "pyjwt" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==8.4.1" },
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
+    { name = "pytest-cov" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==6.2.1" },
     { name = "python-dotenv", specifier = "==1.0.0" },
     { name = "python-dotenv", marker = "extra == 'backend'", specifier = "==1.0.0" },
     { name = "python-dotenv", marker = "extra == 'dev'", specifier = "==1.0.0" },
+    { name = "pytz" },
     { name = "supabase", specifier = "==2.0.2" },
     { name = "supabase", marker = "extra == 'backend'", specifier = "==2.0.2" },
     { name = "uvicorn", extras = ["standard"], specifier = "==0.24.0" },
@@ -842,6 +848,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pyjwt"
+version = "2.10.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/46/bd74733ff231675599650d3e47f361794b22ef3e3770998dda30d3b63726/pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953", size = 87785, upload-time = "2024-11-28T03:43:29.933Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/ad/689f02752eeec26aed679477e80e632ef1b682313be70793d798c1d5fc8f/PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb", size = 22997, upload-time = "2024-11-28T03:43:27.893Z" },
+]
+
+[[package]]
 name = "pymdown-extensions"
 version = "10.16.1"
 source = { registry = "https://pypi.org/simple" }
@@ -915,6 +930,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/31/06/1ef763af20d0572c032fa22882cfbfb005fba6e7300715a37840858c919e/python-dotenv-1.0.0.tar.gz", hash = "sha256:a8df96034aae6d2d50a4ebe8216326c61c3eb64836776504fcca410e5937a3ba", size = 37399, upload-time = "2023-02-24T06:46:37.282Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/44/2f/62ea1c8b593f4e093cc1a7768f0d46112107e790c3e478532329e434f00b/python_dotenv-1.0.0-py3-none-any.whl", hash = "sha256:f5971a9226b701070a4bf2c38c89e5a3f0d64de8debda981d1db98583009122a", size = 19482, upload-time = "2023-02-24T06:46:36.009Z" },
+]
+
+[[package]]
+name = "pytz"
+version = "2025.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/bf/abbd3cdfb8fbc7fb3d4d38d320f2441b1e7cbe29be4f23797b4a2b5d8aac/pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3", size = 320884, upload-time = "2025-03-25T02:25:00.538Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/c4/34e93fe5f5429d7570ec1fa436f1986fb1f00c3e0f43a589fe2bbcd22c3f/pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00", size = 509225, upload-time = "2025-03-25T02:24:58.468Z" },
 ]
 
 [[package]]
