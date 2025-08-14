@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
+import api from '../lib/api';
 import { Category, CategoryCreate, CategoryUpdate } from '../types/category';
 
 interface CategoryContextType {
@@ -37,15 +37,8 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     try {
       setLoading(true);
       setError(null);
-
-      const { data, error: fetchError } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
-
-      if (fetchError) throw fetchError;
-
-      setCategories(data || []);
+      const response = await api.get('/categories?include_inactive=true');
+      setCategories(response.data || []);
     } catch (err) {
       setError('Erro ao carregar categorias');
       console.error('Erro ao buscar categorias:', err);
@@ -61,16 +54,8 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
   const createCategory = async (categoryData: CategoryCreate) => {
     try {
       setError(null);
-
-      const { data, error: createError } = await supabase
-        .from('categories')
-        .insert([categoryData])
-        .select()
-        .single();
-
-      if (createError) throw createError;
-
-      setCategories(prev => [...prev, data]);
+      const response = await api.post('/categories/', categoryData);
+      setCategories(prev => [...prev, response.data]);
     } catch (err) {
       setError('Erro ao criar categoria');
       throw err;
@@ -80,18 +65,9 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
   const updateCategory = async (id: string, categoryData: CategoryUpdate) => {
     try {
       setError(null);
-
-      const { data, error: updateError } = await supabase
-        .from('categories')
-        .update(categoryData)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (updateError) throw updateError;
-
+      const response = await api.put(`/categories/${id}`, categoryData);
       setCategories(prev => 
-        prev.map(cat => cat.id === id ? data : cat)
+        prev.map(cat => cat.id === id ? response.data : cat)
       );
     } catch (err) {
       setError('Erro ao atualizar categoria');
@@ -102,14 +78,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
   const deleteCategory = async (id: string) => {
     try {
       setError(null);
-
-      const { error: deleteError } = await supabase
-        .from('categories')
-        .update({ is_active: false })
-        .eq('id', id);
-
-      if (deleteError) throw deleteError;
-
+      await api.delete(`/categories/${id}`);
       setCategories(prev => 
         prev.map(cat => cat.id === id ? { ...cat, is_active: false } : cat)
       );
@@ -122,16 +91,9 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
   const restoreCategory = async (id: string) => {
     try {
       setError(null);
-
-      const { error: restoreError } = await supabase
-        .from('categories')
-        .update({ is_active: true })
-        .eq('id', id);
-
-      if (restoreError) throw restoreError;
-
+      const response = await api.post(`/categories/${id}/restore`);
       setCategories(prev => 
-        prev.map(cat => cat.id === id ? { ...cat, is_active: true } : cat)
+        prev.map(cat => cat.id === id ? response.data : cat)
       );
     } catch (err) {
       setError('Erro ao restaurar categoria');
