@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Container,
   Paper,
@@ -13,11 +11,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  useMediaQuery,
-  IconButton,
-  Avatar,
-  Menu,
-  MenuItem as MenuItemComponent
+  useMediaQuery
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
@@ -47,10 +41,6 @@ const Dashboard: React.FC = () => {
     amount: 0, 
     description: '' 
   });
-  const [user, setUser] = useState<User | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  // Configurar Axios com token
   const api = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000,
@@ -66,13 +56,6 @@ const Dashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    const loadUser = () => {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        setUser(JSON.parse(userStr));
-      }
-    };
-
     const loadTransactions = async () => {
       try {
         const response = await api.get('/transactions/');
@@ -84,7 +67,6 @@ const Dashboard: React.FC = () => {
       }
     };
 
-    loadUser();
     loadTransactions();
   }, []);
 
@@ -151,42 +133,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            💰 MyFinance
-          </Typography>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              Olá, {user?.full_name || 'Usuário'}
-            </Typography>
-            
-            <IconButton
-              onClick={handleMenuOpen}
-              sx={{ color: 'white' }}
-            >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(255,255,255,0.2)' }}>
-                {user?.full_name?.charAt(0) || 'U'}
-              </Avatar>
-            </IconButton>
-            
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              <MenuItemComponent onClick={handleMenuClose}>
-                Perfil
-              </MenuItemComponent>
-              <MenuItemComponent onClick={handleLogout}>
-                Sair
-              </MenuItemComponent>
-            </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Resumo Financeiro */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2, mb: 4 }}>
@@ -294,4 +240,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;  

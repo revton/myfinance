@@ -12,6 +12,7 @@ import ResetPassword from './components/ResetPassword';
 // Componente principal da aplicação
 import Dashboard from './components/Dashboard';
 import CategoriesPage from './pages/CategoriesPage';
+import Layout from './components/Layout';
 
 const theme = createTheme({
   palette: {
@@ -29,7 +30,7 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     return <Navigate to="/auth/login" replace />;
   }
   
-  return <>{children}</>;
+  return <Layout>{children}</Layout>;
 };
 
 function App() {
