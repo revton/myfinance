@@ -34,6 +34,7 @@ import { useCategories } from '../contexts/CategoryContext';
 import CategoryForm from '../components/categories/CategoryForm';
 import CategoryCard from '../components/categories/CategoryCard';
 import CategoryStats from '../components/categories/CategoryStats';
+import { getIconComponent } from '../utils/iconUtils';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -215,52 +216,53 @@ const CategoriesPage: React.FC = () => {
 
           <TabPanel value={tabValue} index={3}>
             <Grid container spacing={3}>
-              {deletedCategories.map((category) => (
-                <Grid item xs={12} sm={6} md={4} key={category.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Box
-                          sx={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: '50%',
-                            backgroundColor: category.color,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mr: 2
-                          }}
-                        >
-                          <Typography variant="h6" color="white">
-                            {category.icon}
+              {deletedCategories.map((category) => {
+                const IconComponent = getIconComponent(category.icon);
+                return (
+                  <Grid item xs={12} sm={6} md={4} key={category.id}>
+                    <Card>
+                      <CardContent>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                          <Box
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: '50%',
+                              backgroundColor: category.color,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              mr: 2
+                            }}
+                          >
+                            <IconComponent sx={{ color: 'white', fontSize: 24 }} /> 
+                          </Box>
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="h6">{category.name}</Typography>
+                            <Chip 
+                              label={category.type === 'expense' ? 'Despesa' : 'Receita'} 
+                              size="small" 
+                              color={category.type === 'expense' ? 'error' : 'success'}
+                            />
+                          </Box>
+                          <IconButton
+                            onClick={() => handleRestore(category.id)}
+                            color="primary"
+                            title="Restaurar categoria"
+                          >
+                            <RestoreIcon />
+                          </IconButton>
+                        </Box>
+                        {category.description && (
+                          <Typography variant="body2" color="text.secondary">
+                            {category.description}
                           </Typography>
-                        </Box>
-                        <Box sx={{ flexGrow: 1 }}>
-                          <Typography variant="h6">{category.name}</Typography>
-                          <Chip 
-                            label={category.type === 'expense' ? 'Despesa' : 'Receita'} 
-                            size="small" 
-                            color={category.type === 'expense' ? 'error' : 'success'}
-                          />
-                        </Box>
-                        <IconButton
-                          onClick={() => handleRestore(category.id)}
-                          color="primary"
-                          title="Restaurar categoria"
-                        >
-                          <RestoreIcon />
-                        </IconButton>
-                      </Box>
-                      {category.description && (
-                        <Typography variant="body2" color="text.secondary">
-                          {category.description}
-                        </Typography>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
               {deletedCategories.length === 0 && (
                 <Grid item xs={12}>
                   <Box textAlign="center" py={4}>
