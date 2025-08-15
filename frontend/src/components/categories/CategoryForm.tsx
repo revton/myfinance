@@ -78,50 +78,36 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
   };
 
   const iconOptions = [
-    { value: 'category', label: 'Categoria' },
     { value: 'home', label: 'Casa' },
-    { value: 'food', label: 'Comida' },
-    { value: 'transport', label: 'Transporte' },
-    { value: 'shopping', label: 'Compras' },
-    { value: 'entertainment', label: 'Entretenimento' },
-    { value: 'health', label: 'Saúde' },
-    { value: 'education', label: 'Educação' },
+    { value: 'restaurant', label: 'Comida' },
+    { value: 'commute', label: 'Transporte' },
+    { value: 'shopping_cart', label: 'Compras' },
+    { value: 'local_activity', label: 'Entretenimento' },
+    { value: 'health_and_safety', label: 'Saúde' },
+    { value: 'school', label: 'Educação' },
     { value: 'work', label: 'Trabalho' },
-    { value: 'salary', label: 'Salário' },
-    { value: 'investment', label: 'Investimento' },
-    { value: 'gift', label: 'Presente' },
+    { value: 'monetization_on', label: 'Salário' },
+    { value: 'show_chart', label: 'Investimento' },
+    { value: 'card_giftcard', label: 'Presente' },
     { value: 'restaurant', label: 'Restaurante' },
-    { value: 'car', label: 'Carro' },
-    { value: 'plane', label: 'Avião' },
-    { value: 'train', label: 'Trem' },
-    { value: 'bus', label: 'Ônibus' },
-    { value: 'bike', label: 'Bicicleta' },
-    { value: 'walk', label: 'Caminhada' },
+    { value: 'directions_car', label: 'Carro' },
+    { value: 'flight', label: 'Avião' },
+    { value: 'directions_bus', label: 'Ônibus' },
+    { value: 'directions_bike', label: 'Bicicleta' },
     { value: 'coffee', label: 'Café' },
-    { value: 'beer', label: 'Cerveja' },
-    { value: 'wine', label: 'Vinho' },
-    { value: 'pizza', label: 'Pizza' },
-    { value: 'burger', label: 'Hambúrguer' },
-    { value: 'sushi', label: 'Sushi' },
-    { value: 'grocery', label: 'Supermercado' },
-    { value: 'pharmacy', label: 'Farmácia' },
-    { value: 'hospital', label: 'Hospital' },
-    { value: 'doctor', label: 'Médico' },
-    { value: 'gym', label: 'Academia' },
-    { value: 'sports', label: 'Esportes' },
+    { value: 'local_grocery_store', label: 'Supermercado' },
+    { value: 'local_pharmacy', label: 'Farmácia' },
+    { value: 'local_hospital', label: 'Hospital' },
+    { value: 'medical_services', label: 'Médico' },
+    { value: 'fitness_center', label: 'Academia' },
+    { value: 'sports_esports', label: 'Esportes' },
     { value: 'movie', label: 'Cinema' },
-    { value: 'music', label: 'Música' },
+    { value: 'music_note', label: 'Música' },
     { value: 'book', label: 'Livro' },
-    { value: 'game', label: 'Jogo' },
-    { value: 'travel', label: 'Viagem' },
+    { value: 'sports_esports', label: 'Jogo' },
+    { value: 'luggage', label: 'Viagem' },
     { value: 'hotel', label: 'Hotel' },
-    { value: 'beach', label: 'Praia' },
-    { value: 'mountain', label: 'Montanha' },
-    { value: 'shopping_cart', label: 'Carrinho' },
-    { value: 'credit_card', label: 'Cartão' },
-    { value: 'cash', label: 'Dinheiro' },
-    { value: 'bank', label: 'Banco' },
-    { value: 'wallet', label: 'Carteira' }
+    { value: 'credit_card', label: 'Cartão' }
   ];
 
   const colorOptions = [
@@ -212,7 +198,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
                           mr: 1
                         }}
                       >
-                        <IconComponent sx={{ color: 'white' }} />
+                        {React.createElement(IconComponent, { sx: { color: 'white' } })}
                       </Box>
                       {icon.label}
                     </Box>

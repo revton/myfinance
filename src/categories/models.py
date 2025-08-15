@@ -34,13 +34,13 @@ class CategoryBase(BaseModel):
     @validator('icon')
     def validate_icon(cls, v):
         valid_icons = [
-            'category', 'home', 'food', 'transport', 'shopping', 'entertainment',
-            'health', 'education', 'work', 'salary', 'investment', 'gift',
-            'restaurant', 'car', 'plane', 'train', 'bus', 'bike', 'walk',
-            'coffee', 'beer', 'wine', 'pizza', 'burger', 'sushi', 'grocery',
-            'pharmacy', 'hospital', 'doctor', 'gym', 'sports', 'movie',
-            'music', 'book', 'game', 'travel', 'hotel', 'beach', 'mountain',
-            'shopping_cart', 'credit_card', 'cash', 'bank', 'wallet'
+            'category', 'home', 'restaurant', 'commute', 'shopping_cart', 
+            'local_activity', 'health_and_safety', 'school', 'work', 
+            'monetization_on', 'show_chart', 'card_giftcard', 'directions_car', 
+            'flight', 'directions_bus', 'directions_bike', 'coffee', 
+            'local_grocery_store', 'local_pharmacy', 'local_hospital', 
+            'medical_services', 'fitness_center', 'sports_esports', 'movie', 
+            'music_note', 'book', 'luggage', 'hotel', 'credit_card'
         ]
         if v not in valid_icons:
             raise ValueError(f'Ícone deve ser um dos valores válidos: {", ".join(valid_icons)}')

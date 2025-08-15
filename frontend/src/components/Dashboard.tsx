@@ -13,9 +13,17 @@ import {
   Divider,
   useMediaQuery
 } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import { getIconComponent } from '../utils/iconUtils';
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+}
 
 interface Transaction {
   id: string;
@@ -23,6 +31,8 @@ interface Transaction {
   amount: number;
   description: string;
   created_at: string;
+  category_id: string;
+  category: Category;
 }
 
 interface User {
@@ -36,10 +46,12 @@ const Dashboard: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [form, setForm] = useState<Omit<Transaction, 'id' | 'created_at'>>({ 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [form, setForm] = useState<Omit<Transaction, 'id' | 'created_at' | 'category'>>({ 
     type: 'income', 
     amount: 0, 
-    description: '' 
+    description: '',
+    category_id: ''
   });
   const api = axios.create({
     baseURL: API_BASE_URL,
@@ -56,52 +68,50 @@ const Dashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    const loadTransactions = async () => {
+    const loadData = async () => {
       try {
-        const response = await api.get('/transactions/');
-        const data = Array.isArray(response.data) ? response.data : [];
-        setTransactions(data as Transaction[]);
+        const [transactionsResponse, categoriesResponse] = await Promise.all([
+          api.get('/transactions/'),
+          api.get('/categories/')
+        ]);
+        
+        const transactionsData = Array.isArray(transactionsResponse.data) ? transactionsResponse.data : [];
+        setTransactions(transactionsData as Transaction[]);
+
+        const categoriesData = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
+        setCategories(categoriesData as Category[]);
+
       } catch (error) {
-        console.error('Erro ao carregar transações:', error);
+        console.error('Erro ao carregar dados:', error);
         setTransactions([]);
+        setCategories([]);
       }
     };
 
-    loadTransactions();
+    loadData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.description || !form.amount) return;
+    if (!form.description || !form.amount || !form.category_id) return;
     
     try {
       const res = await api.post('/transactions/', { 
         ...form, 
         amount: Number(form.amount) 
       });
-      setTransactions([...transactions, res.data]);
-      setForm({ ...form, amount: 0, description: '' });
+      // After creating a transaction, we should reload the transactions to get the category object
+      const response = await api.get('/transactions/');
+      const data = Array.isArray(response.data) ? response.data : [];
+      setTransactions(data as Transaction[]);
+      setForm({ ...form, amount: 0, description: '', category_id: '' });
     } catch (error) {
       console.error('Erro ao criar transação:', error);
     }
-  };
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-    window.location.href = '/auth/login';
   };
 
   const formatCurrency = (amount: number) => {
@@ -171,6 +181,27 @@ const Dashboard: React.FC = () => {
             </TextField>
             
             <TextField
+              select
+              label="Categoria"
+              name="category_id"
+              value={form.category_id}
+              onChange={handleChange}
+              sx={{ minWidth: 150 }}
+            >
+              <MenuItem value="">
+                <em>Selecione a Categoria</em>
+              </MenuItem>
+              {categories.map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    {React.createElement(getIconComponent(category.icon))}
+                    <Typography sx={{ ml: 1 }}>{category.name}</Typography>
+                  </Box>
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
               label="Valor"
               name="amount"
               type="number"
@@ -210,10 +241,11 @@ const Dashboard: React.FC = () => {
                 <React.Fragment key={transaction.id}>
                   <ListItem>
                     <ListItemText
+                      disableTypography
                       primary={
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Typography variant="body1">
-                            {transaction.type === 'income' ? '💰' : '💸'} {transaction.description}
+                            {transaction.category?.icon ? React.createElement(getIconComponent(transaction.category.icon)) : (transaction.type === 'income' ? '💰' : '💸')} {transaction.description}
                           </Typography>
                           <Typography 
                             variant="body1" 
@@ -226,7 +258,16 @@ const Dashboard: React.FC = () => {
                           </Typography>
                         </Box>
                       }
-                      secondary={formatDate(transaction.created_at)}
+                      secondary={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {transaction.category?.name || 'Sem Categoria'}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatDate(transaction.created_at)}
+                          </Typography>
+                        </Box>
+                      }
                     />
                   </ListItem>
                   {i < transactions.length - 1 && <Divider />}
@@ -240,4 +281,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;  
+export default Dashboard;
