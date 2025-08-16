@@ -60,4 +60,7 @@ coverage.xml
 Thumbs.db
 
 # Dependency Management
-uv.lock 
+uv.lock
+
+# Qwen Code files
+QWEN.md 
