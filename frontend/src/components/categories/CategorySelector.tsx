@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { useCategories } from '../../contexts/CategoryContext';
 import { CategoryType } from '../../types/category';
+import { getIconComponent } from '../../utils/iconUtils';
 
 interface CategorySelectorProps {
   value: string | null;
@@ -27,8 +28,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   required = false,
   disabled = false
 }) => {
-  const { getCategoriesByType } = useCategories();
-  const categories = getCategoriesByType(type);
+  const { expenseCategories, incomeCategories } = useCategories();
+  const categories = type === CategoryType.EXPENSE ? expenseCategories : incomeCategories;
 
   return (
     <FormControl fullWidth required={required} disabled={disabled}>
@@ -56,9 +57,10 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                   mr: 1
                 }}
               >
-                <Typography variant="caption" color="white" fontSize="10px">
-                  {category.icon}
-                </Typography>
+                {(() => {
+                  const IconComponent = getIconComponent(category.icon);
+                  return <IconComponent sx={{ color: 'white', fontSize: 16 }} />;
+                })()}
               </Box>
               <Typography>{category.name}</Typography>
             </Box>

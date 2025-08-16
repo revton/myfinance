@@ -18,11 +18,15 @@ import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import { getIconComponent } from '../utils/iconUtils';
+import { useCategories } from '../contexts/CategoryContext';
+import CategorySelector from './categories/CategorySelector';
+import { CategoryType } from '../types/category';
 
 interface Category {
   id: string;
   name: string;
   icon: string;
+  type: 'income' | 'expense';
 }
 
 interface Transaction {
@@ -45,8 +49,9 @@ const Dashboard: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
+  const { expenseCategories, incomeCategories } = useCategories();
+  
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [form, setForm] = useState<Omit<Transaction, 'id' | 'created_at' | 'category'>>({ 
     type: 'income', 
     amount: 0, 
@@ -70,21 +75,16 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [transactionsResponse, categoriesResponse] = await Promise.all([
+        const [transactionsResponse] = await Promise.all([
           api.get('/transactions/'),
-          api.get('/categories/')
         ]);
         
         const transactionsData = Array.isArray(transactionsResponse.data) ? transactionsResponse.data : [];
         setTransactions(transactionsData as Transaction[]);
 
-        const categoriesData = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
-        setCategories(categoriesData as Category[]);
-
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
         setTransactions([]);
-        setCategories([]);
       }
     };
 
@@ -92,7 +92,13 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Reset category when type changes
+    if (name === 'type') {
+      setForm(prev => ({ ...prev, category_id: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -180,26 +186,13 @@ const Dashboard: React.FC = () => {
               <MenuItem value="expense">💸 Despesa</MenuItem>
             </TextField>
             
-            <TextField
-              select
-              label="Categoria"
-              name="category_id"
+            <CategorySelector
               value={form.category_id}
-              onChange={handleChange}
-              sx={{ minWidth: 150 }}
-            >
-              <MenuItem value="">
-                <em>Selecione a Categoria</em>
-              </MenuItem>
-              {categories.map((category) => (
-                <MenuItem key={category.id} value={category.id}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {React.createElement(getIconComponent(category.icon))}
-                    <Typography sx={{ ml: 1 }}>{category.name}</Typography>
-                  </Box>
-                </MenuItem>
-              ))}
-            </TextField>
+              onChange={(categoryId) => setForm(prev => ({ ...prev, category_id: categoryId || '' }))}
+              type={form.type as CategoryType}
+              label="Categoria"
+              required
+            />
 
             <TextField
               label="Valor"
@@ -245,7 +238,31 @@ const Dashboard: React.FC = () => {
                       primary={
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Typography variant="body1">
-                            {transaction.category?.icon ? React.createElement(getIconComponent(transaction.category.icon)) : (transaction.type === 'income' ? '💰' : '💸')} {transaction.description}
+                            {transaction.category?.icon ? (
+                              (() => {
+                                const IconComponent = getIconComponent(transaction.category.icon);
+                                return (
+                                  <Box
+                                    component="span"
+                                    sx={{
+                                      width: 20,
+                                      height: 20,
+                                      borderRadius: '50%',
+                                      backgroundColor: transaction.category.color,
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      mr: 1,
+                                      verticalAlign: 'middle'
+                                    }}
+                                  >
+                                    <IconComponent sx={{ color: 'white', fontSize: 16 }} />
+                                  </Box>
+                                );
+                              })()
+                            ) : (
+                              transaction.type === 'income' ? '💰' : '💸'
+                            )} {transaction.description}
                           </Typography>
                           <Typography 
                             variant="body1" 
