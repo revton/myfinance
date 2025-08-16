@@ -4,6 +4,8 @@ import type { Category, CategoryCreate, CategoryUpdate } from '../types/category
 
 interface CategoryContextType {
   categories: Category[];
+  expenseCategories: Category[];
+  incomeCategories: Category[];
   loading: boolean;
   error: string | null;
   createCategory: (data: CategoryCreate) => Promise<void>;
@@ -30,6 +32,8 @@ interface CategoryProviderProps {
 
 export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [expenseCategories, setExpenseCategories] = useState<Category[]>([]);
+  const [incomeCategories, setIncomeCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,13 +41,31 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('access_token'); // Get token here
+      
+      // Carregar todas as categorias
+      const token = localStorage.getItem('access_token');
       const response = await api.get('/categories?include_inactive=true', {
         headers: {
-          Authorization: token ? `Bearer ${token}` : '' // Set header explicitly
+          Authorization: token ? `Bearer ${token}` : ''
         }
       });
       setCategories(response.data || []);
+      
+      // Carregar categorias de despesa
+      const expenseResponse = await api.get('/categories?category_type=expense', {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : ''
+        }
+      });
+      setExpenseCategories(expenseResponse.data || []);
+      
+      // Carregar categorias de receita
+      const incomeResponse = await api.get('/categories?category_type=income', {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : ''
+        }
+      });
+      setIncomeCategories(incomeResponse.data || []);
     } catch (err) {
       setError('Erro ao carregar categorias');
       console.error('Erro ao buscar categorias:', err);
@@ -64,6 +86,13 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
       setError(null);
       const response = await api.post('/categories/', categoryData);
       setCategories(prev => [...prev, response.data]);
+      
+      // Atualizar listas específicas por tipo
+      if (response.data.type === 'expense') {
+        setExpenseCategories(prev => [...prev, response.data]);
+      } else {
+        setIncomeCategories(prev => [...prev, response.data]);
+      }
     } catch (err) {
       setError('Erro ao criar categoria');
       throw err;
@@ -77,6 +106,17 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
       setCategories(prev => 
         prev.map(cat => cat.id === id ? response.data : cat)
       );
+      
+      // Atualizar listas específicas por tipo
+      if (response.data.type === 'expense') {
+        setExpenseCategories(prev => 
+          prev.map(cat => cat.id === id ? response.data : cat)
+        );
+      } else {
+        setIncomeCategories(prev => 
+          prev.map(cat => cat.id === id ? response.data : cat)
+        );
+      }
     } catch (err) {
       setError('Erro ao atualizar categoria');
       throw err;
@@ -90,6 +130,10 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
       setCategories(prev => 
         prev.map(cat => cat.id === id ? { ...cat, is_active: false } : cat)
       );
+      
+      // Remover das listas específicas
+      setExpenseCategories(prev => prev.filter(cat => cat.id !== id));
+      setIncomeCategories(prev => prev.filter(cat => cat.id !== id));
     } catch (err) {
       setError('Erro ao excluir categoria');
       throw err;
@@ -103,6 +147,13 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
       setCategories(prev => 
         prev.map(cat => cat.id === id ? response.data : cat)
       );
+      
+      // Adicionar às listas específicas por tipo
+      if (response.data.type === 'expense') {
+        setExpenseCategories(prev => [...prev, response.data]);
+      } else {
+        setIncomeCategories(prev => [...prev, response.data]);
+      }
     } catch (err) {
       setError('Erro ao restaurar categoria');
       throw err;
@@ -119,6 +170,8 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
 
   const value = {
     categories,
+    expenseCategories,
+    incomeCategories,
     loading,
     error,
     createCategory,

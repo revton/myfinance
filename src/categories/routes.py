@@ -13,12 +13,13 @@ router = APIRouter(prefix="/categories", tags=["categories"])
 @router.get("/", response_model=List[CategoryWithTransactionCount])
 async def get_categories(
     include_inactive: bool = Query(False, description="Include inactive categories"),
+    category_type: Optional[str] = Query(None, description="Filter by category type (income or expense)"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """Lista todas as categorias do usuário"""
     service = CategoryService(db, current_user.id)
-    return service.get_categories(include_inactive=include_inactive)
+    return service.get_categories(include_inactive=include_inactive, category_type=category_type)
 
 @router.get("/{category_id}", response_model=CategoryResponse)
 async def get_category(

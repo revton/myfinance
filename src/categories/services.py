@@ -11,7 +11,7 @@ class CategoryService:
         self.db = db
         self.user_id = user_id
     
-    def get_categories(self, include_inactive: bool = False) -> List[CategoryWithTransactionCount]:
+    def get_categories(self, include_inactive: bool = False, category_type: Optional[str] = None) -> List[CategoryWithTransactionCount]:
         """Lista categorias com contagem de transações"""
         query = self.db.query(
             Category,
@@ -20,6 +20,10 @@ class CategoryService:
         
         if not include_inactive:
             query = query.filter(Category.is_active == True)
+        
+        # Filtrar por tipo se especificado
+        if category_type:
+            query = query.filter(Category.type == category_type)
         
         query = query.filter(Category.user_id == self.user_id)
         query = query.group_by(Category.id)

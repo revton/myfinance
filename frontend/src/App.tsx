@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -12,7 +12,7 @@ import ResetPassword from './components/ResetPassword';
 // Componente principal da aplicação
 import Dashboard from './components/Dashboard';
 import CategoriesPage from './pages/CategoriesPage';
-import Layout from './components/Layout';
+import PrivateRoute from './components/PrivateRoute';
 
 const theme = createTheme({
   palette: {
@@ -22,15 +22,62 @@ const theme = createTheme({
   },
 });
 
-// Componente para verificar se o usuário está autenticado
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const token = localStorage.getItem('access_token');
-  
-  if (!token) {
-    return <Navigate to="/auth/login" replace />;
-  }
-  
-  return <Layout>{children}</Layout>;
+const AppRoutes: React.FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleAuthError = () => {
+      console.log('Redirecting to login due to auth error.');
+      navigate('/auth/login');
+    };
+
+    window.addEventListener('auth-error', handleAuthError);
+
+    return () => {
+      window.removeEventListener('auth-error', handleAuthError);
+    };
+  }, [navigate]);
+
+  return (
+    <Routes>
+      {/* Rotas públicas de autenticação */}
+      <Route path="/auth/login" element={<Login />} />
+      <Route path="/auth/register" element={<Register />} />
+      <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+      <Route path="/auth/reset-password" element={<ResetPassword />} />
+      
+      {/* Rotas protegidas */}
+      <Route 
+        path="/dashboard" 
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/categories" 
+        element={
+          <PrivateRoute>
+            <CategoriesPage />
+          </PrivateRoute>
+        } 
+      />
+      
+      {/* Redirecionar raiz para dashboard ou login */}
+      <Route 
+        path="/" 
+        element={
+          localStorage.getItem('access_token') ? 
+            <Navigate to="/dashboard" replace /> : 
+            <Navigate to="/auth/login" replace />
+        } 
+      />
+      
+      {/* Rota 404 - redirecionar para login */}
+      <Route path="*" element={<Navigate to="/auth/login" replace />} />
+    </Routes>
+  );
 };
 
 function App() {
@@ -38,44 +85,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Routes>
-          {/* Rotas públicas de autenticação */}
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/register" element={<Register />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-          <Route path="/auth/reset-password" element={<ResetPassword />} />
-          
-          {/* Rotas protegidas */}
-          <Route 
-            path="/dashboard" 
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/categories" 
-            element={
-              <PrivateRoute>
-                <CategoriesPage />
-              </PrivateRoute>
-            } 
-          />
-          
-          {/* Redirecionar raiz para dashboard ou login */}
-          <Route 
-            path="/" 
-            element={
-              localStorage.getItem('access_token') ? 
-                <Navigate to="/dashboard" replace /> : 
-                <Navigate to="/auth/login" replace />
-            } 
-          />
-          
-          {/* Rota 404 - redirecionar para login */}
-          <Route path="*" element={<Navigate to="/auth/login" replace />} />
-        </Routes>
+        <AppRoutes />
       </Router>
     </ThemeProvider>
   );

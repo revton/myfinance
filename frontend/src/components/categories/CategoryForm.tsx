@@ -14,6 +14,17 @@ import {
 import { getIconComponent } from '../../utils/iconUtils';
 import { CategoryType } from '../../types/category';
 
+// Importar os mesmos ícones que usamos no iconUtils
+import {
+  Category, Home, Restaurant, Commute, ShoppingCart, 
+  LocalActivity, HealthAndSafety, School, Work, 
+  MonetizationOn, ShowChart, CardGiftcard, DirectionsCar, 
+  Flight, DirectionsBus, DirectionsBike, Coffee, 
+  LocalGroceryStore, LocalPharmacy, LocalHospital, 
+  MedicalServices, FitnessCenter, SportsEsports, Movie, 
+  MusicNote, Book, Luggage, Hotel, CreditCard
+} from '@mui/icons-material';
+
 interface CategoryFormProps {
   category?: Category | null;
   onSubmit: (data: any) => void;
@@ -77,37 +88,37 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
     }
   };
 
+  // Usar os mesmos ícones disponíveis no iconUtils
   const iconOptions = [
-    { value: 'home', label: 'Casa' },
-    { value: 'restaurant', label: 'Comida' },
-    { value: 'commute', label: 'Transporte' },
-    { value: 'shopping_cart', label: 'Compras' },
-    { value: 'local_activity', label: 'Entretenimento' },
-    { value: 'health_and_safety', label: 'Saúde' },
-    { value: 'school', label: 'Educação' },
-    { value: 'work', label: 'Trabalho' },
-    { value: 'monetization_on', label: 'Salário' },
-    { value: 'show_chart', label: 'Investimento' },
-    { value: 'card_giftcard', label: 'Presente' },
-    { value: 'restaurant', label: 'Restaurante' },
-    { value: 'directions_car', label: 'Carro' },
-    { value: 'flight', label: 'Avião' },
-    { value: 'directions_bus', label: 'Ônibus' },
-    { value: 'directions_bike', label: 'Bicicleta' },
-    { value: 'coffee', label: 'Café' },
-    { value: 'local_grocery_store', label: 'Supermercado' },
-    { value: 'local_pharmacy', label: 'Farmácia' },
-    { value: 'local_hospital', label: 'Hospital' },
-    { value: 'medical_services', label: 'Médico' },
-    { value: 'fitness_center', label: 'Academia' },
-    { value: 'sports_esports', label: 'Esportes' },
-    { value: 'movie', label: 'Cinema' },
-    { value: 'music_note', label: 'Música' },
-    { value: 'book', label: 'Livro' },
-    { value: 'sports_esports', label: 'Jogo' },
-    { value: 'luggage', label: 'Viagem' },
-    { value: 'hotel', label: 'Hotel' },
-    { value: 'credit_card', label: 'Cartão' }
+    { value: 'category', label: 'Categoria Padrão', icon: Category },
+    { value: 'home', label: 'Casa', icon: Home },
+    { value: 'restaurant', label: 'Comida', icon: Restaurant },
+    { value: 'commute', label: 'Transporte', icon: Commute },
+    { value: 'shopping_cart', label: 'Compras', icon: ShoppingCart },
+    { value: 'local_activity', label: 'Entretenimento', icon: LocalActivity },
+    { value: 'health_and_safety', label: 'Saúde', icon: HealthAndSafety },
+    { value: 'school', label: 'Educação', icon: School },
+    { value: 'work', label: 'Trabalho', icon: Work },
+    { value: 'monetization_on', label: 'Salário', icon: MonetizationOn },
+    { value: 'show_chart', label: 'Investimento', icon: ShowChart },
+    { value: 'card_giftcard', label: 'Presente', icon: CardGiftcard },
+    { value: 'directions_car', label: 'Carro', icon: DirectionsCar },
+    { value: 'flight', label: 'Avião', icon: Flight },
+    { value: 'directions_bus', label: 'Ônibus', icon: DirectionsBus },
+    { value: 'directions_bike', label: 'Bicicleta', icon: DirectionsBike },
+    { value: 'coffee', label: 'Café', icon: Coffee },
+    { value: 'local_grocery_store', label: 'Supermercado', icon: LocalGroceryStore },
+    { value: 'local_pharmacy', label: 'Farmácia', icon: LocalPharmacy },
+    { value: 'local_hospital', label: 'Hospital', icon: LocalHospital },
+    { value: 'medical_services', label: 'Médico', icon: MedicalServices },
+    { value: 'fitness_center', label: 'Academia', icon: FitnessCenter },
+    { value: 'sports_esports', label: 'Esportes', icon: SportsEsports },
+    { value: 'movie', label: 'Cinema', icon: Movie },
+    { value: 'music_note', label: 'Música', icon: MusicNote },
+    { value: 'book', label: 'Livro', icon: Book },
+    { value: 'luggage', label: 'Viagem', icon: Luggage },
+    { value: 'hotel', label: 'Hotel', icon: Hotel },
+    { value: 'credit_card', label: 'Cartão', icon: CreditCard }
   ];
 
   const colorOptions = [
@@ -182,7 +193,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
               onChange={(e) => handleChange('icon', e.target.value)}
             >
               {iconOptions.map((icon) => {
-                const IconComponent = getIconComponent(icon.value);
+                const IconComponent = icon.icon;
                 return (
                   <MenuItem key={icon.value} value={icon.value}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>

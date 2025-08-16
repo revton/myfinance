@@ -15,4 +15,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Interceptor para tratar erros de autenticação
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        console.log('Authentication error: token is invalid or expired. Redirecting to login.');
+        localStorage.removeItem('access_token');
+        // Use um evento para notificar a aplicação para redirecionar
+        window.dispatchEvent(new Event('auth-error'));
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
