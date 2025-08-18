@@ -5,17 +5,28 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
+from uuid import UUID
 
 class TransactionType(str, Enum):
     """Tipos de transação"""
     INCOME = "income"
     EXPENSE = "expense"
 
+class Category(BaseModel):
+    id: UUID
+    name: str
+    icon: str
+    color: str
+
+    class Config:
+        from_attributes = True
+
 class TransactionBase(BaseModel):
     """Modelo base para transações"""
     type: TransactionType = Field(..., description="Tipo da transação: income ou expense")
     amount: float = Field(..., gt=0, description="Valor da transação (sempre positivo)")
     description: str = Field(..., min_length=1, max_length=500, description="Descrição da transação")
+    category_id: Optional[UUID] = Field(None, description="ID da categoria")
 
 class TransactionCreate(TransactionBase):
     """Modelo para criação de transações"""
@@ -26,12 +37,14 @@ class TransactionUpdate(BaseModel):
     type: Optional[TransactionType] = Field(None, description="Tipo da transação")
     amount: Optional[float] = Field(None, gt=0, description="Valor da transação")
     description: Optional[str] = Field(None, min_length=1, max_length=500, description="Descrição da transação")
+    category_id: Optional[UUID] = Field(None, description="ID da categoria")
 
 class Transaction(TransactionBase):
     """Modelo completo de transação com campos do banco"""
-    id: str = Field(..., description="ID único da transação")
+    id: UUID = Field(..., description="ID único da transação")
     created_at: datetime = Field(..., description="Data de criação")
     updated_at: datetime = Field(..., description="Data da última atualização")
+    category: Optional[Category] = Field(None, description="Categoria da transação")
     
     model_config = ConfigDict(
         from_attributes=True,
@@ -42,7 +55,13 @@ class Transaction(TransactionBase):
                 "amount": 1000.00,
                 "description": "Salário do mês",
                 "created_at": "2024-01-01T00:00:00Z",
-                "updated_at": "2024-01-01T00:00:00Z"
+                "updated_at": "2024-01-01T00:00:00Z",
+                "category": {
+                    "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+                    "name": "Salário",
+                    "icon": "work",
+                    "color": "#00FF00"
+                }
             }
         }
     )
@@ -64,7 +83,13 @@ class TransactionList(BaseModel):
                         "amount": 1000.00,
                         "description": "Salário do mês",
                         "created_at": "2024-01-01T00:00:00Z",
-                        "updated_at": "2024-01-01T00:00:00Z"
+                        "updated_at": "2024-01-01T00:00:00Z",
+                        "category": {
+                            "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+                            "name": "Salário",
+                            "icon": "work",
+                            "color": "#00FF00"
+                        }
                     }
                 ],
                 "total": 1,
@@ -72,4 +97,4 @@ class TransactionList(BaseModel):
                 "per_page": 10
             }
         }
-    ) 
+    )

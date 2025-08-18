@@ -42,6 +42,7 @@ src/*.egg-info/
 # Coverage reports
 coverage/
 frontend/coverage/
+coverage.xml
 
 # Temporary files
 *.bak
@@ -56,4 +57,10 @@ frontend/coverage/
 
 # OS files
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Dependency Management
+uv.lock
+
+# Qwen Code files
+QWEN.md 

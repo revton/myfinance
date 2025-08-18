@@ -10,6 +10,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
 from .service import AuthService
 from .utils.jwt_handler import JWTHandler
+from .models import User
 
 # Configurar HTTPBearer para autenticação
 security = HTTPBearer(auto_error=False)
@@ -25,7 +26,7 @@ def get_jwt_handler() -> JWTHandler:
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
-) -> dict:
+) -> User:
     """
     Dependência para obter o usuário atual baseado no token JWT
     
@@ -33,7 +34,7 @@ async def get_current_user(
         credentials: Credenciais de autorização
         
     Returns:
-        Dados do usuário atual
+        Objeto User do usuário atual
         
     Raises:
         HTTPException: Se o token for inválido ou ausente
@@ -47,10 +48,16 @@ async def get_current_user(
     
     try:
         token = credentials.credentials
+        print(f"Token recebido: {token}")  # Log do token recebido
         jwt_handler = get_jwt_handler()
+        print(f"JWT Handler: {jwt_handler}")  # Log do JWT Handler
         user_data = jwt_handler.verify_token(token)
-        return user_data
+        print(f"Dados do usuário decodificados: {user_data}")  # Log dos dados do usuário
+        # Renomear 'user_id' para 'id' para corresponder ao modelo Pydantic User
+        user_data['id'] = user_data.pop('user_id')
+        return User(**user_data)
     except Exception as e:
+        print(f"Erro ao verificar token: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido",
@@ -59,7 +66,7 @@ async def get_current_user(
 
 async def get_current_user_optional(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
-) -> Optional[dict]:
+) -> Optional[User]:
     """
     Dependência opcional para obter o usuário atual
     
@@ -67,7 +74,7 @@ async def get_current_user_optional(
         credentials: Credenciais de autorização (opcional)
         
     Returns:
-        Dados do usuário atual ou None se não autenticado
+        Objeto User do usuário atual ou None se não autenticado
     """
     if not credentials:
         return None
@@ -76,12 +83,12 @@ async def get_current_user_optional(
         token = credentials.credentials
         jwt_handler = get_jwt_handler()
         user_data = jwt_handler.verify_token(token)
-        return user_data
+        return User(**user_data)
     except Exception:
         return None
 
 async def get_current_user_id(
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ) -> str:
     """
     Dependência para obter apenas o ID do usuário atual
@@ -92,10 +99,10 @@ async def get_current_user_id(
     Returns:
         ID do usuário atual
     """
-    return current_user["user_id"]
+    return str(current_user.id)
 
 async def get_current_user_email(
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ) -> str:
     """
     Dependência para obter apenas o email do usuário atual
@@ -106,7 +113,7 @@ async def get_current_user_email(
     Returns:
         Email do usuário atual
     """
-    return current_user["email"]
+    return current_user.email
 
 async def require_authenticated_user(
     current_user: dict = Depends(get_current_user)
