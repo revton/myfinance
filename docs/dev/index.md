@@ -108,6 +108,9 @@ Para visualizar a documentação localmente:
   uv run invoke test-all
   ```
 
+## Cobertura de Testes
+- [Guia de Cobertura de Testes](testes-cobertura.md) - Estratégia e métricas de cobertura de código
+
 ## Validação de Segurança das Dependências
 
 - **Backend/Docs (Python):**
@@ -213,8 +216,16 @@ Acesse em [http://localhost:9000](http://localhost:9000) (usuário/senha padrão
 
 ## Documentação Técnica
 
+### Autenticação
+- [Guia do Desenvolvedor - Sistema de Autenticação](autenticacao-guia-desenvolvedor.md) - Implementação técnica do sistema de autenticação com Supabase Auth
+
 ### Migração para SQLAlchemy
 - [Resumo da Migração SQLAlchemy](migration-sqlalchemy-summary.md) - Documentação completa da migração do Supabase para SQLAlchemy direto
+
+### Sistema de Categorias
+- [Guia do Desenvolvedor - Sistema de Categorias](categorias-guia-desenvolvedor.md) - Implementação técnica do sistema de categorias
+
+### Migração para SQLAlchemy
 
 ## Endpoints de Receitas e Despesas
 
@@ -241,4 +252,44 @@ Acesse em [http://localhost:9000](http://localhost:9000) (usuário/senha padrão
 
 **Resposta:**
 - 200 OK
-- Lista de receitas e despesas cadastradas 
+- Lista de receitas e despesas cadastradas
+
+---
+
+## ✅ **Status de Implementação Atual**
+
+### **Backend**
+- ✅ Configurar ambiente de desenvolvimento
+- ✅ Implementar autenticação com Supabase Auth
+- ✅ Criar modelos de dados
+- ✅ Implementar CRUD de transações
+- ✅ Configurar RLS no banco
+- ✅ Adicionar testes unitários
+
+### **Frontend**
+- ✅ Configurar ambiente de desenvolvimento
+- ✅ Implementar autenticação
+- ✅ Criar componentes de transações
+- ✅ Implementar formulários
+- ✅ Adicionar testes unitários
+- ✅ Configurar proxy de API
+
+### **DevOps**
+- ✅ Configurar variáveis de ambiente
+- ✅ Atualizar documentação
+- ⏳ Implementar testes automatizados completos
+- ⏳ Configurar monitoramento
+
+### **Funcionalidades Adicionais**
+- ✅ Sistema de categorias implementado
+- ✅ Interface de gerenciamento de categorias
+- ✅ Integração de categorias com transações
+- ⏳ Filtros avançados
+- ⏳ Dashboard com visualizações gráficas
+
+### **Status Geral**
+- ✅ MVP funcional e completo
+- ✅ Sistema de autenticação seguro
+- ✅ Sistema de categorias implementado
+- ⏳ Otimizações e melhorias pendentes
+- ⏳ Testes e monitoramento avançados 

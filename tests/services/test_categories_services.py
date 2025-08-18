@@ -19,7 +19,7 @@ class TestCategoryService:
         category_data = CategoryCreate(
             name="Alimentação",
             description="Gastos com comida",
-            icon="food",
+            icon="restaurant",
             color="#FF6B6B",
             type=CategoryType.EXPENSE
         )

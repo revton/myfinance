@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Container,
   Paper,
@@ -13,15 +11,23 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  useMediaQuery,
-  IconButton,
-  Avatar,
-  Menu,
-  MenuItem as MenuItemComponent
+  useMediaQuery
 } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import { getIconComponent } from '../utils/iconUtils';
+import { useCategories } from '../contexts/CategoryContext';
+import CategorySelector from './categories/CategorySelector';
+import { CategoryType } from '../types/category';
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  type: 'income' | 'expense';
+}
 
 interface Transaction {
   id: string;
@@ -29,6 +35,8 @@ interface Transaction {
   amount: number;
   description: string;
   created_at: string;
+  category_id: string;
+  category: Category;
 }
 
 interface User {
@@ -41,16 +49,15 @@ const Dashboard: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
+  const { expenseCategories, incomeCategories } = useCategories();
+  
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [form, setForm] = useState<Omit<Transaction, 'id' | 'created_at'>>({ 
+  const [form, setForm] = useState<Omit<Transaction, 'id' | 'created_at' | 'category'>>({ 
     type: 'income', 
     amount: 0, 
-    description: '' 
+    description: '',
+    category_id: ''
   });
-  const [user, setUser] = useState<User | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  // Configurar Axios com token
   const api = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000,
@@ -66,60 +73,51 @@ const Dashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    const loadUser = () => {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        setUser(JSON.parse(userStr));
-      }
-    };
-
-    const loadTransactions = async () => {
+    const loadData = async () => {
       try {
-        const response = await api.get('/transactions/');
-        const data = Array.isArray(response.data) ? response.data : [];
-        setTransactions(data as Transaction[]);
+        const [transactionsResponse] = await Promise.all([
+          api.get('/transactions/'),
+        ]);
+        
+        const transactionsData = Array.isArray(transactionsResponse.data) ? transactionsResponse.data : [];
+        setTransactions(transactionsData as Transaction[]);
+
       } catch (error) {
-        console.error('Erro ao carregar transações:', error);
+        console.error('Erro ao carregar dados:', error);
         setTransactions([]);
       }
     };
 
-    loadUser();
-    loadTransactions();
+    loadData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Reset category when type changes
+    if (name === 'type') {
+      setForm(prev => ({ ...prev, category_id: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.description || !form.amount) return;
+    if (!form.description || !form.amount || !form.category_id) return;
     
     try {
       const res = await api.post('/transactions/', { 
         ...form, 
         amount: Number(form.amount) 
       });
-      setTransactions([...transactions, res.data]);
-      setForm({ ...form, amount: 0, description: '' });
+      // After creating a transaction, we should reload the transactions to get the category object
+      const response = await api.get('/transactions/');
+      const data = Array.isArray(response.data) ? response.data : [];
+      setTransactions(data as Transaction[]);
+      setForm({ ...form, amount: 0, description: '', category_id: '' });
     } catch (error) {
       console.error('Erro ao criar transação:', error);
     }
-  };
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-    window.location.href = '/auth/login';
   };
 
   const formatCurrency = (amount: number) => {
@@ -151,42 +149,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            💰 MyFinance
-          </Typography>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              Olá, {user?.full_name || 'Usuário'}
-            </Typography>
-            
-            <IconButton
-              onClick={handleMenuOpen}
-              sx={{ color: 'white' }}
-            >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(255,255,255,0.2)' }}>
-                {user?.full_name?.charAt(0) || 'U'}
-              </Avatar>
-            </IconButton>
-            
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              <MenuItemComponent onClick={handleMenuClose}>
-                Perfil
-              </MenuItemComponent>
-              <MenuItemComponent onClick={handleLogout}>
-                Sair
-              </MenuItemComponent>
-            </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Resumo Financeiro */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2, mb: 4 }}>
@@ -224,6 +186,14 @@ const Dashboard: React.FC = () => {
               <MenuItem value="expense">💸 Despesa</MenuItem>
             </TextField>
             
+            <CategorySelector
+              value={form.category_id}
+              onChange={(categoryId) => setForm(prev => ({ ...prev, category_id: categoryId || '' }))}
+              type={form.type as CategoryType}
+              label="Categoria"
+              required
+            />
+
             <TextField
               label="Valor"
               name="amount"
@@ -264,10 +234,35 @@ const Dashboard: React.FC = () => {
                 <React.Fragment key={transaction.id}>
                   <ListItem>
                     <ListItemText
+                      disableTypography
                       primary={
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Typography variant="body1">
-                            {transaction.type === 'income' ? '💰' : '💸'} {transaction.description}
+                            {transaction.category?.icon ? (
+                              (() => {
+                                const IconComponent = getIconComponent(transaction.category.icon);
+                                return (
+                                  <Box
+                                    component="span"
+                                    sx={{
+                                      width: 20,
+                                      height: 20,
+                                      borderRadius: '50%',
+                                      backgroundColor: transaction.category.color,
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      mr: 1,
+                                      verticalAlign: 'middle'
+                                    }}
+                                  >
+                                    <IconComponent sx={{ color: 'white', fontSize: 16 }} />
+                                  </Box>
+                                );
+                              })()
+                            ) : (
+                              transaction.type === 'income' ? '💰' : '💸'
+                            )} {transaction.description}
                           </Typography>
                           <Typography 
                             variant="body1" 
@@ -280,7 +275,16 @@ const Dashboard: React.FC = () => {
                           </Typography>
                         </Box>
                       }
-                      secondary={formatDate(transaction.created_at)}
+                      secondary={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {transaction.category?.name || 'Sem Categoria'}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatDate(transaction.created_at)}
+                          </Typography>
+                        </Box>
+                      }
                     />
                   </ListItem>
                   {i < transactions.length - 1 && <Divider />}
@@ -294,4 +298,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

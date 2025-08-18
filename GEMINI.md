@@ -17,3 +17,12 @@ I am a software engineer focused on applying software development best practices
 - **Pull Requests:** Once a feature is complete, create a draft Pull Request (`--draft`) for review and merging, always targeting the `develop` branch. Do not merge it automatically.
 - **Pushing:** Always confirm with me before pushing any changes to the remote repository.
 - **Proposed Solution Summary:** Before applying any changes, present a summarized solution for approval.
+
+## Architectural Principles
+
+To ensure the project is scalable, maintainable, and ready for future expansions (like mobile applications), the following architectural principles must be followed:
+
+- **Backend-centric Logic:** All business logic, data validation, and data access must be centralized in the backend API (the `src` directory). The backend is the single source of truth.
+- **Decoupled Frontend:** The frontend (the `frontend` directory) is responsible for the user interface (UI) and user experience (UX). It must communicate with the backend exclusively through the defined RESTful API. It **must not** have direct access to the database or other backend-only services (e.g., direct Supabase calls).
+- **Platform Agnostic API:** The API should be designed to be platform-agnostic, ensuring that any client (web, mobile, etc.) can consume it and receive consistent behavior and data.
+- **Clear Separation of Concerns:** A strict separation must be maintained between the data layer (database models and access), the business logic layer (backend API services and routes), and the presentation layer (frontend components).

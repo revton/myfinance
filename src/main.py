@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status, HTTPException, Depends
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import text
 from .config import settings
 from .models import TransactionCreate, Transaction, TransactionList, TransactionUpdate
@@ -69,7 +69,8 @@ async def create_transaction(transaction: TransactionCreate, db: Session = Depen
             id=uuid.uuid4(),
             type=transaction.type.value,
             amount=transaction.amount,
-            description=transaction.description
+            description=transaction.description,
+            category_id=transaction.category_id
         )
         
         # Adiciona e commita
@@ -80,14 +81,7 @@ async def create_transaction(transaction: TransactionCreate, db: Session = Depen
         logger.info(f"Transação criada: {db_transaction.id}")
         
         # Converte para modelo Pydantic
-        return Transaction(
-            id=str(db_transaction.id),
-            type=db_transaction.type,
-            amount=db_transaction.amount,
-            description=db_transaction.description,
-            created_at=db_transaction.created_at,
-            updated_at=db_transaction.updated_at
-        )
+        return db_transaction
             
     except HTTPException:
         # Re-raise HTTPException para manter o status code correto
@@ -101,21 +95,12 @@ async def create_transaction(transaction: TransactionCreate, db: Session = Depen
 async def list_transactions(db: Session = Depends(get_db)):
     try:
         # Busca todas as transações ordenadas por data de criação
-        db_transactions = db.query(TransactionModel).order_by(TransactionModel.created_at.desc()).all()
+        db_transactions = db.query(TransactionModel).options(joinedload(TransactionModel.category)).order_by(TransactionModel.created_at.desc()).all()
         
         logger.info(f"Listadas {len(db_transactions)} transações")
         
         # Converte para modelos Pydantic
-        return [
-            Transaction(
-                id=str(t.id),
-                type=t.type,
-                amount=t.amount,
-                description=t.description,
-                created_at=t.created_at,
-                updated_at=t.updated_at
-            ) for t in db_transactions
-        ]
+        return db_transactions
         
     except HTTPException:
         # Re-raise HTTPException para manter o status code correto
@@ -128,7 +113,7 @@ async def list_transactions(db: Session = Depends(get_db)):
 async def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
     try:
         # Busca transação por ID
-        db_transaction = db.query(TransactionModel).filter(TransactionModel.id == transaction_id).first()
+        db_transaction = db.query(TransactionModel).options(joinedload(TransactionModel.category)).filter(TransactionModel.id == transaction_id).first()
         
         if not db_transaction:
             raise HTTPException(status_code=404, detail="Transação não encontrada")
@@ -136,14 +121,7 @@ async def get_transaction(transaction_id: str, db: Session = Depends(get_db)):
         logger.info(f"Transação encontrada: {transaction_id}")
         
         # Converte para modelo Pydantic
-        return Transaction(
-            id=str(db_transaction.id),
-            type=db_transaction.type,
-            amount=db_transaction.amount,
-            description=db_transaction.description,
-            created_at=db_transaction.created_at,
-            updated_at=db_transaction.updated_at
-        )
+        return db_transaction
         
     except HTTPException:
         raise
@@ -161,12 +139,9 @@ async def update_transaction(transaction_id: str, transaction: TransactionUpdate
             raise HTTPException(status_code=404, detail="Transação não encontrada")
         
         # Atualiza campos fornecidos
-        if transaction.type is not None:
-            db_transaction.type = transaction.type.value
-        if transaction.amount is not None:
-            db_transaction.amount = transaction.amount
-        if transaction.description is not None:
-            db_transaction.description = transaction.description
+        update_data = transaction.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_transaction, key, value)
         
         # Commita as mudanças
         db.commit()
@@ -175,14 +150,7 @@ async def update_transaction(transaction_id: str, transaction: TransactionUpdate
         logger.info(f"Transação atualizada: {transaction_id}")
         
         # Converte para modelo Pydantic
-        return Transaction(
-            id=str(db_transaction.id),
-            type=db_transaction.type,
-            amount=db_transaction.amount,
-            description=db_transaction.description,
-            created_at=db_transaction.created_at,
-            updated_at=db_transaction.updated_at
-        )
+        return db_transaction
         
     except HTTPException:
         raise
@@ -229,4 +197,4 @@ if __name__ == "__main__":
         host=settings.API_HOST,
         port=settings.API_PORT,
         reload=settings.DEBUG
-    ) 
+    )

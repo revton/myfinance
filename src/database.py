@@ -4,6 +4,7 @@ Baseados nos modelos Pydantic para integração com Alembic
 """
 from datetime import datetime
 from sqlalchemy import Column, String, Float, Text, DateTime, CheckConstraint, Index, ForeignKey, Boolean, Enum as SQLEnum
+from sqlalchemy.orm import relationship
 from .custom_types import GUID as UUID
 from sqlalchemy.sql import func
 from .database_sqlalchemy import Base
@@ -25,6 +26,8 @@ class Category(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
+    transactions = relationship("Transaction", back_populates="category")
+
 class Transaction(Base):
     """Modelo SQLAlchemy para transações"""
     __tablename__ = "transactions"
@@ -37,6 +40,8 @@ class Transaction(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
+    category = relationship("Category", back_populates="transactions")
+
     __table_args__ = (
         CheckConstraint("type IN ('income', 'expense')", name="check_transaction_type"),
         CheckConstraint("amount > 0", name="check_amount_positive"),

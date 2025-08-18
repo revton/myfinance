@@ -8,7 +8,7 @@ class TestCategoryCreate:
         category_data = CategoryCreate(
             name="Alimentação",
             description="Gastos com comida",
-            icon="food",
+            icon="restaurant",
             color="#FF6B6B",
             type=CategoryType.EXPENSE
         )
@@ -16,7 +16,7 @@ class TestCategoryCreate:
         # Assert
         assert category_data.name == "Alimentação"
         assert category_data.description == "Gastos com comida"
-        assert category_data.icon == "food"
+        assert category_data.icon == "restaurant"
         assert category_data.color == "#FF6B6B"
         assert category_data.type == CategoryType.EXPENSE
     
