@@ -14,7 +14,7 @@ class TestCategoryEndpoints:
         category_data = {
             "name": "Alimentação",
             "description": "Gastos com comida",
-            "icon": "food",
+            "icon": "restaurant",
             "color": "#FF6B6B",
             "type": "expense"
         }
@@ -83,7 +83,7 @@ class TestCategoryEndpoints:
         mock_category_1.id = str(uuid4())
         mock_category_1.name = "Alimentação"
         mock_category_1.description = "Gastos com comida"
-        mock_category_1.icon = "food"
+        mock_category_1.icon = "restaurant"
         mock_category_1.color = "#FF6B6B"
         mock_category_1.type = "expense"
         mock_category_1.user_id = str(user_id) # Add user_id
@@ -92,7 +92,7 @@ class TestCategoryEndpoints:
         mock_category_2.id = str(uuid4())
         mock_category_2.name = "Salário"
         mock_category_2.description = "Recebimento de salário"
-        mock_category_2.icon = "wallet" # Changed to a valid icon
+        mock_category_2.icon = "credit_card" # Changed to a valid icon
         mock_category_2.color = "#6BFF6B"
         mock_category_2.type = "income"
         mock_category_2.user_id = str(user_id) # Add user_id
@@ -111,7 +111,7 @@ class TestCategoryEndpoints:
         assert response_json[0]["user_id"] == str(user_id) # Assert user_id
         assert response_json[1]["user_id"] == str(user_id) # Assert user_id
         # Removed user_id from assert_called_once_with
-        mock_service.get_categories.assert_called_once_with(include_inactive=False)
+        mock_service.get_categories.assert_called_once_with(include_inactive=False, category_type=None)
 
 
     @patch('src.categories.routes.CategoryService')
@@ -122,7 +122,7 @@ class TestCategoryEndpoints:
         update_data = {
             "name": "Nova Alimentação",
             "description": "Novos gastos",
-            "icon": "food", # Changed to a valid icon
+            "icon": "restaurant", # Changed to a valid icon
             "color": "#ABCDEF",
             "type": "expense"
         }

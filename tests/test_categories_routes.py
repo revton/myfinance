@@ -17,7 +17,7 @@ class TestCategoriesRoutes:
         category_data = {
             "name": "Alimentação",
             "description": "Gastos com comida",
-            "icon": "food",
+                        "icon": "restaurant",
             "color": "#FF5733",
             "type": "expense"
         }
@@ -44,7 +44,7 @@ class TestCategoriesRoutes:
         category_data = {
             "name": "",  # Invalid name
             "description": "Gastos com comida",
-            "icon": "food",
+                        "icon": "restaurant",
             "color": "#FF5733",
             "type": "expense"
         }
@@ -66,7 +66,7 @@ class TestCategoriesRoutes:
         category_data1 = {
             "name": "Alimentação",
             "description": "Gastos com comida",
-            "icon": "food",
+                        "icon": "restaurant",
             "color": "#FF5733",
             "type": "expense"
         }
@@ -101,7 +101,7 @@ class TestCategoriesRoutes:
         category_data = {
             "name": "Alimentação",
             "description": "Gastos com comida",
-            "icon": "food",
+                        "icon": "restaurant",
             "color": "#FF5733",
             "type": "expense"
         }
@@ -128,7 +128,7 @@ class TestCategoriesRoutes:
         category_data = {
             "name": "Alimentação",
             "description": "Gastos com comida",
-            "icon": "food",
+                        "icon": "restaurant",
             "color": "#FF5733",
             "type": "expense"
         }
@@ -164,7 +164,7 @@ class TestCategoriesRoutes:
         category_data = {
             "name": "Alimentação",
             "description": "Gastos com comida",
-            "icon": "food",
+                        "icon": "restaurant",
             "color": "#FF5733",
             "type": "expense"
         }
@@ -193,7 +193,7 @@ class TestCategoriesRoutes:
         category_data = {
             "name": "Alimentação",
             "description": "Gastos com comida",
-            "icon": "food",
+                        "icon": "restaurant",
             "color": "#FF5733",
             "type": "expense"
         }

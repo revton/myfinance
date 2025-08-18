@@ -10,19 +10,19 @@ client = TestClient(app)
 def mock_auth_service():
     mock_auth_service_instance = MagicMock()
     mock_auth_service_instance.register_user = AsyncMock(return_value={
-        "user_id": "user-123",
+        "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
         "email": "test@example.com"
     })
     mock_auth_service_instance.login_user = AsyncMock(return_value={
         "access_token": "token-123",
         "refresh_token": "refresh-123",
         "token_type": "bearer",
-        "user": {"id": "user-123", "email": "test@example.com"}
+        "user": {"id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa", "email": "test@example.com"}
     })
     mock_auth_service_instance.logout_user = AsyncMock(return_value={"message": "Logout realizado com sucesso"})
     mock_auth_service_instance.get_user_profile = AsyncMock(return_value={
         "id": "profile-123",
-        "user_id": "user-123",
+        "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
         "email": "test@example.com",
         "full_name": "Test User",
         "timezone": "America/Sao_Paulo",
@@ -31,7 +31,7 @@ def mock_auth_service():
     })
     mock_auth_service_instance.update_user_profile = AsyncMock(return_value={
         "id": "profile-123",
-        "user_id": "user-123",
+        "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
         "email": "test@example.com",
         "full_name": "Updated Name",
         "timezone": "America/New_York",
@@ -65,7 +65,7 @@ class TestAuthEndpoints:
         
         # Assert
         assert response.status_code == 201
-        assert response.json()["user_id"] == "user-123"
+        assert response.json()["user_id"] == "97eeaf25-6faf-43f8-97e0-5391a3bff4aa"
         mock_auth_service.register_user.assert_called_once()
     
     def test_register_endpoint_invalid_data(self, mock_auth_service):
@@ -115,7 +115,7 @@ class TestAuthEndpoints:
         assert result["access_token"] == "token-123"
         assert result["refresh_token"] == "refresh-123"
         assert result["token_type"] == "bearer"
-        assert result["user"]["id"] == "user-123"
+        assert result["user"]["id"] == "97eeaf25-6faf-43f8-97e0-5391a3bff4aa"
     
     def test_login_endpoint_invalid_data(self, mock_auth_service):
         """Testa endpoint de login com dados inválidos"""
@@ -155,7 +155,7 @@ class TestAuthEndpoints:
         # Arrange
         mock_jwt = mock_jwt_handler.return_value
         mock_jwt.verify_token.return_value = {
-            "user_id": "user-123",
+            "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
             "email": "test@example.com"
         }
         
@@ -172,7 +172,7 @@ class TestAuthEndpoints:
         assert response.status_code == 200
         result = response.json()
         assert result["email"] == "test@example.com"
-        assert result["id"] == "user-123"
+        assert result["id"] == "97eeaf25-6faf-43f8-97e0-5391a3bff4aa"
         assert result["profile"]["full_name"] == "Test User"
     
     def test_me_endpoint_no_token(self):
@@ -202,7 +202,7 @@ class TestAuthEndpoints:
         # Arrange
         mock_jwt = mock_jwt_handler.return_value
         mock_jwt.verify_token.return_value = {
-            "user_id": "user-123",
+            "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
             "email": "test@example.com"
         }
         
@@ -230,7 +230,7 @@ class TestAuthEndpoints:
         # Arrange
         mock_jwt = mock_jwt_handler.return_value
         mock_jwt.verify_token.return_value = {
-            "user_id": "user-123",
+            "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
             "email": "test@example.com"
         }
         
@@ -252,7 +252,7 @@ class TestAuthEndpoints:
         # Arrange
         mock_jwt = mock_jwt_handler.return_value
         mock_jwt.verify_token.return_value = {
-            "user_id": "user-123",
+            "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
             "email": "test@example.com"
         }
         
@@ -282,7 +282,7 @@ class TestAuthEndpoints:
         # Arrange
         mock_jwt = mock_jwt_handler.return_value
         mock_jwt.verify_token.return_value = {
-            "user_id": "user-123",
+            "user_id": "97eeaf25-6faf-43f8-97e0-5391a3bff4aa",
             "email": "test@example.com"
         }
         

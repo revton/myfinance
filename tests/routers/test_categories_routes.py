@@ -69,7 +69,7 @@ class TestCategoriesEndpoints:
                 user_id=user_id,
                 name="Category 2",
                 description="Desc 2",
-                icon="food",
+                icon="restaurant",
                 color="#111111",
                 type=CategoryType.INCOME,
                 is_default=False,
