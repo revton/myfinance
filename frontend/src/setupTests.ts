@@ -3,18 +3,43 @@ import { vi } from 'vitest';
 
 // Mock @mui/icons-material to prevent EMFILE errors
 vi.mock('@mui/icons-material', () => {
+  const React = require('react');
+  const mockIcon = (props: any) => React.createElement('div', props, 'MockIcon');
+  
   return {
     __esModule: true,
-    // Default export for cases like `import Icon from '@mui/icons-material';`
-    default: vi.fn((props) => <div {...props}>MockIcon</div>),
-    // Named exports for specific icons like `import { Add } from '@mui/icons-material';`
-    // We can return a generic mock component for all named exports
-    __all__: new Proxy({}, {
-      get: (target, name) => {
-        if (name === '__esModule') return true;
-        return vi.fn((props) => <div {...props}>{String(name)}Mock</div>);
-      },
-    }),
+    // Mock all icons as the same component to prevent import issues
+    Category: mockIcon,
+    Home: mockIcon,
+    Restaurant: mockIcon,
+    Commute: mockIcon,
+    ShoppingCart: mockIcon,
+    LocalActivity: mockIcon,
+    HealthAndSafety: mockIcon,
+    School: mockIcon,
+    Work: mockIcon,
+    MonetizationOn: mockIcon,
+    ShowChart: mockIcon,
+    CardGiftcard: mockIcon,
+    DirectionsCar: mockIcon,
+    Flight: mockIcon,
+    DirectionsBus: mockIcon,
+    DirectionsBike: mockIcon,
+    Coffee: mockIcon,
+    LocalGroceryStore: mockIcon,
+    LocalPharmacy: mockIcon,
+    LocalHospital: mockIcon,
+    MedicalServices: mockIcon,
+    FitnessCenter: mockIcon,
+    SportsEsports: mockIcon,
+    Movie: mockIcon,
+    MusicNote: mockIcon,
+    Book: mockIcon,
+    Luggage: mockIcon,
+    Hotel: mockIcon,
+    CreditCard: mockIcon,
+    // Default export
+    default: mockIcon
   };
 });
 
