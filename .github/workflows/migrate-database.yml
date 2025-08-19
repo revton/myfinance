@@ -31,11 +31,12 @@ jobs:
         id: check
         run: |
           echo "Checking for pending migrations..."
-          python scripts/check_pending_migrations.py
-          if [ $? -eq 0 ]; then
-            echo "pending=false" >> $GITHUB_OUTPUT
-          else
+          output=$(python scripts/check_pending_migrations.py)
+          echo "$output"
+          if echo "$output" | grep -q "Há migrações pendentes"; then
             echo "pending=true" >> $GITHUB_OUTPUT
+          else
+            echo "pending=false" >> $GITHUB_OUTPUT
           fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
