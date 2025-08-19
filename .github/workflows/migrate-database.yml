@@ -85,46 +85,6 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ENVIRONMENT: production
 
-      - name: Send notification on success
-        if: success()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "text": "✅ Database migration applied successfully on main branch",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "✅ *Database migration applied successfully*\n• Branch: `main`\n• Commit: `${{ github.sha }}`\n• Environment: `production`"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Send notification on failure
-        if: failure()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "text": "❌ Database migration failed on main branch",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "❌ *Database migration failed*\n• Branch: `main`\n• Commit: `${{ github.sha }}`\n• Environment: `production`\n• Check logs for details"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
   no-migrations:
     name: No Pending Migrations
     needs: check-migrations

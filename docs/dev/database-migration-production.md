@@ -113,4 +113,4 @@ Se encontrar problemas durante a migração:
 1. **Verifique os logs completos**
 2. **Confirme as credenciais do banco**
 3. **Consulte o histórico de migrações**
-4. **Entre em contato com a equipe de desenvolvimento**
+4. **Verifique as variáveis de ambiente**
