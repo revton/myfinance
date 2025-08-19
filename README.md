@@ -30,6 +30,15 @@ uv run invoke frontend   # React na porta 5173
 uv run invoke docs       # Documentação na porta 8001
 ```
 
+### 4. Aplicar migrações (se necessário)
+```bash
+# Verificar status das migrações
+uv run invoke show-migration-status
+
+# Aplicar migrações pendentes
+uv run invoke migrate-production
+```
+
 ## 📚 Documentação
 
 - [Configuração de Ambiente](docs/dev/env-setup.md)
