@@ -53,7 +53,7 @@ def main():
     
     # Mostra status atual
     print("📊 Status atual das migrações:")
-    if not run_command("uv run alembic current", "Verificando status das migrações"):
+    if not run_command("alembic current", "Verificando status das migrações"):
         print("❌ Falha ao verificar status das migrações")
         return
     
@@ -61,7 +61,7 @@ def main():
     
     # Mostra histórico
     print("📋 Histórico de migrações:")
-    if not run_command("uv run alembic history --verbose", "Verificando histórico de migrações"):
+    if not run_command("alembic history --verbose", "Verificando histórico de migrações"):
         print("❌ Falha ao verificar histórico de migrações")
         return
 

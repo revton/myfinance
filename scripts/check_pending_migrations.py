@@ -31,7 +31,7 @@ def check_pending_migrations():
     print("🔍 Verificando migrações pendentes...")
     
     # Verifica o status atual
-    result = run_command("uv run alembic current", "verificar status das migrações")
+    result = run_command("alembic current", "verificar status das migrações")
     if not result:
         return False
     
@@ -43,7 +43,7 @@ def check_pending_migrations():
     print(f"   Revisão atual: {current_revision if current_revision else 'Nenhuma'}")
     
     # Verifica o head
-    result = run_command("uv run alembic heads", "verificar head das migrações")
+    result = run_command("alembic heads", "verificar head das migrações")
     if not result:
         return False
     
@@ -80,7 +80,7 @@ def main():
     
     # Verifica migrações pendentes
     if check_pending_migrations():
-        print("\n💡 Execute 'uv run alembic upgrade head' para aplicar as migrações")
+        print("\n💡 Execute 'alembic upgrade head' para aplicar as migrações")
         sys.exit(0)  # Exit code 0 indica que há migrações pendentes (não é erro)
     else:
         print("\n✅ Nenhuma migração pendente")
