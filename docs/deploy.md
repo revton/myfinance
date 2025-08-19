@@ -210,6 +210,25 @@ SUPABASE_ANON_KEY=sua_supabase_anon_key
 - Vercel: Deploy logs
 - GitHub Actions: Actions tab
 
+## 🔄 Migrações de Banco de Dados
+
+### Migrações Automáticas
+Quando um merge é feito na branch `main`, o GitHub Actions automaticamente:
+1. Verifica se há migrações pendentes
+2. Se houver, aplica as migrações no banco de produção
+3. Notifica via Slack sobre o sucesso ou falha
+
+### Migrações Manuais
+Para aplicar migrações manualmente:
+
+```bash
+# Verificar status das migrações
+uv run invoke show-migration-status
+
+# Aplicar migrações pendentes
+uv run invoke migrate-production
+```
+
 ## 📈 Próximos Passos
 
 1. **Implementar autenticação** com Supabase Auth

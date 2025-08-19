@@ -34,6 +34,94 @@ def test_database_connection(c):
     c.run("uv run python scripts/test_supabase_sqlalchemy.py")
 
 @task
+def migrate_production(c):
+    """Aplica migrações no banco de dados de produção."""
+    print("🚀 Aplicando migrações no banco de dados de produção...")
+    
+    # Verifica se estamos em ambiente de produção
+    environment = os.getenv("ENVIRONMENT", "development")
+    if environment != "production":
+        print("⚠️  Atenção: Você não está em ambiente de produção!")
+        print("💡 Para forçar a migração em produção, defina ENVIRONMENT=production")
+        response = input("Deseja continuar mesmo assim? (s/N): ").strip().lower()
+        if response != 's':
+            print("❌ Operação cancelada")
+            return
+    
+    # Verifica se DATABASE_URL está configurada
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        print("❌ DATABASE_URL não está configurada")
+        print("💡 Configure a variável DATABASE_URL com a URL do banco de produção")
+        return
+    
+    print(f"   Ambiente: {environment}")
+    print(f"   Banco de dados: {database_url.split('@')[-1] if '@' in database_url else 'Configurado'}")
+    
+    # Mostra o status atual das migrações
+    print("\n📊 Status atual das migrações:")
+    c.run("uv run alembic current", warn=True)
+    
+    # Aplica as migrações pendentes
+    print("\n🚀 Aplicando migrações...")
+    result = c.run("uv run alembic upgrade head", warn=True)
+    
+    if result.exited == 0:
+        print("✅ Migrações aplicadas com sucesso!")
+    else:
+        print("❌ Erro ao aplicar migrações")
+        print("💡 Verifique os logs acima para mais detalhes")
+
+@task
+def show_migration_status(c):
+    """Mostra o status das migrações."""
+    print("📊 Status das migrações:")
+    
+    # Verifica ambiente
+    environment = os.getenv("ENVIRONMENT", "development")
+    database_url = os.getenv("DATABASE_URL")
+    
+    print(f"   Ambiente: {environment}")
+    print(f"   Banco de dados: {'Configurado' if database_url else 'Não configurado'}")
+    
+    # Mostra status
+    c.run("uv run alembic current", warn=True)
+    
+    # Mostra histórico
+    print("\n📋 Histórico de migrações:")
+    c.run("uv run alembic history --verbose", warn=True)
+
+@task
+def check_pending_migrations(c):
+    """Verifica se há migrações pendentes."""
+    print("🔍 Verificando migrações pendentes...")
+    
+    # Verifica ambiente
+    environment = os.getenv("ENVIRONMENT", "development")
+    database_url = os.getenv("DATABASE_URL")
+    
+    print(f"   Ambiente: {environment}")
+    print(f"   Banco de dados: {'Configurado' if database_url else 'Não configurado'}")
+    
+    # Verifica migrações pendentes
+    c.run("uv run python scripts/check_pending_migrations.py", warn=True)
+
+@task
+def initialize_production_database(c):
+    """Inicializa o banco de dados em produção."""
+    print("🚀 Inicializando banco de dados em produção...")
+    
+    # Verifica ambiente
+    environment = os.getenv("ENVIRONMENT", "development")
+    database_url = os.getenv("DATABASE_URL")
+    
+    print(f"   Ambiente: {environment}")
+    print(f"   Banco de dados: {'Configurado' if database_url else 'Não configurado'}")
+    
+    # Inicializa banco
+    c.run("uv run python scripts/initialize_production_database.py", warn=True)
+
+@task
 def frontend(c, port=5173):
     """Inicia o frontend React/Vite na porta especificada (padrão: 5173)."""
     frontend_port = port or os.getenv("VITE_PORT", "5173")

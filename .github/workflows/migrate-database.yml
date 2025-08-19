@@ -1,0 +1,99 @@
+name: Database Migration on Main Merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-migrations:
+    name: Check Database Migrations
+    runs-on: ubuntu-latest
+    environment: production
+    outputs:
+      pending: ${{ steps.check.outputs.pending }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install uv
+        run: |
+          pip install uv
+
+      - name: Install dependencies
+        run: |
+          uv pip install -r pyproject.toml --extra backend
+
+      - name: Check for pending migrations
+        id: check
+        run: |
+          echo "Checking for pending migrations..."
+          if python scripts/check_pending_migrations.py; then
+            echo "pending=false" >> $GITHUB_OUTPUT
+          else
+            echo "pending=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ENVIRONMENT: production
+
+  migrate-database:
+    name: Apply Database Migrations
+    needs: check-migrations
+    if: needs.check-migrations.outputs.pending == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install uv
+        run: |
+          pip install uv
+
+      - name: Install dependencies
+        run: |
+          uv pip install -r pyproject.toml --extra backend
+
+      - name: Apply database migrations
+        run: |
+          echo "Applying database migrations..."
+          uv run alembic upgrade head
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ENVIRONMENT: production
+
+      - name: Verify migration status
+        run: |
+          echo "Verifying migration status..."
+          uv run alembic current
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ENVIRONMENT: production
+
+  no-migrations:
+    name: No Pending Migrations
+    needs: check-migrations
+    if: needs.check-migrations.outputs.pending == 'false'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: No migrations needed
+        run: |
+          echo "✅ No pending database migrations"
+          echo "No database migrations were needed for this deployment."
