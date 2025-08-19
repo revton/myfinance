@@ -20,29 +20,7 @@ def upgrade() -> None:
     # Habilitar RLS na tabela user_profiles
     op.execute("ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;")
     
-    # Criar política para usuários autenticados poderem ver apenas seus próprios perfis
-    op.execute("""
-        CREATE POLICY "Users can view own profile" ON user_profiles
-        FOR SELECT USING (auth.uid()::text = user_id::text);
-    """)
     
-    # Criar política para usuários autenticados poderem inserir seus próprios perfis
-    op.execute("""
-        CREATE POLICY "Users can insert own profile" ON user_profiles
-        FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
-    """)
-    
-    # Criar política para usuários autenticados poderem atualizar seus próprios perfis
-    op.execute("""
-        CREATE POLICY "Users can update own profile" ON user_profiles
-        FOR UPDATE USING (auth.uid()::text = user_id::text);
-    """)
-    
-    # Criar política para usuários autenticados poderem deletar seus próprios perfis
-    op.execute("""
-        CREATE POLICY "Users can delete own profile" ON user_profiles
-        FOR DELETE USING (auth.uid()::text = user_id::text);
-    """)
     
     # ### Sincronizar com PostgREST (Supabase) ###
     # Notificar PostgREST sobre a nova tabela
@@ -60,12 +38,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # ### Remover políticas RLS ###
-    op.execute("DROP POLICY IF EXISTS \"Users can view own profile\" ON user_profiles;")
-    op.execute("DROP POLICY IF EXISTS \"Users can insert own profile\" ON user_profiles;")
-    op.execute("DROP POLICY IF EXISTS \"Users can update own profile\" ON user_profiles;")
-    op.execute("DROP POLICY IF EXISTS \"Users can delete own profile\" ON user_profiles;")
-    
     # Desabilitar RLS
     op.execute("ALTER TABLE user_profiles DISABLE ROW LEVEL SECURITY;")
     

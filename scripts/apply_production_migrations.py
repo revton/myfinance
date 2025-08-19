@@ -59,12 +59,12 @@ def run_command(command, description):
 def show_current_status():
     """Mostra o status atual das migrações"""
     print("📊 Status atual das migrações:")
-    return run_command("uv run alembic current", "Verificando status das migrações")
+    return run_command("alembic current", "Verificando status das migrações")
 
 def apply_migrations():
     """Aplica as migrações pendentes"""
     print("🚀 Aplicando migrações...")
-    return run_command("uv run alembic upgrade head", "Aplicando migrações")
+    return run_command("alembic upgrade head", "Aplicando migrações")
 
 def main():
     """Função principal"""
