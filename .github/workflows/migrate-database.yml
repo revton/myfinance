@@ -21,21 +21,18 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install uv
-        run: |
-          pip install uv
 
       - name: Install dependencies
         run: |
-          uv pip install -r pyproject.toml --extra backend
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Check for pending migrations
         id: check
         run: |
           echo "Checking for pending migrations..."
-          if python scripts/check_pending_migrations.py; then
+          python scripts/check_pending_migrations.py
+          if [ $? -eq 0 ]; then
             echo "pending=false" >> $GITHUB_OUTPUT
           else
             echo "pending=true" >> $GITHUB_OUTPUT
@@ -59,20 +56,16 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install uv
-        run: |
-          pip install uv
 
       - name: Install dependencies
         run: |
-          uv pip install -r pyproject.toml --extra backend
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Apply database migrations
         run: |
           echo "Applying database migrations..."
-          uv run alembic upgrade head
+          alembic upgrade head
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ENVIRONMENT: production
@@ -80,7 +73,7 @@ jobs:
       - name: Verify migration status
         run: |
           echo "Verifying migration status..."
-          uv run alembic current
+          alembic current
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ENVIRONMENT: production
