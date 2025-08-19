@@ -54,6 +54,6 @@ def downgrade() -> None:
                existing_type=sa.UUID(),
                server_default=sa.text('gen_random_uuid()'),
                existing_nullable=False)
-    op.drop_column('transactions', 'category_id')
+    
     
     # ### end Alembic commands ### 
