@@ -69,7 +69,7 @@ def initialize_database():
     
     # Verifica se já existem tabelas
     print("🔍 Verificando estado atual do banco...")
-    result = run_command("uv run alembic current", "verificando estado do banco")
+    result = run_command("alembic current", "verificando estado do banco")
     
     if not result:
         print("❌ Falha ao verificar estado do banco")
@@ -80,7 +80,7 @@ def initialize_database():
     
     # Aplica todas as migrações
     print("🚀 Aplicando todas as migrações...")
-    result = run_command("uv run alembic upgrade head", "aplicando migrações")
+    result = run_command("alembic upgrade head", "aplicando migrações")
     
     if not result:
         print("❌ Falha ao aplicar migrações")
@@ -88,7 +88,7 @@ def initialize_database():
     
     # Verifica o status final
     print("📊 Verificando status final...")
-    result = run_command("uv run alembic current", "verificando status final")
+    result = run_command("alembic current", "verificando status final")
     
     if not result:
         print("❌ Falha ao verificar status final")
