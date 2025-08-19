@@ -55,14 +55,5 @@ def downgrade() -> None:
                server_default=sa.text('gen_random_uuid()'),
                existing_nullable=False)
     op.drop_column('transactions', 'category_id')
-    op.create_table('email_confirmation_tokens',
-    sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
-    sa.Column('email', sa.VARCHAR(length=255), autoincrement=False, nullable=False),
-    sa.Column('token', sa.VARCHAR(length=255), autoincrement=False, nullable=False),
-    sa.Column('created_at', postgresql.TIMESTAMP(), server_default=sa.text('now()'), autoincrement=False, nullable=True),
-    sa.Column('expires_at', postgresql.TIMESTAMP(), autoincrement=False, nullable=False),
-    sa.Column('used', sa.BOOLEAN(), server_default=sa.text('false'), autoincrement=False, nullable=True),
-    sa.PrimaryKeyConstraint('id', name='email_confirmation_tokens_pkey'),
-    sa.UniqueConstraint('token', name='email_confirmation_tokens_token_key')
-    )
+    
     # ### end Alembic commands ### 
