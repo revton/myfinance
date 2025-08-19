@@ -30,7 +30,6 @@ def upgrade() -> None:
                existing_type=sa.NUMERIC(precision=10, scale=2),
                type_=sa.Float(),
                existing_nullable=False)
-    op.create_index('idx_transactions_amount', 'transactions', ['amount'], unique=False)
     
     # ### Criar tabela user_profiles ###
     op.create_table('user_profiles',
@@ -62,25 +61,25 @@ def upgrade() -> None:
     
     # Criar política para usuários autenticados poderem ver apenas seus próprios perfis
     op.execute("""
-        CREATE POLICY "Users can view own profile" ON user_profiles
+        CREATE POLICY \"Users can view own profile\" ON user_profiles
         FOR SELECT USING (auth.uid()::text = user_id::text);
     """)
     
     # Criar política para usuários autenticados poderem inserir seus próprios perfis
     op.execute("""
-        CREATE POLICY "Users can insert own profile" ON user_profiles
+        CREATE POLICY \"Users can insert own profile\" ON user_profiles
         FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
     """)
     
     # Criar política para usuários autenticados poderem atualizar seus próprios perfis
     op.execute("""
-        CREATE POLICY "Users can update own profile" ON user_profiles
+        CREATE POLICY \"Users can update own profile\" ON user_profiles
         FOR UPDATE USING (auth.uid()::text = user_id::text);
     """)
     
     # Criar política para usuários autenticados poderem deletar seus próprios perfis
     op.execute("""
-        CREATE POLICY "Users can delete own profile" ON user_profiles
+        CREATE POLICY \"Users can delete own profile\" ON user_profiles
         FOR DELETE USING (auth.uid()::text = user_id::text);
     """)
     
@@ -107,7 +106,6 @@ def downgrade() -> None:
     op.drop_index('idx_user_profiles_user_id', table_name='user_profiles')
     op.drop_table('user_profiles')
     
-    op.drop_index('idx_transactions_amount', table_name='transactions')
     op.alter_column('transactions', 'amount',
                existing_type=sa.Float(),
                type_=sa.NUMERIC(precision=10, scale=2),
@@ -120,4 +118,4 @@ def downgrade() -> None:
                existing_type=sa.UUID(),
                server_default=sa.text('gen_random_uuid()'),
                existing_nullable=False)
-    # ### end Alembic commands ### 
+    # ### end Alembic commands ###
