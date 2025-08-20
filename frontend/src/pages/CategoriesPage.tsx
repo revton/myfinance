@@ -118,9 +118,9 @@ const CategoriesPage: React.FC = () => {
     }
   };
 
-  const expenseCategories = categories.filter(c => c.type === 'expense' && c.is_active);
-  const incomeCategories = categories.filter(c => c.type === 'income' && c.is_active);
-  const deletedCategories = categories.filter(c => !c.is_active);
+  const expenseCategories = (categories ?? []).filter(c => c.type === 'expense' && c.is_active);
+  const incomeCategories = (categories ?? []).filter(c => c.type === 'income' && c.is_active);
+  const deletedCategories = (categories ?? []).filter(c => !c.is_active);
 
   if (loading) {
     return (
