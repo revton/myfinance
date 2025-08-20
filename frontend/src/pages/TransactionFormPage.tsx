@@ -23,7 +23,7 @@ import { API_BASE_URL, APP_CONFIG } from '../config'; // Import APP_CONFIG
 
 interface TransactionFormData {
   type: 'income' | 'expense';
-  amount: number | '';
+  amount: string | number;
   description: string;
   category_id: string | '';
 }
@@ -54,13 +54,11 @@ const TransactionFormPage: React.FC = () => {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    // Replace comma with dot for internal processing
-    value = value.replace(',', '.');
-    // Allow only numbers and a single decimal point
-    if (/^\d*\.?\d*$/.test(value) || value === '') {
+    // Allow only numbers, commas, and a single decimal point/comma
+    if (/^[\d,.]*$/.test(value) || value === '') {
       setFormData(prev => ({
         ...prev,
-        amount: value === '' ? '' : parseFloat(value),
+        amount: value,
       }));
     }
   };
@@ -72,8 +70,19 @@ const TransactionFormPage: React.FC = () => {
     setLoading(true);
 
     // Basic validation
-    if (!formData.type || !formData.amount || formData.amount <= 0 || !formData.description) {
-      setFormError('Por favor, preencha todos os campos obrigatórios e certifique-se que o valor é positivo.');
+    if (!formData.type || !formData.amount || !formData.description) {
+      setFormError('Por favor, preencha todos os campos obrigatórios.');
+      setLoading(false);
+      return;
+    }
+
+    // Parse amount, replacing comma with dot if present
+    const amountString = formData.amount.toString().replace(',', '.');
+    const amount = parseFloat(amountString);
+
+    // Validate amount is a positive number
+    if (isNaN(amount) || amount <= 0) {
+      setFormError('Por favor, insira um valor monetário válido.');
       setLoading(false);
       return;
     }
@@ -81,7 +90,7 @@ const TransactionFormPage: React.FC = () => {
     try {
       await api.post(`${APP_CONFIG.api.endpoints.transactions}`, {
         type: formData.type,
-        amount: parseFloat(formData.amount.toString()), // Ensure amount is number
+        amount: amount,
         description: formData.description,
         category_id: formData.category_id || null, // Send null if no category selected
       });
@@ -151,6 +160,7 @@ const TransactionFormPage: React.FC = () => {
               margin="normal"
               required
               inputProps={{ inputMode: 'decimal' }}
+              placeholder="0,00"
             />
 
             <TextField
