@@ -21,7 +21,6 @@ interface AmountRangeFilterProps {
 interface AmountRangeFilters {
   minAmount?: number;
   maxAmount?: number;
-  type: 'expense' | 'income' | 'all';
 }
 
 const AmountRangeFilter: React.FC<AmountRangeFilterProps> = ({ 
@@ -29,9 +28,7 @@ const AmountRangeFilter: React.FC<AmountRangeFilterProps> = ({
   initialFilters,
   maxAmount = 10000 
 }) => {
-  const [filters, setFilters] = useState<AmountRangeFilters>(initialFilters || {
-    type: 'all'
-  });
+  const [filters, setFilters] = useState<AmountRangeFilters>(initialFilters || {});
 
   const handleAmountChange = (field: 'minAmount' | 'maxAmount', value: string) => {
     const numValue = value === '' ? undefined : parseFloat(value);
@@ -51,38 +48,10 @@ const AmountRangeFilter: React.FC<AmountRangeFilterProps> = ({
     onFilterChange(newFilters);
   };
 
-  const handleTypeChange = (type: string) => {
-    const newFilters = { ...filters, type: type as any };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const getTypeLabel = () => {
-    switch (filters.type) {
-      case 'expense': return 'Despesas';
-      case 'income': return 'Receitas';
-      case 'all': return 'Todas';
-      default: return 'Tipo';
-    }
-  };
-
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Typography variant="h6">Filtro por Valor</Typography>
       
-      <FormControl fullWidth>
-        <InputLabel>Tipo de Transação</InputLabel>
-        <Select
-          value={filters.type}
-          label="Tipo de Transação"
-          onChange={(e) => handleTypeChange(e.target.value)}
-        >
-          <MenuItem value="all">Todas</MenuItem>
-          <MenuItem value="expense">Despesas</MenuItem>
-          <MenuItem value="income">Receitas</MenuItem>
-        </Select>
-      </FormControl>
-
       <Box sx={{ display: 'flex', gap: 2 }}>
         <TextField
           label="Valor Mínimo"
