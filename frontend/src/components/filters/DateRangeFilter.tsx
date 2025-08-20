@@ -39,30 +39,46 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ onFilterChange, initi
     const now = new Date();
     switch (period) {
       case 'today':
-        newFilters.startDate = now;
-        newFilters.endDate = now;
+        const todayStart = new Date(now);
+        todayStart.setHours(0, 0, 0, 0); // Start of day
+        const todayEnd = new Date(now);
+        todayEnd.setHours(23, 59, 59, 999); // End of day
+        newFilters.startDate = todayStart;
+        newFilters.endDate = todayEnd;
         break;
       case 'week':
         const weekStart = new Date(now);
         weekStart.setDate(now.getDate() - now.getDay());
+        weekStart.setHours(0, 0, 0, 0); // Start of week
+        const weekEnd = new Date(now);
+        weekEnd.setHours(23, 59, 59, 999); // End of current day
         newFilters.startDate = weekStart;
-        newFilters.endDate = now;
+        newFilters.endDate = weekEnd;
         break;
       case 'month':
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        monthStart.setHours(0, 0, 0, 0); // Start of month
+        const monthEnd = new Date(now);
+        monthEnd.setHours(23, 59, 59, 999); // End of current day
         newFilters.startDate = monthStart;
-        newFilters.endDate = now;
+        newFilters.endDate = monthEnd;
         break;
       case 'quarter':
         const quarter = Math.floor(now.getMonth() / 3);
         const quarterStart = new Date(now.getFullYear(), quarter * 3, 1);
+        quarterStart.setHours(0, 0, 0, 0); // Start of quarter
+        const quarterEnd = new Date(now);
+        quarterEnd.setHours(23, 59, 59, 999); // End of current day
         newFilters.startDate = quarterStart;
-        newFilters.endDate = now;
+        newFilters.endDate = quarterEnd;
         break;
       case 'year':
         const yearStart = new Date(now.getFullYear(), 0, 1);
+        yearStart.setHours(0, 0, 0, 0); // Start of year
+        const yearEnd = new Date(now);
+        yearEnd.setHours(23, 59, 59, 999); // End of current day
         newFilters.startDate = yearStart;
-        newFilters.endDate = now;
+        newFilters.endDate = yearEnd;
         break;
     }
     
