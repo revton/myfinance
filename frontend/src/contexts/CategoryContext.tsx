@@ -26,6 +26,7 @@ interface CategoryContextData {
   deleteCategory: (id: string) => Promise<void>;
   restoreCategory: (id: string) => Promise<void>;
   refreshCategories: () => void;
+  getCategoriesByType: (type: 'expense' | 'income') => Category[];
 }
 
 const CategoryContext = createContext<CategoryContextData>({} as CategoryContextData);
@@ -98,6 +99,10 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     fetchCategories();
   };
 
+  const getCategoriesByType = (type: 'expense' | 'income') => {
+    return categories.filter(cat => cat.type === type);
+  };
+
   return (
     <CategoryContext.Provider value={{ 
       categories, 
@@ -107,7 +112,8 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       updateCategory, 
       deleteCategory, 
       restoreCategory,
-      refreshCategories
+      refreshCategories,
+      getCategoriesByType
     }}>
       {children}
     </CategoryContext.Provider>
