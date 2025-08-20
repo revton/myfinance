@@ -53,7 +53,9 @@ const TransactionFormPage: React.FC = () => {
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    let value = e.target.value;
+    // Replace comma with dot for internal processing
+    value = value.replace(',', '.');
     // Allow only numbers and a single decimal point
     if (/^\d*\.?\d*$/.test(value) || value === '') {
       setFormData(prev => ({
