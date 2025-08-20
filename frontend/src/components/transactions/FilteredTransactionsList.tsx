@@ -127,20 +127,6 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
         }
       }
 
-      // Filtro por categoria (status)
-      if (filters.status?.hasCategory === true) {
-        if (!transaction.category_id) {
-          return false;
-        }
-      }
-
-      // Filtro por notas (status)
-      if (filters.status?.hasNotes === true) {
-        if (!transaction.notes) {
-          return false;
-        }
-      }
-
       return true;
     });
   }, [transactions, filters]);

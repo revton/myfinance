@@ -213,7 +213,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             onChange={(_, isExpanded) => setExpanded(isExpanded ? 'status' : false)}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>Filtro por Status</Typography>
+              <Typography>Filtro de Tipo de Transação</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <StatusFilter
