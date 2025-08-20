@@ -39,10 +39,10 @@ export const useTransactions = () => {
       const currentBalance = fetchedTransactions.reduce((sum, t) => 
         t.type === 'income' ? sum + t.amount : sum - t.amount, 0);
       const monthlyIncome = fetchedTransactions
-        .filter(t => t.type === 'income' && new Date(t.date).getMonth() === new Date().getMonth())
+        .filter(t => t.type === 'income' && new Date(t.created_at).getMonth() === new Date().getMonth())
         .reduce((sum, t) => sum + t.amount, 0);
       const monthlyExpenses = fetchedTransactions
-        .filter(t => t.type === 'expense' && new Date(t.date).getMonth() === new Date().getMonth())
+        .filter(t => t.type === 'expense' && new Date(t.created_at).getMonth() === new Date().getMonth())
         .reduce((sum, t) => sum + t.amount, 0);
       
       // Placeholder for previousMonthBalance and percentageChange - requires more complex logic
