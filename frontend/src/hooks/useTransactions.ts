@@ -1,28 +1,58 @@
 // src/hooks/useTransactions.ts
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_BASE_URL, APP_CONFIG } from '../config';
+
+interface Transaction {
+  id: string;
+  type: 'income' | 'expense';
+  description: string;
+  date: string; // Changed to string to match API response
+  amount: number;
+  category?: {
+    name: string;
+  };
+}
+
+interface BalanceData {
+  currentBalance: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  previousMonthBalance: number;
+  percentageChange: number;
+}
 
 export const useTransactions = () => {
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [balanceData, setBalanceData] = useState<BalanceData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const balanceData = {
-    currentBalance: 1000,
-    monthlyIncome: 2000,
-    monthlyExpenses: 1000,
-    previousMonthBalance: 800,
-    percentageChange: 25,
+  const fetchTransactions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_BASE_URL}${APP_CONFIG.api.endpoints.transactions}`);
+      // Assuming the API returns an object with recentTransactions and balanceData
+      setRecentTransactions(response.data.recentTransactions || []);
+      setBalanceData(response.data.balanceData || null);
+    } catch (err) {
+      console.error('Error fetching transactions:', err);
+      setError('Failed to load transactions.');
+      setRecentTransactions([]); // Clear transactions on error
+      setBalanceData(null); // Clear balance data on error
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const recentTransactions = [
-    { id: '1', type: 'income', description: 'Salary', date: new Date(), amount: 2000, category: { name: 'Work' } },
-    { id: '2', type: 'expense', description: 'Groceries', date: new Date(), amount: 200, category: { name: 'Food' } },
-  ];
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
 
   const refresh = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1000);
+    fetchTransactions();
   };
 
-  setTimeout(() => setLoading(false), 1000);
-
-  return { balanceData, recentTransactions, loading, refresh };
+  return { balanceData, recentTransactions, loading, error, refresh };
 };
