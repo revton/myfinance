@@ -1,6 +1,6 @@
 // src/contexts/CategoryContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { API_BASE_URL, APP_CONFIG } from '../config';
 
 interface Category {
@@ -39,7 +39,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get<Category[]>(`${API_BASE_URL}${APP_CONFIG.api.endpoints.categories}`);
+      const response = await api.get<Category[]>(`${APP_CONFIG.api.endpoints.categories}`);
       setCategories(response.data);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -56,7 +56,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const createCategory = async (categoryData: Omit<Category, 'id' | 'is_active' | 'is_default' | 'created_at' | 'updated_at' | 'transaction_count'>) => {
     try {
-      await axios.post(`${API_BASE_URL}${APP_CONFIG.api.endpoints.categories}`, categoryData);
+      await api.post(`${APP_CONFIG.api.endpoints.categories}`, categoryData);
       fetchCategories(); // Refresh list after creation
     } catch (err: any) {
       console.error('Error creating category:', err);
@@ -66,7 +66,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      await axios.put(`${API_BASE_URL}${APP_CONFIG.api.endpoints.categories}/${id}`, categoryData);
+      await api.put(`${APP_CONFIG.api.endpoints.categories}/${id}`, categoryData);
       fetchCategories(); // Refresh list after update
     } catch (err: any) {
       console.error('Error updating category:', err);
@@ -76,7 +76,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const deleteCategory = async (id: string) => {
     try {
-      await axios.delete(`${API_BASE_URL}${APP_CONFIG.api.endpoints.categories}/${id}`);
+      await api.delete(`${APP_CONFIG.api.endpoints.categories}/${id}`);
       fetchCategories(); // Refresh list after deletion
     } catch (err: any) {
       console.error('Error deleting category:', err);
@@ -86,7 +86,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const restoreCategory = async (id: string) => {
     try {
-      await axios.post(`${API_BASE_URL}${APP_CONFIG.api.endpoints.categories}/${id}/restore`);
+      await api.post(`${APP_CONFIG.api.endpoints.categories}/${id}/restore`);
       fetchCategories(); // Refresh list after restore
     } catch (err: any) {
       console.error('Error restoring category:', err);
