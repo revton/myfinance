@@ -44,6 +44,16 @@ export const BalanceCard: React.FC = () => {
   if (loading) {
     return <Card><CardContent><Typography>Carregando...</Typography></CardContent></Card>;
   }
+
+  if (!balanceData) {
+    return (
+      <Card>
+        <CardContent>
+          <Typography color="error">Não foi possível carregar os dados de saldo.</Typography>
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
     <Card elevation={2}>
