@@ -23,7 +23,7 @@ interface Transaction {
   type: 'income' | 'expense';
   amount: number;
   description: string;
-  date: Date;
+  created_at: string;
   category_id?: string;
   notes?: string;
 }
@@ -50,7 +50,7 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
     return transactions.filter(transaction => {
       // Filtro por período
       if (filters.dateRange?.startDate || filters.dateRange?.endDate) {
-        const transactionDate = new Date(transaction.date);
+        const transactionDate = new Date(transaction.created_at);
         if (filters.dateRange.startDate && transactionDate < filters.dateRange.startDate) {
           return false;
         }
