@@ -66,7 +66,7 @@ export const RecentTransactionsCard: React.FC = () => {
                 secondary={
                   <Box display="flex" alignItems="center" gap={1}>
                     <Typography variant="body2" color="text.secondary" component="span">
-                      {formatDate(new Date(transaction.date))}
+                      {formatDate(new Date(transaction.created_at))}
                     </Typography>
                     {transaction.category && (
                       <>

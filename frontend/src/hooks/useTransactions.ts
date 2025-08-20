@@ -7,7 +7,7 @@ interface Transaction {
   id: string;
   type: 'income' | 'expense';
   description: string;
-  date: string; // Changed to string to match API response
+  created_at: string;
   amount: number;
   category?: {
     name: string;
