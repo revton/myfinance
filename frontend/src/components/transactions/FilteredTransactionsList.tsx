@@ -78,13 +78,6 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
       }
 
       // Filtro por tipo
-      if (filters.amountRange?.type && filters.amountRange.type !== 'all') {
-        if (transaction.type !== filters.amountRange.type) {
-          return false;
-        }
-      }
-
-      // Filtro por status
       if (filters.status?.type && filters.status.type !== 'all') {
         if (transaction.type !== filters.status.type) {
           return false;

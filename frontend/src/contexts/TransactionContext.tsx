@@ -30,7 +30,8 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get<Transaction[]>(`${API_BASE_URL}${APP_CONFIG.api.endpoints.transactions}`);
+      // Note: The API endpoint requires a trailing slash
+      const response = await axios.get<Transaction[]>(`${API_BASE_URL}${APP_CONFIG.api.endpoints.transactions}/`);
       setTransactions(response.data);
     } catch (err: any) {
       console.error('Error fetching transactions:', err);

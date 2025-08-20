@@ -11,7 +11,7 @@ export const APP_CONFIG = {
   api: {
     baseUrl: API_BASE_URL,
     endpoints: {
-      transactions: '/transactions',
+      transactions: '/transactions/',
       categories: '/categories',
       health: '/health',
     },
