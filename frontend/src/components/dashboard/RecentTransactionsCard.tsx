@@ -65,13 +65,13 @@ export const RecentTransactionsCard: React.FC = () => {
                 primary={transaction.description}
                 secondary={
                   <Box display="flex" alignItems="center" gap={1}>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" component="span">
                       {formatDate(transaction.date)}
                     </Typography>
                     {transaction.category && (
                       <>
                         <Category fontSize="small" />
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" component="span">
                           {transaction.category.name}
                         </Typography>
                       </>
