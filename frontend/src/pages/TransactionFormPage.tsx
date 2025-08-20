@@ -17,7 +17,7 @@ import {
   Paper
 } from '@mui/material';
 import { useCategories } from '../contexts/CategoryContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../lib/api';
 import { API_BASE_URL, APP_CONFIG } from '../config'; // Import APP_CONFIG
 
@@ -30,6 +30,7 @@ interface TransactionFormData {
 
 const TransactionFormPage: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
   const [formData, setFormData] = useState<TransactionFormData>({
     type: 'expense', // Default to expense
@@ -40,9 +41,33 @@ const TransactionFormPage: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const expenseCategories = categories.filter(cat => cat.type === 'expense' && cat.is_active);
   const incomeCategories = categories.filter(cat => cat.type === 'income' && cat.is_active);
+
+  // Fetch transaction data when editing
+  useEffect(() => {
+    if (id) {
+      setIsEditing(true);
+      const fetchTransaction = async () => {
+        try {
+          const response = await api.get(`${APP_CONFIG.api.endpoints.transactions}${id}`);
+          const transaction = response.data;
+          setFormData({
+            type: transaction.type,
+            amount: transaction.amount.toString(),
+            description: transaction.description,
+            category_id: transaction.category_id || '',
+          });
+        } catch (err: any) {
+          console.error('Error fetching transaction:', err);
+          setFormError(err.response?.data?.detail || 'Erro ao carregar transação.');
+        }
+      };
+      fetchTransaction();
+    }
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>)=>{
     const { name, value } = e.target;
@@ -88,24 +113,38 @@ const TransactionFormPage: React.FC = () => {
     }
 
     try {
-      await api.post(`${APP_CONFIG.api.endpoints.transactions}`, {
-        type: formData.type,
-        amount: amount,
-        description: formData.description,
-        category_id: formData.category_id || null, // Send null if no category selected
-      });
-      setSuccess('Transação adicionada com sucesso!');
-      setFormData({ // Reset form
-        type: 'expense',
-        amount: '',
-        description: '',
-        category_id: '',
-      });
-      // Optionally redirect after a short delay
-      setTimeout(() => navigate('/dashboard'), 2000);
+      if (isEditing && id) {
+        // Update existing transaction
+        await api.put(`${APP_CONFIG.api.endpoints.transactions}${id}`, {
+          type: formData.type,
+          amount: amount,
+          description: formData.description,
+          category_id: formData.category_id || null,
+        });
+        setSuccess('Transação atualizada com sucesso!');
+      } else {
+        // Create new transaction
+        await api.post(`${APP_CONFIG.api.endpoints.transactions}`, {
+          type: formData.type,
+          amount: amount,
+          description: formData.description,
+          category_id: formData.category_id || null,
+        });
+        setSuccess('Transação adicionada com sucesso!');
+        // Reset form only when creating new transaction
+        setFormData({
+          type: 'expense',
+          amount: '',
+          description: '',
+          category_id: '',
+        });
+      }
+      
+      // Redirect after a short delay
+      setTimeout(() => navigate('/transactions'), 2000);
     } catch (err: any) {
-      console.error('Error adding transaction:', err);
-      setFormError(err.response?.data?.detail || 'Erro ao adicionar transação.');
+      console.error('Error saving transaction:', err);
+      setFormError(err.response?.data?.detail || `Erro ao ${isEditing ? 'atualizar' : 'adicionar'} transação.`);
     } finally {
       setLoading(false);
     }
@@ -133,7 +172,7 @@ const TransactionFormPage: React.FC = () => {
     <Container maxWidth="md">
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Nova Transação
+          {isEditing ? 'Editar Transação' : 'Nova Transação'}
         </Typography>
         <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
           <form onSubmit={handleSubmit}>
@@ -211,7 +250,7 @@ const TransactionFormPage: React.FC = () => {
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/transactions')}
                 disabled={loading}
               >
                 Cancelar

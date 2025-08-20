@@ -10,13 +10,29 @@ import {
   IconButton,
   Chip,
   Skeleton,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAdvancedFilters } from '../../hooks/useAdvancedFilters';
 import AdvancedFilters from '../filters/AdvancedFilters';
 import TransactionItem from './TransactionItem';
+import { useNavigate } from 'react-router-dom';
+import api from '../../lib/api';
+import { APP_CONFIG } from '../../config';
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+}
 
 interface Transaction {
   id: string;
@@ -25,24 +41,51 @@ interface Transaction {
   description: string;
   created_at: string;
   category_id?: string;
+  category?: Category | null;
   notes?: string;
 }
 
 interface FilteredTransactionsListProps {
-  onEditTransaction?: (transaction: Transaction) => void;
   onDeleteTransaction?: (transactionId: string) => void;
 }
 
 const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
-  onEditTransaction,
   onDeleteTransaction
 }) => {
-  const { transactions, loading, error } = useTransactions();
+  const navigate = useNavigate();
+  const { transactions, loading, error, fetchTransactions } = useTransactions();
   const { filters, updateFilters } = useAdvancedFilters({
     onFiltersChange: (newFilters) => {
       console.log('Filtros aplicados:', newFilters);
     }
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
+
+  const handleDeleteClick = (transactionId: string) => {
+    setTransactionToDelete(transactionId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!transactionToDelete) return;
+    
+    try {
+      await api.delete(`${APP_CONFIG.api.endpoints.transactions}${transactionToDelete}`);
+      // Refresh transactions list
+      fetchTransactions();
+      setDeleteDialogOpen(false);
+      setTransactionToDelete(null);
+    } catch (err: any) {
+      console.error('Error deleting transaction:', err);
+      alert(err.response?.data?.detail || 'Erro ao deletar transação.');
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setTransactionToDelete(null);
+  };
 
   const filteredTransactions = useMemo(() => {
     if (!transactions) return [];
@@ -154,12 +197,36 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
             <TransactionItem
               key={transaction.id}
               transaction={transaction}
-              onEdit={onEditTransaction}
-              onDelete={onDeleteTransaction}
+              onEdit={() => navigate(`/transactions/${transaction.id}/edit`)}
+              onDelete={() => handleDeleteClick(transaction.id)}
             />
           ))}
         </List>
       )}
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="delete-transaction-dialog-title"
+        aria-describedby="delete-transaction-dialog-description"
+      >
+        <DialogTitle id="delete-transaction-dialog-title">
+          Confirmar exclusão
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-transaction-dialog-description">
+            Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

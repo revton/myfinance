@@ -77,7 +77,15 @@ const AppRoutes: React.FC = () => {
         path="/transactions/new" 
         element={
           <PrivateRoute>
-            <TransactionFormPage /> {/* This component needs to be created */}
+            <TransactionFormPage />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/transactions/:id/edit" 
+        element={
+          <PrivateRoute>
+            <TransactionFormPage />
           </PrivateRoute>
         } 
       />

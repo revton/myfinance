@@ -1,7 +1,7 @@
 // src/contexts/TransactionContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { API_BASE_URL, APP_CONFIG } from '../config';
+import api from '../lib/api';
+import { APP_CONFIG } from '../config';
 
 interface Transaction {
   id: string;
@@ -17,6 +17,7 @@ interface TransactionContextData {
   transactions: Transaction[];
   loading: boolean;
   error: string | null;
+  fetchTransactions: () => Promise<void>;
 }
 
 const TransactionContext = createContext<TransactionContextData>({} as TransactionContextData);
@@ -30,8 +31,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setLoading(true);
     setError(null);
     try {
-      // Note: The API endpoint requires a trailing slash
-      const response = await axios.get<Transaction[]>(`${API_BASE_URL}${APP_CONFIG.api.endpoints.transactions}/`);
+      const response = await api.get<Transaction[]>(APP_CONFIG.api.endpoints.transactions);
       setTransactions(response.data);
     } catch (err: any) {
       console.error('Error fetching transactions:', err);
@@ -47,7 +47,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   return (
-    <TransactionContext.Provider value={{ transactions, loading, error }}>
+    <TransactionContext.Provider value={{ transactions, loading, error, fetchTransactions }}>
       {children}
     </TransactionContext.Provider>
   );
