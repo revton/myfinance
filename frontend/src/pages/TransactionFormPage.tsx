@@ -150,7 +150,7 @@ const TransactionFormPage: React.FC = () => {
               fullWidth
               margin="normal"
               required
-              inputProps={{ inputMode: 'decimal', pattern: "^\\d*\\.?\\d*$" }}
+              inputProps={{ inputMode: 'decimal', pattern: "^\\d*[,.]?\\d*$" }}
             />
 
             <TextField
