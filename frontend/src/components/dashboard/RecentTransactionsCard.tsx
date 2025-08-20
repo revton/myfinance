@@ -78,6 +78,7 @@ export const RecentTransactionsCard: React.FC = () => {
                     )}
                   </Box>
                 }
+                secondaryTypographyProps={{ component: 'span' }}
               />
               <Chip
                 label={formatCurrency(transaction.amount)}
