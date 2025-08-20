@@ -13,6 +13,7 @@ import ResetPassword from './components/ResetPassword';
 import { DashboardPage } from './pages/DashboardPage';
 import CategoriesPage from './pages/CategoriesPage';
 import TransactionsPage from './pages/TransactionsPage';
+import TransactionFormPage from './pages/TransactionFormPage'; // New import
 import PrivateRoute from './components/PrivateRoute';
 
 const theme = createTheme({
@@ -69,6 +70,14 @@ const AppRoutes: React.FC = () => {
         element={
           <PrivateRoute>
             <TransactionsPage />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/transactions/new" 
+        element={
+          <PrivateRoute>
+            <TransactionFormPage /> {/* This component needs to be created */}
           </PrivateRoute>
         } 
       />
