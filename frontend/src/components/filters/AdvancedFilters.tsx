@@ -55,19 +55,17 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   savedFilters = [],
   initialFilters
 }) => {
-  const [filters, setFilters] = useState<CombinedFilters>(initialFilters || {});
   const [expanded, setExpanded] = useState<string | false>(false);
   const [showFilters, setShowFilters] = useState(false);
+  const filters = initialFilters || {};
 
   const handleFilterChange = (filterType: keyof CombinedFilters, value: any) => {
     const newFilters = { ...filters, [filterType]: value };
-    setFilters(newFilters);
     onFiltersChange(newFilters);
   };
 
   const handleClearAll = () => {
     const emptyFilters: CombinedFilters = {};
-    setFilters(emptyFilters);
     onFiltersChange(emptyFilters);
   };
 
@@ -79,7 +77,6 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   };
 
   const handleLoadSavedFilter = (savedFilter: SavedFilter) => {
-    setFilters(savedFilter.filters);
     onFiltersChange(savedFilter.filters);
   };
 
