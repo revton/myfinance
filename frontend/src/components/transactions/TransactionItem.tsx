@@ -24,6 +24,7 @@ interface Transaction {
   amount: number;
   description: string;
   created_at: string;
+  updated_at: string;
   category_id?: string;
   category?: Category | null;
   notes?: string;

@@ -17,6 +17,7 @@ import {
   Paper
 } from '@mui/material';
 import { useCategories } from '../contexts/CategoryContext';
+import { useTransactions } from '../contexts/TransactionContext'; // Add this import
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../lib/api';
 import { API_BASE_URL, APP_CONFIG } from '../config'; // Import APP_CONFIG
@@ -32,6 +33,7 @@ const TransactionFormPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  const { fetchTransactions } = useTransactions(); // Add this line to get the refresh function
   const [formData, setFormData] = useState<TransactionFormData>({
     type: 'expense', // Default to expense
     amount: '',
@@ -122,6 +124,8 @@ const TransactionFormPage: React.FC = () => {
           category_id: formData.category_id || null,
         });
         setSuccess('Transação atualizada com sucesso!');
+        // Refresh transactions list
+        await fetchTransactions();
       } else {
         // Create new transaction
         await api.post(`${APP_CONFIG.api.endpoints.transactions}`, {
@@ -131,6 +135,8 @@ const TransactionFormPage: React.FC = () => {
           category_id: formData.category_id || null,
         });
         setSuccess('Transação adicionada com sucesso!');
+        // Refresh transactions list
+        await fetchTransactions();
         // Reset form only when creating new transaction
         setFormData({
           type: 'expense',
