@@ -26,9 +26,6 @@ This PR includes several important fixes and improvements to the application:
   - Updated Transaction interfaces to match backend models
   - Ensured consistent data flow across all components
 
-### 4. Added Playwright for E2E testing
-- Added Playwright configuration and initial test for transactions page
-
 ## What Should Be Tested
 
 ### 1. Transactions Page
@@ -52,10 +49,6 @@ This PR includes several important fixes and improvements to the application:
 - [ ] Verify that all components load and update data correctly
 - [ ] Test that navigation between pages works smoothly
 
-### 5. Playwright Tests
-- [ ] Run Playwright tests to verify the transactions page loads correctly
-- [ ] Confirm that no console errors appear during normal usage
-
 ## Technical Details
 
 ### Files Modified:
@@ -72,10 +65,9 @@ This PR includes several important fixes and improvements to the application:
 11. `frontend/src/pages/TransactionFormPage.tsx` - Added data refresh after updates
 12. `frontend/src/contexts/TransactionContext.tsx` - Updated interfaces
 13. `frontend/src/components/transactions/TransactionItem.tsx` - Updated interfaces
-14. Added Playwright configuration and tests
 
 ### Dependencies Added:
-- Playwright for E2E testing
+- None
 
 ## How to Test
 
@@ -85,7 +77,6 @@ This PR includes several important fixes and improvements to the application:
 4. Create, edit, and delete some transactions
 5. Navigate to the Dashboard and verify that "Gastos por Categoria" shows real data
 6. Edit a transaction and verify that both the Transactions list and Dashboard update immediately
-7. Run Playwright tests with `npm run test:e2e`
 
 ## Expected Behavior
 

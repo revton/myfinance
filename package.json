@@ -1,8 +1,5 @@
 {
-  "scripts": {
-    "test:e2e": "playwright test"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.49.1"
+  "dependencies": {
+    "graceful-fs": "^4.2.11"
   }
 }
