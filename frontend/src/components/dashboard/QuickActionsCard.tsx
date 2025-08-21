@@ -9,9 +9,7 @@ import {
 } from '@mui/material';
 import { 
   Add, 
-  Assessment, 
-  Category, 
-  Settings 
+  Category 
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,22 +24,10 @@ export const QuickActionsCard: React.FC = () => {
       onClick: () => navigate('/transactions/new')
     },
     {
-      label: 'Relatórios',
-      icon: <Assessment />,
-      color: 'secondary' as const,
-      onClick: () => navigate('/reports')
-    },
-    {
       label: 'Categorias',
       icon: <Category />,
       color: 'success' as const,
       onClick: () => navigate('/categories')
-    },
-    {
-      label: 'Configurações',
-      icon: <Settings />,
-      color: 'info' as const,
-      onClick: () => navigate('/settings')
     }
   ];
   
