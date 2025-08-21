@@ -1,5 +1,5 @@
 // src/hooks/useAdvancedFilters.ts
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
 // Import filter types from the component
@@ -23,6 +23,9 @@ export const useAdvancedFilters = (options: UseAdvancedFiltersOptions = {}) => {
     `${storageKey}-saved`,
     []
   );
+  
+  // Ref to track if we've already loaded filters from localStorage
+  const hasLoadedRef = useRef(false);
 
   const updateFilters = useCallback((newFilters: CombinedFilters) => {
     setFilters(newFilters);
@@ -60,16 +63,19 @@ export const useAdvancedFilters = (options: UseAdvancedFiltersOptions = {}) => {
     }
   }, [filters, storageKey]);
 
-  // Carregar filtros ativos ao inicializar
+  // Carregar filtros ativos ao inicializar (apenas uma vez)
   useEffect(() => {
-    const savedActiveFilters = localStorage.getItem(`${storageKey}-active`);
-    if (savedActiveFilters) {
-      try {
-        const parsedFilters = JSON.parse(savedActiveFilters);
-        setFilters(parsedFilters);
-      } catch (error) {
-        console.error('Erro ao carregar filtros salvos:', error);
+    if (!hasLoadedRef.current) {
+      const savedActiveFilters = localStorage.getItem(`${storageKey}-active`);
+      if (savedActiveFilters) {
+        try {
+          const parsedFilters = JSON.parse(savedActiveFilters);
+          setFilters(parsedFilters);
+        } catch (error) {
+          console.error('Erro ao carregar filtros salvos:', error);
+        }
       }
+      hasLoadedRef.current = true;
     }
   }, [storageKey]);
 

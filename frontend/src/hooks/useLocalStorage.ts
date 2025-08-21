@@ -1,5 +1,5 @@
 // src/hooks/useLocalStorage.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] => {
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -12,7 +12,7 @@ export const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dis
     }
   });
 
-  const setValue = (value: T | ((val: T) => T)) => {
+  const setValue = useCallback((value: T | ((val: T) => T)) => {
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
@@ -20,7 +20,7 @@ export const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dis
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [key, storedValue]);
 
   return [storedValue, setValue];
 };
