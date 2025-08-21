@@ -62,25 +62,26 @@ vi.mock('./lib/api', () => {
 });
 
 // Mock the CategoryContext
-vi.mock('./contexts/CategoryContext', () => {
-  const actual = vi.importActual('./contexts/CategoryContext');
-  return {
-    ...actual,
-    useCategories: () => ({
-      categories: [],
-      expenseCategories: [],
-      incomeCategories: [],
-      loading: false,
-      error: null,
-      createCategory: vi.fn(),
-      updateCategory: vi.fn(),
-      deleteCategory: vi.fn(),
-      restoreCategory: vi.fn(),
-      getCategoriesByType: vi.fn(() => []),
-      getCategoryById: vi.fn(),
-    }),
-  };
-});
+vi.mock('./components/categories/CategorySelector', () => ({
+  __esModule: true,
+  default: ({ onChange }: any) => (
+    <input data-testid="category-selector" onChange={(e) => onChange(e.target.value)} />
+  ),
+}));
+
+vi.mock('./contexts/CategoryContext', () => ({
+  __esModule: true,
+  useCategories: () => ({
+    expenseCategories: [{ id: '1', name: 'Food', type: 'expense' }],
+    incomeCategories: [{ id: '2', name: 'Salary', type: 'income' }],
+    getCategoriesByType: (type: string) => {
+      if (type === 'expense') {
+        return [{ id: '1', name: 'Food', type: 'expense' }];
+      }
+      return [{ id: '2', name: 'Salary', type: 'income' }];
+    },
+  }),
+}));
 
 describe('Dashboard Component', () => {
 
@@ -100,9 +101,24 @@ describe('Dashboard Component', () => {
     localStorage.setItem('access_token', 'fake-token');
     theme = createTheme();
 
+    const transactions: any[] = [];
+
     mockApi = {
-      get: vi.fn(),
-      post: vi.fn(),
+      get: vi.fn().mockImplementation(async (url: string) => {
+        if (url === '/transactions/') {
+          return { data: transactions };
+        }
+        return { data: [] };
+      }),
+      post: vi.fn().mockImplementation(async (url: string, data: any) => {
+        const newTransaction = {
+            id: 'mock-id-' + Math.random(),
+            created_at: new Date().toISOString(),
+            ...data,
+        };
+        transactions.push(newTransaction);
+        return { data: newTransaction };
+      }),
       interceptors: {
         request: {
           use: vi.fn((config) => config),
@@ -114,15 +130,6 @@ describe('Dashboard Component', () => {
     };
 
     mockedAxios.create.mockReturnValue(mockApi as any);
-
-    mockApi.get.mockResolvedValue({ data: [] });
-    mockApi.post.mockImplementation(async (url: string, data: any) => ({ 
-        data: {
-            id: 'mock-id-' + Math.random(),
-            created_at: new Date().toISOString(),
-            ...data,
-        }
-    }));
   });
 
   afterEach(() => {
@@ -187,36 +194,22 @@ describe('Dashboard Component', () => {
     );
     
     // Aguardar o componente carregar completamente
-    await waitFor(() => {
-      expect(screen.getByText(/Nova Transação/i)).toBeTruthy();
-    });
+    await screen.findByText(/Nova Transação/i);
     
     // Selecionar o tipo "Despesa"
-    const selectElement = screen.getByLabelText(/Tipo/i);
-    await act(async () => {
-      fireEvent.mouseDown(selectElement);
-      fireEvent.click(selectElement); // Click to open the dropdown
-    });
-    
-    // Clicar na opção Despesa
-    await act(async () => {
-      const despesaOption = await screen.findByRole('option', { name: /Despesa/i });
-      fireEvent.click(despesaOption);
-    });
+    fireEvent.mouseDown(screen.getByLabelText(/Tipo/i));
+    const despesaOption = await screen.findByRole('option', { name: /Despesa/i });
+    fireEvent.click(despesaOption);
     
     // Preencher o formulário
-    await act(async () => {
-      fireEvent.change(screen.getByLabelText(/Valor/i), { target: { value: '50' } });
-      fireEvent.change(screen.getByLabelText(/Descrição/i), { target: { value: 'Mercado' } });
-      fireEvent.click(screen.getByText(/Adicionar/i));
-    });
+    fireEvent.change(screen.getByLabelText(/Valor/i), { target: { value: '50' } });
+    fireEvent.change(screen.getByLabelText(/Descrição/i), { target: { value: 'Mercado' } });
+    fireEvent.change(screen.getByTestId('category-selector'), { target: { value: '1' } });
+    fireEvent.click(screen.getByText(/Adicionar/i));
     
-    // Verificar se a despesa foi adicionada (usando seletores mais flexíveis)
-    await waitFor(() => {
-      // Verificar se os elementos da transação foram renderizados
-      const transactionElements = screen.queryAllByText(/Mercado|Receita|Despesa/);
-      expect(transactionElements.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    // Verificar se a despesa foi adicionada
+    const transaction = await screen.findByText(/Mercado/i);
+    expect(transaction).toBeInTheDocument();
   });
 
   it('exibe lista vazia se axios.get falhar', async () => {

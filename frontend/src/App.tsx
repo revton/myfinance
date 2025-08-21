@@ -10,8 +10,10 @@ import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 
 // Componente principal da aplicação
-import Dashboard from './components/Dashboard';
+import { DashboardPage } from './pages/DashboardPage';
 import CategoriesPage from './pages/CategoriesPage';
+import TransactionsPage from './pages/TransactionsPage';
+import TransactionFormPage from './pages/TransactionFormPage'; // New import
 import PrivateRoute from './components/PrivateRoute';
 
 const theme = createTheme({
@@ -51,7 +53,7 @@ const AppRoutes: React.FC = () => {
         path="/dashboard" 
         element={
           <PrivateRoute>
-            <Dashboard />
+            <DashboardPage />
           </PrivateRoute>
         } 
       />
@@ -60,6 +62,30 @@ const AppRoutes: React.FC = () => {
         element={
           <PrivateRoute>
             <CategoriesPage />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/transactions" 
+        element={
+          <PrivateRoute>
+            <TransactionsPage />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/transactions/new" 
+        element={
+          <PrivateRoute>
+            <TransactionFormPage />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/transactions/:id/edit" 
+        element={
+          <PrivateRoute>
+            <TransactionFormPage />
           </PrivateRoute>
         } 
       />

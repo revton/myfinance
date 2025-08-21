@@ -70,7 +70,8 @@ const CategoriesPage: React.FC = () => {
     createCategory, 
     updateCategory, 
     deleteCategory, 
-    restoreCategory 
+    restoreCategory,
+    refreshCategories
   } = useCategories();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -95,8 +96,9 @@ const CategoriesPage: React.FC = () => {
         await createCategory(categoryData);
       }
       handleCloseDialog();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar categoria:', error);
+      // Optionally, set a local error state to display to the user
     }
   };
 
@@ -104,8 +106,9 @@ const CategoriesPage: React.FC = () => {
     if (window.confirm('Tem certeza que deseja excluir esta categoria?')) {
       try {
         await deleteCategory(categoryId);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro ao excluir categoria:', error);
+        // Optionally, set a local error state to display to the user
       }
     }
   };
@@ -113,14 +116,15 @@ const CategoriesPage: React.FC = () => {
   const handleRestore = async (categoryId: string) => {
     try {
       await restoreCategory(categoryId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao restaurar categoria:', error);
+      // Optionally, set a local error state to display to the user
     }
   };
 
-  const expenseCategories = categories.filter(c => c.type === 'expense' && c.is_active);
-  const incomeCategories = categories.filter(c => c.type === 'income' && c.is_active);
-  const deletedCategories = categories.filter(c => !c.is_active);
+  const expenseCategories = (categories ?? []).filter(c => c.type === 'expense' && c.is_active);
+  const incomeCategories = (categories ?? []).filter(c => c.type === 'income' && c.is_active);
+  const deletedCategories = (categories ?? []).filter(c => !c.is_active);
 
   if (loading) {
     return (
