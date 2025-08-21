@@ -1,5 +1,5 @@
 // src/components/filters/StatusFilter.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -26,6 +26,20 @@ const StatusFilter: React.FC<StatusFilterProps> = ({ onFilterChange, initialFilt
   const [filters, setFilters] = useState<StatusFilters>(initialFilters || {
     type: 'all'
   });
+  
+  // Ref to track the previous initialFilters value
+  const prevInitialFiltersRef = useRef(initialFilters);
+
+  // Reset filters when initialFilters changes (e.g., when filters are cleared)
+  useEffect(() => {
+    // Only reset if initialFilters has actually changed
+    if (JSON.stringify(initialFilters) !== JSON.stringify(prevInitialFiltersRef.current)) {
+      setFilters(initialFilters || {
+        type: 'all'
+      });
+      prevInitialFiltersRef.current = initialFilters;
+    }
+  }, [initialFilters]);
 
   const handleFilterChange = (field: keyof StatusFilters, value: any) => {
     const newFilters = { ...filters, [field]: value };

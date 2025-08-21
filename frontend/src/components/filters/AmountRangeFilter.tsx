@@ -1,5 +1,5 @@
 // src/components/filters/AmountRangeFilter.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -29,6 +29,18 @@ const AmountRangeFilter: React.FC<AmountRangeFilterProps> = ({
   maxAmount = 10000 
 }) => {
   const [filters, setFilters] = useState<AmountRangeFilters>(initialFilters || {});
+  
+  // Ref to track the previous initialFilters value
+  const prevInitialFiltersRef = useRef(initialFilters);
+
+  // Reset filters when initialFilters changes (e.g., when filters are cleared)
+  useEffect(() => {
+    // Only reset if initialFilters has actually changed
+    if (JSON.stringify(initialFilters) !== JSON.stringify(prevInitialFiltersRef.current)) {
+      setFilters(initialFilters || {});
+      prevInitialFiltersRef.current = initialFilters;
+    }
+  }, [initialFilters]);
 
   const handleAmountChange = (field: 'minAmount' | 'maxAmount', value: string) => {
     const numValue = value === '' ? undefined : parseFloat(value);

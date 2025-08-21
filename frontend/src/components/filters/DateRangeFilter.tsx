@@ -1,5 +1,5 @@
 // src/components/filters/DateRangeFilter.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   FormControl,
@@ -31,6 +31,20 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ onFilterChange, initi
   const [filters, setFilters] = useState<DateRangeFilters>(initialFilters || {
     period: 'month'
   });
+  
+  // Ref to track the previous initialFilters value
+  const prevInitialFiltersRef = useRef(initialFilters);
+
+  // Reset filters when initialFilters changes (e.g., when filters are cleared)
+  useEffect(() => {
+    // Only reset if initialFilters has actually changed
+    if (JSON.stringify(initialFilters) !== JSON.stringify(prevInitialFiltersRef.current)) {
+      setFilters(initialFilters || {
+        period: 'month'
+      });
+      prevInitialFiltersRef.current = initialFilters;
+    }
+  }, [initialFilters]);
 
   const handlePeriodChange = (period: string) => {
     const newFilters = { ...filters, period: period as any };

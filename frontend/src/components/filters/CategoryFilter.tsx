@@ -1,5 +1,5 @@
 // src/components/filters/CategoryFilter.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -28,6 +28,18 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
 }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategories);
   const { getCategoriesByType } = useCategories();
+  
+  // Ref to track the previous initialCategories value
+  const prevInitialCategoriesRef = useRef(initialCategories);
+
+  // Reset selected categories when initialCategories changes (e.g., when filters are cleared)
+  useEffect(() => {
+    // Only reset if initialCategories has actually changed
+    if (JSON.stringify(initialCategories) !== JSON.stringify(prevInitialCategoriesRef.current)) {
+      setSelectedCategories(initialCategories || []);
+      prevInitialCategoriesRef.current = initialCategories;
+    }
+  }, [initialCategories]);
 
   const categories = type === 'all' 
     ? [...getCategoriesByType('expense'), ...getCategoriesByType('income')]
