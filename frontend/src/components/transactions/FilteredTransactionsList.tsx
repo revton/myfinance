@@ -1,5 +1,5 @@
 // src/components/transactions/FilteredTransactionsList.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -34,6 +34,29 @@ interface Category {
   color: string;
 }
 
+// Import filter types from the component
+interface DateRangeFilters {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+interface AmountRangeFilters {
+  minAmount?: number;
+  maxAmount?: number;
+}
+
+interface StatusFilters {
+  type: 'all' | 'income' | 'expense';
+  status: 'all' | 'pending' | 'completed';
+}
+
+interface CombinedFilters {
+  dateRange?: DateRangeFilters;
+  categories?: string[];
+  amountRange?: AmountRangeFilters;
+  status?: StatusFilters;
+}
+
 interface Transaction {
   id: string;
   type: 'income' | 'expense';
@@ -54,11 +77,11 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
 }) => {
   const navigate = useNavigate();
   const { transactions, loading, error, fetchTransactions } = useTransactions();
-  const { filters, updateFilters } = useAdvancedFilters({
-    onFiltersChange: (newFilters) => {
-      console.log('Filtros aplicados:', newFilters);
-    }
-  });
+  const { filters, updateFilters } = useAdvancedFilters();
+  
+  const handleFiltersChange = useCallback((newFilters: CombinedFilters) => {
+    updateFilters(newFilters);
+  }, [updateFilters]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
 
@@ -152,7 +175,8 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
   return (
     <Box>
       <AdvancedFilters
-        onFiltersChange={updateFilters}
+        initialFilters={filters}
+        onFiltersChange={handleFiltersChange}
         onSaveFilters={(filters, name) => {
           console.log('Salvando filtros:', name, filters);
         }}
