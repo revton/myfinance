@@ -1,18 +1,86 @@
 // src/hooks/useCategories.ts
-import { useState } from 'react';
+import { useContext, useMemo } from 'react';
+import { useCategories as useCategoriesContext } from '../contexts/CategoryContext';
+import { useTransactions } from '../contexts/TransactionContext';
+
+interface CategorySummary {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  amount: number;
+  percentage: number;
+}
 
 export const useCategories = () => {
-  const [loading, setLoading] = useState(true);
-
-  const categorySummary = [
-    { id: '1', name: 'Food', icon: 'Fastfood', color: '#FF6384', amount: 500, percentage: 50 },
-    { id: '2', name: 'Transport', icon: 'DirectionsCar', color: '#36A2EB', amount: 200, percentage: 20 },
-    { id: '3', name: 'Shopping', icon: 'ShoppingCart', color: '#FFCE56', amount: 150, percentage: 15 },
-    { id: '4', name: 'Health', icon: 'Favorite', color: '#4BC0C0', amount: 100, percentage: 10 },
-    { id: '5', name: 'Other', icon: 'MoreHoriz', color: '#9966FF', amount: 50, percentage: 5 },
-  ];
-
-  setTimeout(() => setLoading(false), 1000);
-
+  const { categories, loading: categoriesLoading } = useCategoriesContext();
+  const { transactions, loading: transactionsLoading } = useTransactions();
+  
+  const loading = categoriesLoading || transactionsLoading;
+  
+  const categorySummary = useMemo(() => {
+    if (loading || !categories.length || !transactions.length) {
+      return [];
+    }
+    
+    // Calculate expenses by category
+    const expenseTransactions = transactions.filter(t => t.type === 'expense');
+    
+    if (expenseTransactions.length === 0) {
+      return [];
+    }
+    
+    // Group transactions by category and calculate totals
+    const categoryTotals: Record<string, number> = {};
+    expenseTransactions.forEach(transaction => {
+      const categoryId = transaction.category_id || 'uncategorized';
+      if (!categoryTotals[categoryId]) {
+        categoryTotals[categoryId] = 0;
+      }
+      categoryTotals[categoryId] += transaction.amount;
+    });
+    
+    // Create summary array with category details
+    const summary: CategorySummary[] = [];
+    let totalExpenses = 0;
+    
+    Object.entries(categoryTotals).forEach(([categoryId, amount]) => {
+      totalExpenses += amount;
+      
+      if (categoryId === 'uncategorized') {
+        summary.push({
+          id: 'uncategorized',
+          name: 'Sem Categoria',
+          icon: 'HelpOutline',
+          color: '#999999',
+          amount,
+          percentage: 0 // Will be calculated below
+        });
+      } else {
+        const category = categories.find(c => c.id === categoryId);
+        if (category) {
+          summary.push({
+            id: category.id,
+            name: category.name,
+            icon: category.icon,
+            color: category.color,
+            amount,
+            percentage: 0 // Will be calculated below
+          });
+        }
+      }
+    });
+    
+    // Calculate percentages
+    summary.forEach(item => {
+      item.percentage = totalExpenses > 0 ? (item.amount / totalExpenses) * 100 : 0;
+    });
+    
+    // Sort by amount descending
+    summary.sort((a, b) => b.amount - a.amount);
+    
+    return summary;
+  }, [categories, transactions, loading]);
+  
   return { categorySummary, loading };
 };

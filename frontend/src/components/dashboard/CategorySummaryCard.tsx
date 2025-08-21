@@ -42,6 +42,27 @@ export const CategorySummaryCard: React.FC = () => {
     return <Card><CardContent><Typography>Carregando...</Typography></CardContent></Card>;
   }
   
+  // If no data, show a message
+  if (categorySummary.length === 0) {
+    return (
+      <Card elevation={2}>
+        <CardContent>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h6" color="text.secondary">
+              Gastos por Categoria
+            </Typography>
+            <Button size="small" onClick={() => navigate('/categories')}>
+              Ver Todas
+            </Button>
+          </Box>
+          <Typography color="text.secondary">
+            Nenhum gasto registrado ainda.
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   const chartData = categorySummary.map((cat, index) => ({
     name: cat.name,
     value: cat.amount,
