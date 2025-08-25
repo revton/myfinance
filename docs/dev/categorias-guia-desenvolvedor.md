@@ -96,18 +96,18 @@ VITE_API_URL=http://localhost:8002
 
 ### **Dependências**
 
-```python
-# requirements.txt
-fastapi==0.104.1
-sqlalchemy==2.0.23
-pydantic==2.5.0
-supabase==2.0.0
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-alembic==1.13.0
-psycopg2-binary==2.9.9
+O projeto utiliza `pyproject.toml` para gerenciar as dependências. Para instalar as dependências principais, use o comando:
+
+```bash
+uv pip install .
 ```
+
+As dependências do módulo de categorias incluem:
+- `fastapi`: Framework web.
+- `sqlalchemy`: ORM para o banco de dados.
+- `pydantic`: Para validação de dados.
+- `alembic`: Para migrações de banco de dados.
+- `psycopg2-binary`: Driver PostgreSQL.
 
 ```json
 // frontend/package.json

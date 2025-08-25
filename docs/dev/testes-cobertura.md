@@ -37,16 +37,15 @@ python_functions = ["test_*"]
 addopts = [
     "--cov=src",
     "--cov-report=term-missing",
-    "--cov-report=html:coverage/backend",
-    "--cov-report=xml:coverage/backend/coverage.xml"
+    "--cov-report=html:reports/coverage-backend",
+    "--cov-report=xml:reports/coverage-backend.xml"
 ]
 
 [tool.coverage.run]
 source = ["src"]
 omit = [
-    "*/tests/*",
-    "*/test_*",
     "*/__pycache__/*",
+    "*/tests/*",
     "src/main.py",
     "src/database_sqlalchemy.py"
 ]
@@ -153,7 +152,7 @@ uv run invoke test-coverage
 ```bash
 # Backend
 uv run invoke test-coverage-html
-# Abra coverage/backend/index.html no navegador
+# Abra reports/coverage-backend/index.html no navegador
 
 # Frontend
 uv run invoke test-frontend-coverage-html
