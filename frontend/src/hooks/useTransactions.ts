@@ -35,20 +35,49 @@ export const useTransactions = () => {
       const response = await axios.get<Transaction[]>(`${API_BASE_URL}${APP_CONFIG.api.endpoints.transactions}`);
       const fetchedTransactions = response.data;
 
-      // Calculate balance data from fetched transactions
+      // Calcular dados do saldo atual
       const currentBalance = fetchedTransactions.reduce((sum, t) => 
         t.type === 'income' ? sum + t.amount : sum - t.amount, 0);
-      const monthlyIncome = fetchedTransactions
-        .filter(t => t.type === 'income' && new Date(t.created_at).getMonth() === new Date().getMonth())
-        .reduce((sum, t) => sum + t.amount, 0);
-      const monthlyExpenses = fetchedTransactions
-        .filter(t => t.type === 'expense' && new Date(t.created_at).getMonth() === new Date().getMonth())
-        .reduce((sum, t) => sum + t.amount, 0);
+
+      // Filtrar transações do mês atual
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const currentYear = currentDate.getFullYear();
       
-      // Placeholder for previousMonthBalance and percentageChange - requires more complex logic
-      // For now, setting to dummy values or 0
-      const previousMonthBalance = 0; // This would require fetching previous month's transactions
-      const percentageChange = 0; // This would require previous month's balance
+      const monthlyTransactions = fetchedTransactions.filter(t => {
+        const transactionDate = new Date(t.created_at);
+        return transactionDate.getMonth() === currentMonth && 
+               transactionDate.getFullYear() === currentYear;
+      });
+
+      const monthlyIncome = monthlyTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+        
+      const monthlyExpenses = monthlyTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      // Calcular transações do mês anterior
+      const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+      const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+      
+      const previousMonthTransactions = fetchedTransactions.filter(t => {
+        const transactionDate = new Date(t.created_at);
+        return transactionDate.getMonth() === previousMonth && 
+               transactionDate.getFullYear() === previousYear;
+      });
+
+      const previousMonthBalance = previousMonthTransactions.reduce((sum, t) => 
+        t.type === 'income' ? sum + t.amount : sum - t.amount, 0);
+
+      // Calcular variação percentual
+      let percentageChange = 0;
+      if (previousMonthBalance !== 0) {
+        percentageChange = ((currentBalance - previousMonthBalance) / Math.abs(previousMonthBalance)) * 100;
+      } else if (currentBalance > 0) {
+        percentageChange = 100; // Se não havia saldo no mês anterior mas há agora
+      }
 
       setRecentTransactions(fetchedTransactions);
       setBalanceData({
@@ -61,8 +90,8 @@ export const useTransactions = () => {
     } catch (err) {
       console.error('Error fetching transactions:', err);
       setError('Failed to load transactions.');
-      setRecentTransactions([]); // Clear transactions on error
-      setBalanceData(null); // Clear balance data on error
+      setRecentTransactions([]);
+      setBalanceData(null);
     } finally {
       setLoading(false);
     }
