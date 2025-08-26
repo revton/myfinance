@@ -15,29 +15,29 @@
    uv venv
    ```
 2. Instale as dependências necessárias:
-   - Backend:
+   - Dependências principais (backend):
      ```sh
-     uv pip install -r pyproject.toml --extra backend
+     uv pip install .
      ```
    - Desenvolvimento:
      ```sh
-     uv pip install -r pyproject.toml --extra dev
+     uv pip install .[dev]
      ```
    - Testes:
      ```sh
-     uv pip install -r pyproject.toml --extra test
+     uv pip install .[test]
      ```
    - Documentação:
      ```sh
-     uv pip install -r pyproject.toml --extra docs
+     uv pip install .[docs]
      ```
    - Segurança:
      ```sh
-     uv pip install -r pyproject.toml --extra security
+     uv pip install .[security]
      ```
    - Para instalar tudo:
      ```sh
-     uv pip install -r pyproject.toml --extra backend --extra dev --extra test --extra docs --extra security
+     uv pip install .[dev,test,docs,quality,security]
      ```
 3. Execute os comandos de automação (sem ativar o ambiente):
    ```sh
@@ -126,12 +126,12 @@ Para visualizar a documentação localmente:
 
 - **Ruff (Python):**
   ```sh
-  uv pip install -r pyproject.toml --extra quality
+  uv pip install .[quality]
   uv run invoke quality-ruff
   ```
 - **Radon (Python):**
   ```sh
-  uv pip install -r pyproject.toml --extra quality
+  uv pip install .[quality]
   uv run invoke quality-radon-cc   # Complexidade ciclomática
   uv run invoke quality-radon-mi   # Índice de manutenibilidade
   uv run invoke quality-radon-raw  # Métricas brutas
@@ -144,7 +144,7 @@ Para visualizar a documentação localmente:
   - Cobertura de testes:
     ```sh
     uv run invoke test-coverage-html
-    # Abra htmlcov/index.html no navegador
+    # Abra reports/coverage-backend/index.html no navegador
     ```
   - Segurança (Bandit):
     ```sh
@@ -171,6 +171,10 @@ Para visualizar a documentação localmente:
     ```sh
     uv run invoke quality-frontend-all
     ```
+
+## Atualização Automática de Screenshots
+
+- **[Screenshots com Playwright](screenshots-playwright.md)** - Documentação sobre como usar o Playwright para atualizar automaticamente os screenshots da documentação do usuário
 
 ## Qualidade e Cobertura Integrada (SonarQube)
 
@@ -224,8 +228,6 @@ Acesse em [http://localhost:9000](http://localhost:9000) (usuário/senha padrão
 
 ### Sistema de Categorias
 - [Guia do Desenvolvedor - Sistema de Categorias](categorias-guia-desenvolvedor.md) - Implementação técnica do sistema de categorias
-
-### Migração para SQLAlchemy
 
 ## Endpoints de Receitas e Despesas
 

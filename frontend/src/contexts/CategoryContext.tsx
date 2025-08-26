@@ -1,190 +1,123 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+// src/contexts/CategoryContext.tsx
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../lib/api';
-import type { Category, CategoryCreate, CategoryUpdate } from '../types/category';
+import { API_BASE_URL, APP_CONFIG } from '../config';
 
-interface CategoryContextType {
+interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  icon: string;
+  color: string;
+  type: 'expense' | 'income';
+  is_active: boolean;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+  transaction_count?: number; // From backend CategoryWithTransactionCount
+}
+
+interface CategoryContextData {
   categories: Category[];
-  expenseCategories: Category[];
-  incomeCategories: Category[];
   loading: boolean;
   error: string | null;
-  createCategory: (data: CategoryCreate) => Promise<void>;
-  updateCategory: (id: string, data: CategoryUpdate) => Promise<void>;
+  createCategory: (category: Omit<Category, 'id' | 'is_active' | 'is_default' | 'created_at' | 'updated_at' | 'transaction_count'>) => Promise<void>;
+  updateCategory: (id: string, category: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   restoreCategory: (id: string) => Promise<void>;
+  refreshCategories: () => void;
   getCategoriesByType: (type: 'expense' | 'income') => Category[];
-  getCategoryById: (id: string) => Category | undefined;
 }
 
-const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
+const CategoryContext = createContext<CategoryContextData>({} as CategoryContextData);
 
-export const useCategories = () => {
-  const context = useContext(CategoryContext);
-  if (context === undefined) {
-    throw new Error('useCategories must be used within a CategoryProvider');
-  }
-  return context;
-};
-
-interface CategoryProviderProps {
-  children: ReactNode;
-}
-
-export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) => {
+export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [expenseCategories, setExpenseCategories] = useState<Category[]>([]);
-  const [incomeCategories, setIncomeCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchCategories = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      
-      // Carregar todas as categorias
-      const token = localStorage.getItem('access_token');
-      const response = await api.get('/categories?include_inactive=true', {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : ''
-        }
-      });
-      setCategories(response.data || []);
-      
-      // Carregar categorias de despesa
-      const expenseResponse = await api.get('/categories?category_type=expense', {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : ''
-        }
-      });
-      setExpenseCategories(expenseResponse.data || []);
-      
-      // Carregar categorias de receita
-      const incomeResponse = await api.get('/categories?category_type=income', {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : ''
-        }
-      });
-      setIncomeCategories(incomeResponse.data || []);
+      const response = await api.get<Category[]>(`${APP_CONFIG.api.endpoints.categories}`);
+      setCategories(response.data);
     } catch (err) {
-      setError('Erro ao carregar categorias');
-      console.error('Erro ao buscar categorias:', err);
+      console.error('Error fetching categories:', err);
+      setError('Failed to load categories.');
+      setCategories([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      fetchCategories();
-    }
-  }, [localStorage.getItem('access_token')]);
+    fetchCategories();
+  }, []);
 
-  const createCategory = async (categoryData: CategoryCreate) => {
+  const createCategory = async (categoryData: Omit<Category, 'id' | 'is_active' | 'is_default' | 'created_at' | 'updated_at' | 'transaction_count'>) => {
     try {
-      setError(null);
-      const response = await api.post('/categories/', categoryData);
-      setCategories(prev => [...prev, response.data]);
-      
-      // Atualizar listas específicas por tipo
-      if (response.data.type === 'expense') {
-        setExpenseCategories(prev => [...prev, response.data]);
-      } else {
-        setIncomeCategories(prev => [...prev, response.data]);
-      }
-    } catch (err) {
-      setError('Erro ao criar categoria');
-      throw err;
+      await api.post(`${APP_CONFIG.api.endpoints.categories}`, categoryData);
+      fetchCategories(); // Refresh list after creation
+    } catch (err: any) {
+      console.error('Error creating category:', err);
+      throw new Error(err.response?.data?.detail || 'Failed to create category.');
     }
   };
 
-  const updateCategory = async (id: string, categoryData: CategoryUpdate) => {
+  const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      setError(null);
-      const response = await api.put(`/categories/${id}`, categoryData);
-      setCategories(prev => 
-        prev.map(cat => cat.id === id ? response.data : cat)
-      );
-      
-      // Atualizar listas específicas por tipo
-      if (response.data.type === 'expense') {
-        setExpenseCategories(prev => 
-          prev.map(cat => cat.id === id ? response.data : cat)
-        );
-      } else {
-        setIncomeCategories(prev => 
-          prev.map(cat => cat.id === id ? response.data : cat)
-        );
-      }
-    } catch (err) {
-      setError('Erro ao atualizar categoria');
-      throw err;
-    }
+      await api.put(`${APP_CONFIG.api.endpoints.categories}/${id}`, categoryData);
+      fetchCategories(); // Refresh list after update
+    } catch (err: any) {
+      console.error('Error updating category:', err);
+      throw new Error(err.response?.data?.detail || 'Failed to update category.');
+    }c
   };
 
   const deleteCategory = async (id: string) => {
     try {
-      setError(null);
-      await api.delete(`/categories/${id}`);
-      setCategories(prev => 
-        prev.map(cat => cat.id === id ? { ...cat, is_active: false } : cat)
-      );
-      
-      // Remover das listas específicas
-      setExpenseCategories(prev => prev.filter(cat => cat.id !== id));
-      setIncomeCategories(prev => prev.filter(cat => cat.id !== id));
-    } catch (err) {
-      setError('Erro ao excluir categoria');
-      throw err;
+      await api.delete(`${APP_CONFIG.api.endpoints.categories}/${id}`);
+      fetchCategories(); // Refresh list after deletion
+    } catch (err: any) {
+      console.error('Error deleting category:', err);
+      throw new Error(err.response?.data?.detail || 'Failed to delete category.');
     }
   };
 
   const restoreCategory = async (id: string) => {
     try {
-      setError(null);
-      const response = await api.post(`/categories/${id}/restore`);
-      setCategories(prev => 
-        prev.map(cat => cat.id === id ? response.data : cat)
-      );
-      
-      // Adicionar às listas específicas por tipo
-      if (response.data.type === 'expense') {
-        setExpenseCategories(prev => [...prev, response.data]);
-      } else {
-        setIncomeCategories(prev => [...prev, response.data]);
-      }
-    } catch (err) {
-      setError('Erro ao restaurar categoria');
-      throw err;
+      await api.post(`${APP_CONFIG.api.endpoints.categories}/${id}/restore`);
+      fetchCategories(); // Refresh list after restore
+    } catch (err: any) {
+      console.error('Error restoring category:', err);
+      throw new Error(err.response?.data?.detail || 'Failed to restore category.');
     }
   };
 
+  const refreshCategories = () => {
+    fetchCategories();
+  };
+
   const getCategoriesByType = (type: 'expense' | 'income') => {
-    return categories.filter(cat => cat.type === type && cat.is_active);
-  };
-
-  const getCategoryById = (id: string) => {
-    return categories.find(cat => cat.id === id);
-  };
-
-  const value = {
-    categories,
-    expenseCategories,
-    incomeCategories,
-    loading,
-    error,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    restoreCategory,
-    getCategoriesByType,
-    getCategoryById,
+    return categories.filter(cat => cat.type === type);
   };
 
   return (
-    <CategoryContext.Provider value={value}>
+    <CategoryContext.Provider value={{ 
+      categories, 
+      loading, 
+      error, 
+      createCategory, 
+      updateCategory, 
+      deleteCategory, 
+      restoreCategory,
+      refreshCategories,
+      getCategoriesByType
+    }}>
       {children}
     </CategoryContext.Provider>
   );
 };
+
+export const useCategories = () => useContext(CategoryContext);

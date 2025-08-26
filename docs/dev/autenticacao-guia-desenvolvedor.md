@@ -75,15 +75,17 @@ ENVIRONMENT=development
 
 ### **Dependências**
 
-```python
-# requirements.txt
-supabase==2.0.0
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-pytz==2023.3
-pydantic[email]==2.5.0
+O projeto utiliza `pyproject.toml` para gerenciar as dependências. Para instalar as dependências principais, use o comando:
+
+```bash
+uv pip install .
 ```
+
+As dependências de autenticação incluem:
+- `supabase`: Cliente Python para Supabase.
+- `python-jose[cryptography]`: Para manipulação de JWT.
+- `passlib[bcrypt]`: Para hashing de senhas.
+- `pydantic[email]`: Para validação de e-mails.
 
 ---
 
