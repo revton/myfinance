@@ -5,6 +5,7 @@ import { BalanceCard } from '../components/dashboard/BalanceCard';
 import { RecentTransactionsCard } from '../components/dashboard/RecentTransactionsCard';
 import { CategorySummaryCard } from '../components/dashboard/CategorySummaryCard';
 import { QuickActionsCard } from '../components/dashboard/QuickActionsCard';
+import SentryTest from '../components/SentryTest';
 
 export const DashboardPage: React.FC = () => {
   return (
@@ -24,6 +25,13 @@ export const DashboardPage: React.FC = () => {
         </Grid>
         <Grid item xs={12} md={6}>
           <RecentTransactionsCard />
+        </Grid>
+        
+        {/* Componente de teste do Sentry */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <SentryTest />
+          </Paper>
         </Grid>
       </Grid>
     </Container>
