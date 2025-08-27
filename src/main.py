@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime
 import logging
 import os
+import sentry_sdk
 
 # Configuração de logging
 logging.basicConfig(
@@ -20,6 +21,22 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Inicialização do Sentry
+if settings.SENTRY_DSN_BACKEND:
+    logger.info("Inicializando Sentry para monitoramento de erros")
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN_BACKEND,
+        # Defina traces_sample_rate como 1.0 para capturar 100%
+        # das transações para monitoramento de performance.
+        # Ajuste em produção se necessário.
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+        environment=settings.ENVIRONMENT,
+    )
+    logger.info(f"Sentry inicializado com sucesso no ambiente: {settings.ENVIRONMENT}")
+else:
+    logger.warning("Variável SENTRY_DSN_BACKEND não configurada. Monitoramento de erros desativado.")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -38,6 +55,23 @@ app.add_middleware(
 # Incluir rotas de autenticação
 app.include_router(auth_router)
 app.include_router(category_router.router)
+
+# Endpoint de teste para o Sentry
+@app.get("/sentry-debug")
+async def trigger_error():
+    """Endpoint para testar a integração com o Sentry"""
+    logger.info("Gerando erro de teste para o Sentry")
+    try:
+        # Gera um erro de divisão por zero
+        division_by_zero = 1 / 0
+        return {"message": "Este código nunca será executado"}
+    except Exception as e:
+        logger.error(f"Erro capturado: {str(e)}")
+        # O Sentry capturará automaticamente esta exceção
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro de teste gerado com sucesso e enviado ao Sentry"
+        )
 
 @app.on_event("startup")
 async def startup_event():

@@ -39,6 +39,9 @@ class Settings:
     # Logs
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     
+    # Sentry
+    SENTRY_DSN_BACKEND: str = os.getenv("SENTRY_DSN_BACKEND", "")
+    
     def __init__(self):
         self._supabase_client = None
     
@@ -76,4 +79,4 @@ class Settings:
         self._supabase_client = mock_client
 
 # Instância global das configurações
-settings = Settings() 
+settings = Settings()
