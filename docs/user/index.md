@@ -43,3 +43,11 @@ Para informações detalhadas sobre o processo de criação de conta, login, rec
 - **[Guia de Autenticação do Usuário](autenticacao-guia-usuario.md)**
 
 Este guia contém tudo o que você precisa saber para gerenciar sua conta com segurança.
+
+## Novidades e Melhorias da Fase 2
+
+Descubra as novas funcionalidades e aprimoramentos que foram adicionados ao MyFinance:
+
+- **[Guia de Polimento da Fase 2](polimento-fase-2.md)**
+
+Este guia apresenta todas as melhorias de interface, performance e experiência do usuário implementadas na Fase 2.
