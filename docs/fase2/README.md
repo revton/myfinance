@@ -69,6 +69,8 @@ A **Fase 2** do MyFinance foca na implementação de duas funcionalidades fundam
 - [x] Formulário para adicionar transações
 - [x] Integração com categorias
 - [x] Design responsivo
+- [x] Gráficos e visualizações avançadas
+- [x] Cards de resumo detalhados
 
 ### 🎨 **Melhorias de UX**
 - [x] Componentes de autenticação com feedback visual
@@ -78,21 +80,21 @@ A **Fase 2** do MyFinance foca na implementação de duas funcionalidades fundam
 ## ⏳ **O que está em andamento**
 
 ### 🎨 **Melhorias de UX - Dashboard**
-- [ ] Dashboard com gráficos e visualizações avançadas
-- [ ] Ações rápidas para funcionalidades principais
-- [ ] Cards de resumo mais detalhados
+- [x] Dashboard com gráficos e visualizações avançadas
+- [x] Ações rápidas para funcionalidades principais
+- [x] Cards de resumo mais detalhados
 - [ ] Animações e transições suaves
 
 ## ❌ **O que ainda falta implementar**
 
 ### 🔍 **Filtros Avançados**
-- [ ] Componente de filtro por período (hoje, semana, mês, trimestre, ano, customizado)
-- [ ] Componente de filtro por categorias múltiplas
-- [ ] Componente de filtro por faixa de valores
-- [ ] Componente de filtro por status de transações
-- [ ] Componente principal de filtros avançados consolidados
-- [ ] Hook para gerenciamento de filtros avançados
-- [ ] Integração dos filtros com a lista de transações
+- [x] Componente de filtro por período (hoje, semana, mês, trimestre, ano, customizado)
+- [x] Componente de filtro por categorias múltiplas
+- [x] Componente de filtro por faixa de valores
+- [x] Componente de filtro por status de transações
+- [x] Componente principal de filtros avançados consolidados
+- [x] Hook para gerenciamento de filtros avançados
+- [x] Integração dos filtros com a lista de transações
 
 ### 🎨 **Melhorias de UX - Geral**
 - [ ] Loading states avançados
@@ -127,8 +129,8 @@ A **Fase 2** do MyFinance foca na implementação de duas funcionalidades fundam
 - ✅ Dados seguros e privados por usuário
 
 ### **Critérios Pendentes**
-- ⏳ Filtros avançados implementados
-- ⏳ Dashboard com visualizações gráficas
+- ✅ Filtros avançados implementados
+- ✅ Dashboard com visualizações gráficas
 - ⏳ Loading states otimizados
 - ⏳ Error handling completo
 

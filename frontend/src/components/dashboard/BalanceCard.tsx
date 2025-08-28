@@ -1,4 +1,5 @@
 // src/components/dashboard/BalanceCard.tsx
+// Componente atualizado para funcionar com a implementação correta do hook useTransactions
 import React from 'react';
 import { 
   Card, 

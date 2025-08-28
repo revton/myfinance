@@ -2,7 +2,7 @@
 Configuração SQLAlchemy direta para Supabase
 Substitui o cliente Supabase por SQLAlchemy para operações de banco
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
@@ -98,7 +98,7 @@ def test_connection():
     """Testa a conexão com o banco"""
     try:
         with engine.connect() as conn:
-            result = conn.execute("SELECT 1")
+            result = conn.execute(text("SELECT 1"))
             logger.info("Conexão com banco testada com sucesso")
             return True
     except Exception as e:
