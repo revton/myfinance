@@ -1,13 +1,8 @@
 // src/components/transactions/FilteredTransactionsList.tsx
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton,
   Chip,
   Skeleton,
   Alert,
@@ -18,6 +13,7 @@ import {
   DialogActions,
   Button
 } from '@mui/material';
+import { FixedSizeList as List } from 'react-window';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAdvancedFilters } from '../../hooks/useAdvancedFilters';
@@ -203,16 +199,26 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
           Nenhuma transação encontrada com os filtros aplicados.
         </Alert>
       ) : (
-        <List>
-          {filteredTransactions.map((transaction) => (
-            <TransactionItem
-              key={transaction.id}
-              transaction={transaction}
-              onEdit={() => navigate(`/transactions/${transaction.id}/edit`)}
-              onDelete={() => handleDeleteClick(transaction.id)}
-            />
-          ))}
-        </List>
+        <Box sx={{ height: 400, width: '100%' }}>
+          <List
+            height={400}
+            width="100%"
+            itemCount={filteredTransactions.length}
+            itemSize={72} /* Altura estimada de cada item de transação */
+            overscanCount={5}
+          >
+            {({ index, style }) => (
+              <div style={style}>
+                <TransactionItem
+                  key={filteredTransactions[index].id}
+                  transaction={filteredTransactions[index]}
+                  onEdit={() => navigate(`/transactions/${filteredTransactions[index].id}/edit`)}
+                  onDelete={() => handleDeleteClick(filteredTransactions[index].id)}
+                />
+              </div>
+            )}
+          </List>
+        </Box>
       )}
 
       <Dialog
