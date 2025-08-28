@@ -2,7 +2,7 @@
 Configuração SQLAlchemy direta para Supabase
 Substitui o cliente Supabase por SQLAlchemy para operações de banco
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
