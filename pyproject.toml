@@ -23,6 +23,7 @@ dependencies = [
     "pytz",
     "PyJWT",
     "pytest-cov",
+    "sentry-sdk[fastapi]>=1.0",
 ]
 
 [project.optional-dependencies]
