@@ -275,3 +275,10 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 **📅 Última Atualização**: Agosto 2025  
 **📍 Versão**: 1.0  
 **👤 Responsável**: Desenvolvedor Full-stack
+
+---
+
+##  commits Recentes
+
+- c539f05 fix(frontend): ensure all errors are sent to Sentry
+- c442a3f feat(frontend): improve transaction list performance with virtualization
