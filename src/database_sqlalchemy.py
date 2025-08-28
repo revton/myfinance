@@ -98,7 +98,7 @@ def test_connection():
     """Testa a conexão com o banco"""
     try:
         with engine.connect() as conn:
-            result = conn.execute("SELECT 1")
+            result = conn.execute(text("SELECT 1"))
             logger.info("Conexão com banco testada com sucesso")
             return True
     except Exception as e:
