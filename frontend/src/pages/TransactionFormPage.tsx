@@ -14,13 +14,18 @@ import {
   Radio,
   Alert,
   CircularProgress,
-  Paper
+  Paper,
+  FormHelperText,
+  Tooltip,
+  IconButton
 } from '@mui/material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useCategories } from '../contexts/CategoryContext';
 import { useTransactions } from '../contexts/TransactionContext'; // Add this import
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../lib/api';
 import { API_BASE_URL, APP_CONFIG } from '../config'; // Import APP_CONFIG
+import { useToast } from '../hooks/useToast';
 
 interface TransactionFormData {
   type: 'income' | 'expense';
@@ -34,6 +39,7 @@ const TransactionFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
   const { fetchTransactions } = useTransactions(); // Add this line to get the refresh function
+  const toast = useToast();
   const [formData, setFormData] = useState<TransactionFormData>({
     type: 'expense', // Default to expense
     amount: '',
@@ -44,6 +50,7 @@ const TransactionFormPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const expenseCategories = categories.filter(cat => cat.type === 'expense' && cat.is_active);
   const incomeCategories = categories.filter(cat => cat.type === 'income' && cat.is_active);
@@ -77,6 +84,14 @@ const TransactionFormPage: React.FC = () => {
       ...prev,
       [name as string]: value,
     }));
+    
+    // Limpar erro do campo quando o usuário fizer alterações
+    if (fieldErrors[name as string]) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [name as string]: ''
+      }));
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +102,14 @@ const TransactionFormPage: React.FC = () => {
         ...prev,
         amount: value,
       }));
+      
+      // Limpar erro do campo quando o usuário fizer alterações
+      if (fieldErrors.amount) {
+        setFieldErrors(prev => ({
+          ...prev,
+          amount: ''
+        }));
+      }
     }
   };
 
@@ -95,6 +118,31 @@ const TransactionFormPage: React.FC = () => {
     setFormError(null);
     setSuccess(null);
     setLoading(true);
+    
+    // Validar campos antes de enviar
+    const validationErrors: Record<string, string> = {};
+    let hasErrors = false;
+    
+    if (!formData.description.trim()) {
+      validationErrors.description = 'Descrição é obrigatória';
+      hasErrors = true;
+    }
+    
+    if (!formData.amount || parseFloat(formData.amount.toString().replace(',', '.')) <= 0) {
+      validationErrors.amount = 'Valor deve ser maior que zero';
+      hasErrors = true;
+    }
+    
+    if (!formData.category_id) {
+      validationErrors.category_id = 'Categoria é obrigatória';
+      hasErrors = true;
+    }
+    
+    if (hasErrors) {
+      setFieldErrors(validationErrors);
+      setLoading(false);
+      return;
+    }
 
     // Basic validation
     if (!formData.type || !formData.amount || !formData.description) {
@@ -124,6 +172,7 @@ const TransactionFormPage: React.FC = () => {
           category_id: formData.category_id || null,
         });
         setSuccess('Transação atualizada com sucesso!');
+        toast.success('Transação atualizada com sucesso!');
         // Refresh transactions list
         await fetchTransactions();
       } else {
@@ -135,6 +184,7 @@ const TransactionFormPage: React.FC = () => {
           category_id: formData.category_id || null,
         });
         setSuccess('Transação adicionada com sucesso!');
+        toast.success('Transação adicionada com sucesso!');
         // Refresh transactions list
         await fetchTransactions();
         // Reset form only when creating new transaction
@@ -150,7 +200,9 @@ const TransactionFormPage: React.FC = () => {
       setTimeout(() => navigate('/transactions'), 2000);
     } catch (err: any) {
       console.error('Error saving transaction:', err);
-      setFormError(err.response?.data?.detail || `Erro ao ${isEditing ? 'atualizar' : 'adicionar'} transação.`);
+      const errorMessage = err.response?.data?.detail || `Erro ao ${isEditing ? 'atualizar' : 'adicionar'} transação.`;
+      setFormError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -183,7 +235,14 @@ const TransactionFormPage: React.FC = () => {
         <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
           <form onSubmit={handleSubmit}>
             <FormControl component="fieldset" margin="normal" fullWidth>
-              <Typography variant="subtitle1" gutterBottom>Tipo de Transação</Typography>
+              <Box display="flex" alignItems="center">
+                <Typography variant="subtitle1" gutterBottom>Tipo de Transação</Typography>
+                <Tooltip title="Selecione se esta transação é uma despesa (saída de dinheiro) ou receita (entrada de dinheiro)">
+                  <IconButton size="small" sx={{ ml: 1 }}>
+                    <HelpOutlineIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
               <RadioGroup
                 row
                 name="type"
@@ -195,51 +254,88 @@ const TransactionFormPage: React.FC = () => {
               </RadioGroup>
             </FormControl>
 
-            <TextField
-              label="Valor"
-              name="amount"
-              type="text" // Use text to control input format
-              value={formData.amount}
-              onChange={handleAmountChange}
-              fullWidth
-              margin="normal"
-              required
-              inputProps={{ inputMode: 'decimal' }}
-              placeholder="0,00"
-            />
+            <Box position="relative">
+              <TextField
+                label="Valor"
+                name="amount"
+                type="text" // Use text to control input format
+                value={formData.amount}
+                onChange={handleAmountChange}
+                fullWidth
+                margin="normal"
+                required
+                inputProps={{ inputMode: 'decimal' }}
+                placeholder="0,00"
+                error={!!fieldErrors.amount}
+                helperText={fieldErrors.amount || ''}
+              />
+              <Tooltip title="Informe o valor da transação utilizando apenas números e vírgula ou ponto como separador decimal. Ex: 10,50 ou 10.50">
+                <IconButton 
+                  size="small" 
+                  sx={{ position: 'absolute', top: 12, right: -8 }}
+                >
+                  <HelpOutlineIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
 
-            <TextField
-              label="Descrição"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-              multiline
-              rows={3}
-            />
-
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="category-label">Categoria</InputLabel>
-              <Select
-                labelId="category-label"
-                id="category-select"
-                name="category_id"
-                value={formData.category_id}
-                label="Categoria"
+            <Box position="relative">
+              <TextField
+                label="Descrição"
+                name="description"
+                value={formData.description}
                 onChange={handleChange}
-              >
-                <MenuItem value="">
-                  <em>Nenhuma</em>
-                </MenuItem>
-                {(formData.type === 'expense' ? expenseCategories : incomeCategories).map(category => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
+                fullWidth
+                margin="normal"
+                required
+                multiline
+                rows={3}
+                error={!!fieldErrors.description}
+                helperText={fieldErrors.description || ''}
+              />
+              <Tooltip title="Descreva a transação de forma clara e objetiva para facilitar a identificação futura. Ex: Compra de supermercado, Pagamento de aluguel, etc.">
+                <IconButton 
+                  size="small" 
+                  sx={{ position: 'absolute', top: 12, right: -8 }}
+                >
+                  <HelpOutlineIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <Box position="relative">
+              <FormControl fullWidth margin="normal" error={!!fieldErrors.category_id}>
+                <InputLabel id="category-label">Categoria</InputLabel>
+                <Select
+                  labelId="category-label"
+                  id="category-select"
+                  name="category_id"
+                  value={formData.category_id}
+                  label="Categoria"
+                  onChange={handleChange}
+                >
+                  <MenuItem value="">
+                    <em>Nenhuma</em>
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {(formData.type === 'expense' ? expenseCategories : incomeCategories).map(category => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {fieldErrors.category_id && (
+                  <FormHelperText>{fieldErrors.category_id}</FormHelperText>
+                )}
+              </FormControl>
+              <Tooltip title="Selecione a categoria que melhor representa esta transação. As categorias são filtradas de acordo com o tipo de transação selecionado (despesa ou receita).">
+                <IconButton 
+                  size="small" 
+                  sx={{ position: 'absolute', top: 12, right: -8 }}
+                >
+                  <HelpOutlineIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
 
             {formError && <Alert severity="error" sx={{ mt: 2 }}>{formError}</Alert>}
             {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}

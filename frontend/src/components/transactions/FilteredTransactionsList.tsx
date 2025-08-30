@@ -17,6 +17,7 @@ import { FixedSizeList as List } from 'react-window';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAdvancedFilters } from '../../hooks/useAdvancedFilters';
+import { useToast } from '../../hooks/useToast';
 import AdvancedFilters from '../filters/AdvancedFilters';
 import TransactionItem from './TransactionItem';
 import { useNavigate } from 'react-router-dom';
@@ -75,6 +76,7 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
   const navigate = useNavigate();
   const { transactions, loading, error, fetchTransactions } = useTransactions();
   const { filters, updateFilters } = useAdvancedFilters();
+  const toast = useToast();
   
   const handleFiltersChange = useCallback((newFilters: CombinedFilters) => {
     updateFilters(newFilters);
@@ -96,9 +98,10 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
       fetchTransactions();
       setDeleteDialogOpen(false);
       setTransactionToDelete(null);
+      toast.success('Transação excluída com sucesso!');
     } catch (err: any) {
       console.error('Error deleting transaction:', err);
-      alert(err.response?.data?.detail || 'Erro ao deletar transação.');
+      toast.error(err.response?.data?.detail || 'Erro ao deletar transação.');
     }
   };
 

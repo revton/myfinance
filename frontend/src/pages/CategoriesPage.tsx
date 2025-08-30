@@ -32,6 +32,7 @@ import {
   RestoreFromTrash as RestoreIcon
 } from '@mui/icons-material';
 import { useCategories } from '../contexts/CategoryContext';
+import { useToast } from '../hooks/useToast';
 import CategoryForm from '../components/categories/CategoryForm';
 import CategoryCard from '../components/categories/CategoryCard';
 import CategoryStats from '../components/categories/CategoryStats';
@@ -64,6 +65,7 @@ const CategoriesPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [showDeleted, setShowDeleted] = useState(false);
+  const toast = useToast();
   
   const { 
     categories, 
@@ -94,14 +96,16 @@ const CategoriesPage: React.FC = () => {
     try {
       if (editingCategory) {
         await updateCategory(editingCategory.id, categoryData);
+        toast.success('Categoria atualizada com sucesso!');
       } else {
         await createCategory(categoryData);
+        toast.success('Categoria criada com sucesso!');
       }
       handleCloseDialog();
     } catch (error: any) {
       console.error('Erro ao salvar categoria:', error);
       Sentry.captureException(error);
-      // Optionally, set a local error state to display to the user
+      toast.error(error.response?.data?.detail || 'Erro ao salvar categoria.');
     }
   };
 
@@ -109,10 +113,11 @@ const CategoriesPage: React.FC = () => {
     if (window.confirm('Tem certeza que deseja excluir esta categoria?')) {
       try {
         await deleteCategory(categoryId);
+        toast.success('Categoria excluída com sucesso!');
       } catch (error: any) {
         console.error('Erro ao excluir categoria:', error);
         Sentry.captureException(error);
-        // Optionally, set a local error state to display to the user
+        toast.error(error.response?.data?.detail || 'Erro ao excluir categoria.');
       }
     }
   };
@@ -120,10 +125,11 @@ const CategoriesPage: React.FC = () => {
   const handleRestore = async (categoryId: string) => {
     try {
       await restoreCategory(categoryId);
+      toast.success('Categoria restaurada com sucesso!');
     } catch (error: any) {
       console.error('Erro ao restaurar categoria:', error);
       Sentry.captureException(error);
-      // Optionally, set a local error state to display to the user
+      toast.error(error.response?.data?.detail || 'Erro ao restaurar categoria.');
     }
   };
 
@@ -438,3 +444,4 @@ const VirtualizedDeletedCategoryGrid: React.FC<VirtualizedDeletedCategoryGridPro
 };
 
 export default CategoriesPage;
+

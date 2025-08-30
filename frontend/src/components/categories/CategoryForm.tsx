@@ -9,8 +9,11 @@ import {
   Button,
   Grid,
   FormHelperText,
-  Typography
+  Typography,
+  Tooltip,
+  IconButton
 } from '@mui/material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { getIconComponent } from '../../utils/iconUtils';
 import { CategoryType } from '../../types/category';
 
@@ -146,52 +149,83 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Nome da Categoria"
-            value={formData.name}
-            onChange={(e) => handleChange('name', e.target.value)}
-            error={!!errors.name}
-            helperText={errors.name}
-            required
-          />
+          <Box position="relative">
+            <TextField
+              fullWidth
+              label="Nome da Categoria"
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              error={!!errors.name}
+              helperText={errors.name}
+              required
+            />
+            <Tooltip title="Informe um nome curto e descritivo para a categoria. Máximo de 50 caracteres.">
+              <IconButton 
+                size="small" 
+                sx={{ position: 'absolute', top: 12, right: -8 }}
+              >
+                <HelpOutlineIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Grid>
 
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Descrição (opcional)"
-            value={formData.description}
-            onChange={(e) => handleChange('description', e.target.value)}
-            error={!!errors.description}
-            helperText={errors.description}
-            multiline
-            rows={3}
-          />
+          <Box position="relative">
+            <TextField
+              fullWidth
+              label="Descrição (opcional)"
+              value={formData.description}
+              onChange={(e) => handleChange('description', e.target.value)}
+              error={!!errors.description}
+              helperText={errors.description}
+              multiline
+              rows={3}
+            />
+            <Tooltip title="Adicione uma descrição mais detalhada para a categoria (opcional). Máximo de 200 caracteres.">
+              <IconButton 
+                size="small" 
+                sx={{ position: 'absolute', top: 12, right: -8 }}
+              >
+                <HelpOutlineIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Tipo</InputLabel>
-            <Select
-              value={formData.type}
-              label="Tipo"
-              onChange={(e) => handleChange('type', e.target.value)}
-            >
-              <MenuItem value={CategoryType.EXPENSE}>Despesa</MenuItem>
-              <MenuItem value={CategoryType.INCOME}>Receita</MenuItem>
-            </Select>
-          </FormControl>
+          <Box position="relative">
+            <FormControl fullWidth>
+              <InputLabel>Tipo</InputLabel>
+              <Select
+                value={formData.type}
+                label="Tipo"
+                onChange={(e) => handleChange('type', e.target.value)}
+              >
+                <MenuItem value={CategoryType.EXPENSE}>Despesa</MenuItem>
+                <MenuItem value={CategoryType.INCOME}>Receita</MenuItem>
+              </Select>
+            </FormControl>
+            <Tooltip title="Selecione se esta categoria será usada para despesas (saídas de dinheiro) ou receitas (entradas de dinheiro).">
+              <IconButton 
+                size="small" 
+                sx={{ position: 'absolute', top: 12, right: -8 }}
+              >
+                <HelpOutlineIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Ícone</InputLabel>
-            <Select
-              value={formData.icon}
-              label="Ícone"
-              onChange={(e) => handleChange('icon', e.target.value)}
-            >
+          <Box position="relative">
+            <FormControl fullWidth>
+              <InputLabel>Ícone</InputLabel>
+              <Select
+                value={formData.icon}
+                label="Ícone"
+                onChange={(e) => handleChange('icon', e.target.value)}
+              >
               {iconOptions.map((icon) => {
                 const IconComponent = icon.icon;
                 return (
@@ -218,16 +252,18 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
               })}
             </Select>
           </FormControl>
+          </Box>
         </Grid>
 
         <Grid item xs={12}>
-          <FormControl fullWidth error={!!errors.color}>
-            <InputLabel>Cor</InputLabel>
-            <Select
-              value={formData.color}
-              label="Cor"
-              onChange={(e) => handleChange('color', e.target.value)}
-            >
+          <Box position="relative">
+            <FormControl fullWidth error={!!errors.color}>
+              <InputLabel>Cor</InputLabel>
+              <Select
+                value={formData.color}
+                label="Cor"
+                onChange={(e) => handleChange('color', e.target.value)}
+              >
               {colorOptions.map((color) => (
                 <MenuItem key={color.value} value={color.value}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -248,6 +284,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSubmit, onCance
             </Select>
             {errors.color && <FormHelperText>{errors.color}</FormHelperText>}
           </FormControl>
+          </Box>
         </Grid>
       </Grid>
 
