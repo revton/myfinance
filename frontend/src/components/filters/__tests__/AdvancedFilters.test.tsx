@@ -7,12 +7,20 @@ import AdvancedFilters from '../AdvancedFilters';
 import { vi } from 'vitest';
 import { useCategories } from '../../../contexts/CategoryContext';
 
-// Mock @mui/icons-material
+// Mock MUI icons to prevent EMFILE errors
 vi.mock('@mui/icons-material', () => ({
-  FilterList: () => <div data-testid="filter-list-icon" />,
-  Clear: () => <div data-testid="clear-icon" />,
-  Save: () => <div data-testid="save-icon" />,
-  ExpandMore: () => <div data-testid="expand-more-icon" />,
+  FilterList: () => <div data-testid="filter-list">FilterList</div>,
+  Clear: () => <div data-testid="clear">Clear</div>,
+  CalendarToday: () => <div data-testid="calendar-today">CalendarToday</div>,
+  Category: () => <div data-testid="category">Category</div>,
+  AttachMoney: () => <div data-testid="attach-money">AttachMoney</div>,
+  CheckCircle: () => <div data-testid="check-circle">CheckCircle</div>,
+  RadioButtonUnchecked: () => <div data-testid="radio-button-unchecked">RadioButtonUnchecked</div>,
+  Note: () => <div data-testid="note">Note</div>,
+  Label: () => <div data-testid="label">Label</div>,
+  ExpandMore: () => <div data-testid="expand-more">ExpandMore</div>,
+  Save: () => <div data-testid="save">Save</div>,
+  Cancel: () => <div data-testid="cancel">Cancel</div>,
 }));
 
 // Mock filter components

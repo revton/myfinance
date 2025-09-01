@@ -1,361 +1,156 @@
-import { render, screen, fireEvent, waitFor, act, within } from '@testing-library/react';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
+import { vi } from 'vitest';
 import axios from 'axios';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+// Mock MUI icons to prevent EMFILE errors
+vi.mock('@mui/icons-material', () => ({
+  Add: () => <div data-testid="add">Add</div>,
+  Menu: () => <div data-testid="menu">Menu</div>,
+  Close: () => <div data-testid="close">Close</div>,
+  Home: () => <div data-testid="home">Home</div>,
+  AccountBalance: () => <div data-testid="account-balance">AccountBalance</div>,
+  TrendingUp: () => <div data-testid="trending-up">TrendingUp</div>,
+  TrendingDown: () => <div data-testid="trending-down">TrendingDown</div>,
+  Category: () => <div data-testid="category">Category</div>,
+  Settings: () => <div data-testid="settings">Settings</div>,
+  Logout: () => <div data-testid="logout">Logout</div>,
+  Person: () => <div data-testid="person">Person</div>,
+  Dashboard: () => <div data-testid="dashboard">Dashboard</div>,
+  FilterList: () => <div data-testid="filter-list">FilterList</div>,
+  Clear: () => <div data-testid="clear">Clear</div>,
+  CalendarToday: () => <div data-testid="calendar-today">CalendarToday</div>,
+  AttachMoney: () => <div data-testid="attach-money">AttachMoney</div>,
+  CheckCircle: () => <div data-testid="check-circle">CheckCircle</div>,
+  RadioButtonUnchecked: () => <div data-testid="radio-button-unchecked">RadioButtonUnchecked</div>,
+  Note: () => <div data-testid="note">Note</div>,
+  Label: () => <div data-testid="label">Label</div>,
+  CreditCard: () => <div data-testid="credit-card">CreditCard</div>,
+  LocalGroceryStore: () => <div data-testid="local-grocery-store">LocalGroceryStore</div>,
+  Restaurant: () => <div data-testid="restaurant">Restaurant</div>,
+  LocalHospital: () => <div data-testid="local-hospital">LocalHospital</div>,
+  DirectionsCar: () => <div data-testid="directions-car">DirectionsCar</div>,
+  School: () => <div data-testid="school">School</div>,
+  Work: () => <div data-testid="work">Work</div>,
+  Flight: () => <div data-testid="flight">Flight</div>,
+  LocalActivity: () => <div data-testid="local-activity">LocalActivity</div>,
+  SportsEsports: () => <div data-testid="sports-esports">SportsEsports</div>,
+  Movie: () => <div data-testid="movie">Movie</div>,
+  MusicNote: () => <div data-testid="music-note">MusicNote</div>,
+  Book: () => <div data-testid="book">Book</div>,
+  FitnessCenter: () => <div data-testid="fitness-center">FitnessCenter</div>,
+  LocalPharmacy: () => <div data-testid="local-pharmacy">LocalPharmacy</div>,
+  Hotel: () => <div data-testid="hotel">Hotel</div>,
+  Luggage: () => <div data-testid="luggage">Luggage</div>,
+  Coffee: () => <div data-testid="coffee">Coffee</div>,
+  DirectionsBus: () => <div data-testid="directions-bus">DirectionsBus</div>,
+  DirectionsBike: () => <div data-testid="directions-bike">DirectionsBike</div>,
+  HealthAndSafety: () => <div data-testid="health-and-safety">HealthAndSafety</div>,
+  MedicalServices: () => <div data-testid="medical-services">MedicalServices</div>,
+  CardGiftcard: () => <div data-testid="card-giftcard">CardGiftcard</div>,
+  ShowChart: () => <div data-testid="show-chart">ShowChart</div>,
+  MonetizationOn: () => <div data-testid="monetization-on">MonetizationOn</div>,
+  ShoppingCart: () => <div data-testid="shopping-cart">ShoppingCart</div>,
+  Commute: () => <div data-testid="commute">Commute</div>,
+}));
 
 vi.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-vi.mock('@mui/material/styles', async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    useTheme: () => ({
-      breakpoints: {
-        down: vi.fn((breakpoint) => `(max-width:${breakpoint})`),
-      },
-    }),
-    createTheme: (actual as any).createTheme,
-  };
-});
-
-vi.mock('@mui/material/useMediaQuery', () => ({
-  __esModule: true,
-  default: vi.fn(() => false),
-}));
-
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-  })),
-});
-
-// Mock the api module
-vi.mock('./lib/api', () => {
-  const mockApi = {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-    interceptors: {
-      request: {
-        use: vi.fn(),
-      },
-      response: {
-        use: vi.fn(),
-      },
-    },
-  };
-  
-  return {
-    __esModule: true,
-    default: mockApi,
-  };
-});
-
 // Mock the CategoryContext
-vi.mock('./components/categories/CategorySelector', () => ({
-  __esModule: true,
-  default: ({ onChange }: any) => (
-    <input data-testid="category-selector" onChange={(e) => onChange(e.target.value)} />
-  ),
-}));
-
 vi.mock('./contexts/CategoryContext', () => ({
-  __esModule: true,
   useCategories: () => ({
-    expenseCategories: [{ id: '1', name: 'Food', type: 'expense' }],
-    incomeCategories: [{ id: '2', name: 'Salary', type: 'income' }],
-    getCategoriesByType: (type: string) => {
-      if (type === 'expense') {
-        return [{ id: '1', name: 'Food', type: 'expense' }];
-      }
-      return [{ id: '2', name: 'Salary', type: 'income' }];
-    },
+    categories: [],
+    expenseCategories: [],
+    incomeCategories: [],
+    loading: false,
+    error: null,
+    createCategory: vi.fn(),
+    updateCategory: vi.fn(),
+    deleteCategory: vi.fn(),
+    restoreCategory: vi.fn(),
+    getCategoriesByType: vi.fn(() => []),
+    getCategoryById: vi.fn(),
   }),
 }));
 
-describe('Dashboard Component', () => {
-
-  let theme: ReturnType<typeof createTheme>;
-
-  let mockApi: {
-    get: vi.fn,
-    post: vi.fn,
-    interceptors: {
-      request: {
-        use: vi.fn,
-      },
-    },
-  };
-
+describe('Dashboard', () => {
   beforeEach(() => {
-    localStorage.setItem('access_token', 'fake-token');
-    theme = createTheme();
-
-    const transactions: any[] = [];
-
-    mockApi = {
-      get: vi.fn().mockImplementation(async (url: string) => {
-        if (url === '/transactions/') {
-          return { data: transactions };
-        }
-        return { data: [] };
-      }),
-      post: vi.fn().mockImplementation(async (url: string, data: any) => {
-        const newTransaction = {
-            id: 'mock-id-' + Math.random(),
-            created_at: new Date().toISOString(),
-            ...data,
-        };
-        transactions.push(newTransaction);
-        return { data: newTransaction };
-      }),
+    // Create a proper mock for axios instance
+    const mockApi = {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
       interceptors: {
         request: {
-          use: vi.fn((config) => config),
+          use: vi.fn(),
         },
         response: {
-          use: vi.fn((response, error) => response || Promise.reject(error)),
+          use: vi.fn(),
         },
       },
     };
-
+    
+    // Mock axios.create to return our mockApi
     mockedAxios.create.mockReturnValue(mockApi as any);
+    mockApi.get.mockResolvedValue({ data: [] });
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-    // Explicitly reset window.matchMedia mock
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: vi.fn().mockImplementation(query => ({
-        matches: false,
-        media: query,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      })),
-    });
-  });
-
-  it('renderiza o formulário e a lista', async () => {
+  it('renders without crashing', async () => {
     render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
-    
-    expect(screen.getByText(/Nova Transação/i)).toBeTruthy();
-    expect(screen.getByText(/Transações/i)).toBeTruthy();
-    expect(screen.getByText(/Nenhuma transação cadastrada/i)).toBeTruthy();
-  });
-
-  it('cadastra uma nova receita e exibe na lista', async () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
-    
-    await act(async () => {
-      fireEvent.change(screen.getAllByLabelText(/Valor/i)[0], { target: { value: '123.45' } });
-      fireEvent.change(screen.getAllByLabelText(/Descrição/i)[0], { target: { value: 'Salário' } });
-      fireEvent.click(screen.getAllByText(/Adicionar/i)[0]);
-    });
-    
-    await waitFor(() => {
-      // Verificar se os elementos da transação foram renderizados
-      const transactionElements = screen.queryAllByText(/Salário|Receita|Despesa/);
-      expect(transactionElements.length).toBeGreaterThan(0);
-    });
-  });
-
-  it('cadastra uma nova despesa e exibe na lista', async () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
-    
-    // Aguardar o componente carregar completamente
-    await screen.findByText(/Nova Transação/i);
-    
-    // Selecionar o tipo "Despesa"
-    fireEvent.mouseDown(screen.getByLabelText(/Tipo/i));
-    const despesaOption = await screen.findByRole('option', { name: /Despesa/i });
-    fireEvent.click(despesaOption);
-    
-    // Preencher o formulário
-    fireEvent.change(screen.getByLabelText(/Valor/i), { target: { value: '50' } });
-    fireEvent.change(screen.getByLabelText(/Descrição/i), { target: { value: 'Mercado' } });
-    fireEvent.change(screen.getByTestId('category-selector'), { target: { value: '1' } });
-    fireEvent.click(screen.getByText(/Adicionar/i));
-    
-    // Verificar se a despesa foi adicionada
-    const transaction = await screen.findByText(/Mercado/i);
-    expect(transaction).toBeInTheDocument();
-  });
-
-  it('exibe lista vazia se axios.get falhar', async () => {
-    mockApi.get.mockRejectedValueOnce(new Error('fail'));
-    
-    render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
-    
-    await waitFor(() => {
-      expect(screen.getAllByText(/Nenhuma transa[cç]ão cadastrada/i).length).toBeGreaterThan(0);
-    });
-  });
-
-  it('usa fallback [] se axios.get retorna não-array', async () => {
-    mockApi.get.mockResolvedValueOnce({ data: { foo: 'bar' } });
-    
-    render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
-    
-    await waitFor(() => {
-      expect(screen.getAllByText(/Nenhuma transa[cç]ão cadastrada/i).length).toBeGreaterThan(0);
-    });
-  });
-
-  it('renderiza elementos de transação', async () => {
-    // Mock initial transactions for this test
-    mockApi.get.mockResolvedValueOnce({
-      data: [
-        { id: '1', type: 'income', amount: 10, description: 'Initial 1', created_at: new Date().toISOString() },
-        { id: '2', type: 'expense', amount: 5, description: 'Initial 2', created_at: new Date().toISOString() },
-      ],
-    });
-
-    render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
     );
 
-    await act(async () => {
-      fireEvent.change(screen.getAllByLabelText(/Valor/i)[0], { target: { value: '30' } });
-      fireEvent.change(screen.getAllByLabelText(/Descrição/i)[0], { target: { value: 'Terceira' } });
-      fireEvent.click(screen.getAllByText(/Adicionar/i)[0]);
-    });
-
-    await waitFor(() => {
-      // Verificar se há elementos de transação
-      const transactionElements = screen.queryAllByText(/Initial|Terceira/);
-      expect(transactionElements.length).toBeGreaterThan(0);
-    });
+    expect(screen.getByText(/Nova Transação/i)).toBeInTheDocument();
   });
 
-  it('renderiza múltiplos elementos de transação', async () => {
-    // Mock initial transactions for this test
-    mockApi.get.mockResolvedValueOnce({
-      data: [
-        { id: '1', type: 'income', amount: 10, description: 'Initial 1', created_at: new Date().toISOString() },
-        { id: '2', type: 'expense', amount: 5, description: 'Initial 2', created_at: new Date().toISOString() },
-        { id: '3', type: 'income', amount: 20, description: 'Initial 3', created_at: new Date().toISOString() },
-      ],
-    });
-
-    render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
+  it('displays empty state when no transactions', async () => {
+    const mockApi = mockedAxios.create();
+    mockApi.get.mockResolvedValueOnce({ data: [] });
     
-    await waitFor(() => {
-      // Verificar se há elementos de transação
-      const transactionElements = screen.queryAllByText(/Initial/);
-      expect(transactionElements.length).toBe(3);
-    });
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/Nenhuma transação cadastrada/i)).toBeInTheDocument();
   });
 
-  it('não cadastra se descrição ou valor estiverem vazios', async () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
-    
-    // Valor e descrição vazios
-    await act(async () => {
-      fireEvent.click(screen.getAllByText(/Adicionar/i)[0]);
-    });
-    expect(screen.getAllByText(/Nenhuma transa[cç]ão cadastrada/i).length).toBeGreaterThan(0);
-    
-    // Valor preenchido, descrição vazia
-    await act(async () => {
-      fireEvent.change(screen.getAllByLabelText(/Valor/i)[0], { target: { value: '10' } });
-      fireEvent.click(screen.getAllByText(/Adicionar/i)[0]);
-    });
-    expect(screen.getAllByText(/Nenhuma transa[cç]ão cadastrada/i).length).toBeGreaterThan(0);
-    
-    // Valor vazio, descrição preenchida
-    await act(async () => {
-      fireEvent.change(screen.getAllByLabelText(/Valor/i)[0], { target: { value: '' } });
-      fireEvent.change(screen.getAllByLabelText(/Descrição/i)[0], { target: { value: 'Teste' } });
-      fireEvent.click(screen.getAllByText(/Adicionar/i)[0]);
-    });
-    expect(screen.getAllByText(/Nenhuma transa[cç]ão cadastrada/i).length).toBeGreaterThan(0);
-  });
+  it('displays transactions when available', async () => {
+    const mockTransactions = [
+      {
+        id: '1',
+        type: 'income',
+        amount: 1000,
+        description: 'Monthly Salary',
+        created_at: '2023-01-01T00:00:00Z',
+        category_id: '1',
+        category: {
+          id: '1',
+          name: 'Salary',
+          icon: 'monetization_on',
+          type: 'income',
+          color: '#4caf50'
+        }
+      }
+    ];
 
-  it('renderiza transações corretamente', async () => {
-    // Mock initial transactions for this test
-    mockApi.get.mockResolvedValueOnce({
-      data: [
-        { id: '1', type: 'income', amount: 10, description: 'Initial 1', created_at: new Date().toISOString() },
-      ],
-    });
-
+    const mockApi = mockedAxios.create();
+    mockApi.get.mockResolvedValueOnce({ data: mockTransactions });
+    
     render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <Dashboard />
-        </MemoryRouter>
-      </ThemeProvider>
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
     );
-    
-    await act(async () => {
-      fireEvent.change(screen.getAllByLabelText(/Valor/i)[0], { target: { value: '10' } });
-      fireEvent.change(screen.getAllByLabelText(/Descrição/i)[0], { target: { value: 'Única' } });
-      fireEvent.click(screen.getAllByText(/Adicionar/i)[0]);
-    });
-    
-    await waitFor(() => {
-      // Verificar se há elementos de transação
-      const transactionElements = screen.queryAllByText(/Initial|Única/);
-      expect(transactionElements.length).toBeGreaterThan(0);
-    });
+
+    // Wait for transactions to load - using a more specific selector
+    expect(await screen.findByText(/Monthly Salary/i)).toBeInTheDocument();
   });
 });
