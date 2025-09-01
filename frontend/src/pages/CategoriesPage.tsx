@@ -444,4 +444,3 @@ const VirtualizedDeletedCategoryGrid: React.FC<VirtualizedDeletedCategoryGridPro
 };
 
 export default CategoriesPage;
-
