@@ -36,10 +36,22 @@ A tela principal permite que você adicione novas receitas e despesas, visualize
 
 > **Observação:** Atualmente, os dados são armazenados de forma temporária. Se o sistema for reiniciado, os dados serão perdidos. Estamos trabalhando para implementar a persistência de dados em breve.
 
-## Guia Detalhado de Autenticação
+## Navegação
 
-Para informações detalhadas sobre o processo de criação de conta, login, recuperação de senha e gerenciamento de perfil, consulte nosso guia completo:
+O MyFinance possui uma interface intuitiva com navegação simples:
 
-- **[Guia de Autenticação do Usuário](autenticacao-guia-usuario.md)**
+1. **Menu Principal**: Acesse diferentes seções do aplicativo através do menu superior
+2. **Botões de Ação**: Botões claramente identificados para ações importantes
+3. **Links de Navegação**: Links para páginas relacionadas no rodapé
 
-Este guia contém tudo o que você precisa saber para gerenciar sua conta com segurança.
+![Navegação do Sistema](screenshot_05_main_application_screen.png)
+
+## Guias Detalhados
+
+Para informações detalhadas sobre como usar o MyFinance, consulte nossos guias completos:
+
+- **[Guia de Autenticação do Usuário](autenticacao-guia-usuario.md)** - Criação de conta, login, recuperação de senha e gerenciamento de perfil
+- **[Guia de Gerenciamento de Transações](transacoes-guia-usuario.md)** - Como adicionar, editar e gerenciar suas transações financeiras
+- **[Guia de Gerenciamento de Categorias](categorias-guia-usuario.md)** - Como criar e organizar categorias para suas transações
+
+Estes guias contêm tudo o que você precisa saber para usar o MyFinance de forma eficiente.

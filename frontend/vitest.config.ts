@@ -23,5 +23,10 @@ export default defineConfig({
     transformMode: {
       web: [/\.[jt]sx?$/],
     },
+    threads: false,
+    testTimeout: 10000,
+    hookTimeout: 15000,
+    // Limit file watchers to avoid EMFILE errors on Windows
+    fileParallelism: false,
   },
 }); 

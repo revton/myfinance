@@ -9,12 +9,14 @@ import {
   TextField,
   Button,
   Chip,
-  Typography
+  Typography,
+  Tooltip
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { ptBR } from 'date-fns/locale';
+import { CalendarMonth, CalendarToday, DateRange } from '@mui/icons-material';
 
 interface DateRangeFilterProps {
   onFilterChange: (filters: DateRangeFilters) => void;
@@ -121,7 +123,10 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ onFilterChange, initi
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h6">Filtro por Período</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <DateRange color="primary" />
+          <Typography variant="h6">Filtro por Período</Typography>
+        </Box>
         
         <FormControl fullWidth>
           <InputLabel>Período</InputLabel>
@@ -129,50 +134,118 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ onFilterChange, initi
             value={filters.period}
             label="Período"
             onChange={(e) => handlePeriodChange(e.target.value)}
+            startAdornment={filters.period === 'custom' ? <DateRange color="action" sx={{ ml: 1 }} /> : <CalendarMonth color="action" sx={{ ml: 1 }} />}
           >
-            <MenuItem value="today">Hoje</MenuItem>
-            <MenuItem value="week">Esta Semana</MenuItem>
-            <MenuItem value="month">Este Mês</MenuItem>
-            <MenuItem value="quarter">Este Trimestre</MenuItem>
-            <MenuItem value="year">Este Ano</MenuItem>
-            <MenuItem value="custom">Personalizado</MenuItem>
+            <MenuItem value="today">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarToday fontSize="small" />
+                <span>Hoje</span>
+              </Box>
+            </MenuItem>
+            <MenuItem value="week">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarMonth fontSize="small" />
+                <span>Esta Semana</span>
+              </Box>
+            </MenuItem>
+            <MenuItem value="month">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarMonth fontSize="small" />
+                <span>Este Mês</span>
+              </Box>
+            </MenuItem>
+            <MenuItem value="quarter">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarMonth fontSize="small" />
+                <span>Este Trimestre</span>
+              </Box>
+            </MenuItem>
+            <MenuItem value="year">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarMonth fontSize="small" />
+                <span>Este Ano</span>
+              </Box>
+            </MenuItem>
+            <MenuItem value="custom">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <DateRange fontSize="small" />
+                <span>Personalizado</span>
+              </Box>
+            </MenuItem>
           </Select>
         </FormControl>
 
         {filters.period === 'custom' && (
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <DatePicker
-              label="Data Inicial"
-              value={filters.startDate || null}
-              onChange={(date) => handleCustomDateChange('startDate', date)}
-              renderInput={(params: any) => <TextField {...params} fullWidth />}
-            />
-            <DatePicker
-              label="Data Final"
-              value={filters.endDate || null}
-              onChange={(date) => handleCustomDateChange('endDate', date)}
-              renderInput={(params: any) => <TextField {...params} fullWidth />}
-            />
+          <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Tooltip title="Selecione a data inicial do período" arrow placement="top">
+              <Box sx={{ width: '100%' }}>
+                <DatePicker
+                  label="Data Inicial"
+                  value={filters.startDate || null}
+                  onChange={(date) => handleCustomDateChange('startDate', date)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      InputProps: {
+                        startAdornment: (
+                          <CalendarToday color="action" sx={{ mr: 1 }} />
+                        ),
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Tooltip>
+            <Tooltip title="Selecione a data final do período" arrow placement="top">
+              <Box sx={{ width: '100%' }}>
+                <DatePicker
+                  label="Data Final"
+                  value={filters.endDate || null}
+                  onChange={(date) => handleCustomDateChange('endDate', date)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      InputProps: {
+                        startAdornment: (
+                          <CalendarToday color="action" sx={{ mr: 1 }} />
+                        ),
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Tooltip>
           </Box>
         )}
 
         {(filters.startDate || filters.endDate) && (
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ width: '100%', mb: 0.5 }}>
+              Período selecionado:
+            </Typography>
             {filters.startDate && (
-              <Chip
-                label={`De: ${filters.startDate.toLocaleDateString('pt-BR')}`}
-                onDelete={() => handleCustomDateChange('startDate', null)}
-                color="primary"
-                variant="outlined"
-              />
+              <Tooltip title="Remover data inicial" arrow>
+                <Chip
+                  icon={<CalendarToday fontSize="small" />}
+                  label={`De: ${filters.startDate.toLocaleDateString('pt-BR')}`}
+                  onDelete={() => handleCustomDateChange('startDate', null)}
+                  color="primary"
+                  variant="outlined"
+                  sx={{ borderRadius: 1.5 }}
+                />
+              </Tooltip>
             )}
             {filters.endDate && (
-              <Chip
-                label={`Até: ${filters.endDate.toLocaleDateString('pt-BR')}`}
-                onDelete={() => handleCustomDateChange('endDate', null)}
-                color="primary"
-                variant="outlined"
-              />
+              <Tooltip title="Remover data final" arrow>
+                <Chip
+                  icon={<CalendarToday fontSize="small" />}
+                  label={`Até: ${filters.endDate.toLocaleDateString('pt-BR')}`}
+                  onDelete={() => handleCustomDateChange('endDate', null)}
+                  color="primary"
+                  variant="outlined"
+                  sx={{ borderRadius: 1.5 }}
+                />
+              </Tooltip>
             )}
           </Box>
         )}

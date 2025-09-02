@@ -1,9 +1,6 @@
 // src/components/transactions/TransactionItem.tsx
 import React from 'react';
 import {
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Chip,
   Box,
@@ -57,26 +54,35 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onEdit, 
   };
 
   return (
-    <ListItem divider sx={{ display: 'flex', alignItems: 'center' }}>
-      <ListItemText
-        primary={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography component="span">{transaction.description}</Typography>
-            {transaction.category && (
-              <Chip
-                label={transaction.category.name}
-                size="small"
-                sx={{ 
-                  backgroundColor: transaction.category.color || '#e0e0e0',
-                  color: 'white',
-                  height: '20px'
-                }}
-              />
-            )}
-          </Box>
-        }
-        secondary={formatDate(transaction.created_at)}
-      />
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center',
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        width: '100%'
+      }}
+    >
+      <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography component="span">{transaction.description}</Typography>
+          {transaction.category && (
+            <Chip
+              label={transaction.category.name}
+              size="small"
+              sx={{ 
+                backgroundColor: transaction.category.color || '#e0e0e0',
+                color: 'white',
+                height: '20px'
+              }}
+            />
+          )}
+        </Box>
+        <Typography variant="body2" color="text.secondary">
+          {formatDate(transaction.created_at)}
+        </Typography>
+      </Box>
       <Box sx={{ 
         display: 'flex', 
         alignItems: 'center', 
@@ -123,7 +129,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onEdit, 
           )}
         </Box>
       </Box>
-    </ListItem>
+    </Box>
   );
 };
 

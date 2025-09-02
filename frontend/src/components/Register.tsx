@@ -10,12 +10,15 @@ import {
   CircularProgress,
   useTheme
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import { useToast } from '../hooks/useToast';
 
 const Register: React.FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const toast = useToast();
   
   const [formData, setFormData] = useState({
     full_name: '',
@@ -54,9 +57,11 @@ const Register: React.FC = () => {
         text: 'Cadastro realizado com sucesso! Você será redirecionado para o login.'
       });
 
+      toast.success('Cadastro realizado com sucesso!');
+
       setTimeout(() => {
-        window.location.href = '/auth/login';
-      }, 3000);
+        navigate('/auth/login');
+      }, 2000);
 
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
@@ -71,6 +76,8 @@ const Register: React.FC = () => {
         type: 'error',
         text: errorMessage
       });
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Paper,
@@ -11,12 +11,15 @@ import {
   useTheme,
   Link as MuiLink
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import { useToast } from '../hooks/useToast';
 
 const Login: React.FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const toast = useToast();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -61,11 +64,13 @@ const Login: React.FC = () => {
         type: 'success',
         text: 'Login realizado com sucesso! Redirecionando...'
       });
+      
+      toast.success('Login realizado com sucesso!');
 
-      // Redirecionar para dashboard após 2 segundos
+      // Redirecionar para dashboard após 1 segundo
       setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 2000);
+        navigate('/dashboard');
+      }, 1000);
 
     } catch (error: any) {
       console.error('Erro no login:', error);
@@ -84,6 +89,8 @@ const Login: React.FC = () => {
         type: 'error',
         text: errorMessage
       });
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -180,4 +187,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

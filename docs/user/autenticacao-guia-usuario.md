@@ -271,4 +271,4 @@ Quando pedir ajuda, forneça:
 
 ---
 
-**🎯 Lembre-se**: Sua segurança é nossa prioridade. Se você suspeitar de qualquer atividade suspeita em sua conta, entre em contato conosco imediatamente. 
+**🎯 Lembre-se**: Sua segurança é nossa prioridade. Se você suspeitar de qualquer atividade suspeita em sua conta, entre em contato conosco imediatamente.
