@@ -13,7 +13,7 @@ import {
   DialogActions,
   Button
 } from '@mui/material';
-import { FixedSizeList as List } from 'react-window';
+import { List as ListComponent } from 'react-window';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAdvancedFilters } from '../../hooks/useAdvancedFilters';
@@ -203,7 +203,7 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
         </Alert>
       ) : (
         <Box sx={{ height: 400, width: '100%' }}>
-          <List
+          <ListComponent
             height={400}
             width="100%"
             itemCount={filteredTransactions.length}
@@ -220,7 +220,7 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
                 />
               </div>
             )}
-          </List>
+          </ListComponent>
         </Box>
       )}
 

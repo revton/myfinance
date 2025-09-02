@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FixedSizeGrid } from 'react-window';
+import { Grid as GridComponent } from 'react-window';
 import {
   Container,
   Paper,
@@ -316,17 +316,19 @@ const VirtualizedCategoryGrid: React.FC<VirtualizedCategoryGridProps> = ({ categ
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       {dimensions.width > 0 && (
-        <FixedSizeGrid
+        <GridComponent
+          cellComponent={Cell}
+          cellProps={{}}
           columnCount={columnCount}
           columnWidth={cellWidth}
+          defaultHeight={dimensions.height}
+          defaultWidth={dimensions.width}
           height={dimensions.height}
           rowCount={rowCount}
           rowHeight={cellHeight}
           width={dimensions.width}
-          overscanRowCount={2}
-        >
-          {Cell}
-        </FixedSizeGrid>
+          overscanCount={2}
+        />
       )}
     </div>
   );
@@ -427,17 +429,19 @@ const VirtualizedDeletedCategoryGrid: React.FC<VirtualizedDeletedCategoryGridPro
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       {dimensions.width > 0 && (
-        <FixedSizeGrid
+        <GridComponent
+          cellComponent={Cell}
+          cellProps={{}}
           columnCount={columnCount}
           columnWidth={cellWidth}
+          defaultHeight={dimensions.height}
+          defaultWidth={dimensions.width}
           height={dimensions.height}
           rowCount={rowCount}
           rowHeight={cellHeight}
           width={dimensions.width}
-          overscanRowCount={2}
-        >
-          {Cell}
-        </FixedSizeGrid>
+          overscanCount={2}
+        />
       )}
     </div>
   );
