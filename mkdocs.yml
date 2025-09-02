@@ -60,7 +60,11 @@ nav:
     - dev/env-setup.md
     - dev/supabase-environments.md
     - dev/migration-sqlalchemy-summary.md
-  - Usuário: user/index.md
+  - Usuário: 
+      - user/index.md
+      - Autenticação: user/autenticacao-guia-usuario.md
+      - Transações: user/transacoes-guia-usuario.md
+      - Categorias: user/categorias-guia-usuario.md
   - Deploy: deploy.md
   - Testes: local-testing.md
 

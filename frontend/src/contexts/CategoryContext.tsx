@@ -1,7 +1,7 @@
-// src/contexts/CategoryContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../lib/api';
 import { API_BASE_URL, APP_CONFIG } from '../config';
+import * as Sentry from '@sentry/react';
 
 interface Category {
   id: string;
@@ -44,6 +44,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setCategories(response.data);
     } catch (err) {
       console.error('Error fetching categories:', err);
+      Sentry.captureException(err);
       setError('Failed to load categories.');
       setCategories([]);
     } finally {
@@ -61,6 +62,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fetchCategories(); // Refresh list after creation
     } catch (err: any) {
       console.error('Error creating category:', err);
+      Sentry.captureException(err);
       throw new Error(err.response?.data?.detail || 'Failed to create category.');
     }
   };
@@ -71,8 +73,9 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fetchCategories(); // Refresh list after update
     } catch (err: any) {
       console.error('Error updating category:', err);
+      Sentry.captureException(err);
       throw new Error(err.response?.data?.detail || 'Failed to update category.');
-    }c
+    }
   };
 
   const deleteCategory = async (id: string) => {
@@ -81,6 +84,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fetchCategories(); // Refresh list after deletion
     } catch (err: any) {
       console.error('Error deleting category:', err);
+      Sentry.captureException(err);
       throw new Error(err.response?.data?.detail || 'Failed to delete category.');
     }
   };
@@ -91,6 +95,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       fetchCategories(); // Refresh list after restore
     } catch (err: any) {
       console.error('Error restoring category:', err);
+      Sentry.captureException(err);
       throw new Error(err.response?.data?.detail || 'Failed to restore category.');
     }
   };

@@ -23,16 +23,24 @@ if (import.meta.env.VITE_SENTRY_DSN_FRONTEND) {
     environment: import.meta.env.VITE_ENVIRONMENT as string,
   });
   console.log(`Sentry inicializado com sucesso no ambiente: ${import.meta.env.VITE_ENVIRONMENT}`);
+
+  // Global error handler for unhandled promise rejections
+  window.addEventListener('unhandledrejection', event => {
+    Sentry.captureException(event.reason);
+  });
+
 } else {
   console.warn('Variável VITE_SENTRY_DSN_FRONTEND não configurada. Monitoramento de erros desativado.');
 }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <TransactionProvider>
-      <CategoryProvider>
-        <App />
-      </CategoryProvider>
-    </TransactionProvider>
+    <Sentry.ErrorBoundary fallback={"<p>An error has occurred</p>"}>
+      <TransactionProvider>
+        <CategoryProvider>
+          <App />
+        </CategoryProvider>
+      </TransactionProvider>
+    </Sentry.ErrorBoundary>
   </StrictMode>,
 )

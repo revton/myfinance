@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Grid as GridComponent } from 'react-window';
 import {
   Container,
   Paper,
@@ -31,10 +32,12 @@ import {
   RestoreFromTrash as RestoreIcon
 } from '@mui/icons-material';
 import { useCategories } from '../contexts/CategoryContext';
+import { useToast } from '../hooks/useToast';
 import CategoryForm from '../components/categories/CategoryForm';
 import CategoryCard from '../components/categories/CategoryCard';
 import CategoryStats from '../components/categories/CategoryStats';
 import { getIconComponent } from '../utils/iconUtils';
+import * as Sentry from '@sentry/react';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -62,6 +65,7 @@ const CategoriesPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [showDeleted, setShowDeleted] = useState(false);
+  const toast = useToast();
   
   const { 
     categories, 
@@ -92,13 +96,16 @@ const CategoriesPage: React.FC = () => {
     try {
       if (editingCategory) {
         await updateCategory(editingCategory.id, categoryData);
+        toast.success('Categoria atualizada com sucesso!');
       } else {
         await createCategory(categoryData);
+        toast.success('Categoria criada com sucesso!');
       }
       handleCloseDialog();
     } catch (error: any) {
       console.error('Erro ao salvar categoria:', error);
-      // Optionally, set a local error state to display to the user
+      Sentry.captureException(error);
+      toast.error(error.response?.data?.detail || 'Erro ao salvar categoria.');
     }
   };
 
@@ -106,9 +113,11 @@ const CategoriesPage: React.FC = () => {
     if (window.confirm('Tem certeza que deseja excluir esta categoria?')) {
       try {
         await deleteCategory(categoryId);
+        toast.success('Categoria excluída com sucesso!');
       } catch (error: any) {
         console.error('Erro ao excluir categoria:', error);
-        // Optionally, set a local error state to display to the user
+        Sentry.captureException(error);
+        toast.error(error.response?.data?.detail || 'Erro ao excluir categoria.');
       }
     }
   };
@@ -116,9 +125,11 @@ const CategoriesPage: React.FC = () => {
   const handleRestore = async (categoryId: string) => {
     try {
       await restoreCategory(categoryId);
+      toast.success('Categoria restaurada com sucesso!');
     } catch (error: any) {
       console.error('Erro ao restaurar categoria:', error);
-      // Optionally, set a local error state to display to the user
+      Sentry.captureException(error);
+      toast.error(error.response?.data?.detail || 'Erro ao restaurar categoria.');
     }
   };
 
@@ -169,49 +180,39 @@ const CategoriesPage: React.FC = () => {
           </Box>
 
           <TabPanel value={tabValue} index={0}>
-            <Grid container spacing={3}>
-              {expenseCategories.map((category) => (
-                <Grid item xs={12} sm={6} md={4} key={category.id}>
-                  <CategoryCard
-                    category={category}
-                    onEdit={() => handleOpenDialog(category)}
-                    onDelete={() => handleDelete(category.id)}
-                  />
-                </Grid>
-              ))}
-              {expenseCategories.length === 0 && (
-                <Grid item xs={12}>
-                  <Box textAlign="center" py={4}>
-                    <Typography variant="body1" color="text.secondary">
-                      Nenhuma categoria de despesa encontrada.
-                    </Typography>
-                  </Box>
-                </Grid>
-              )}
-            </Grid>
+            {expenseCategories.length === 0 ? (
+              <Box textAlign="center" py={4}>
+                <Typography variant="body1" color="text.secondary">
+                  Nenhuma categoria de despesa encontrada.
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ height: 600, width: '100%' }}>
+                <VirtualizedCategoryGrid 
+                  categories={expenseCategories} 
+                  onEdit={handleOpenDialog} 
+                  onDelete={handleDelete} 
+                />
+              </Box>
+            )}
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            <Grid container spacing={3}>
-              {incomeCategories.map((category) => (
-                <Grid item xs={12} sm={6} md={4} key={category.id}>
-                  <CategoryCard
-                    category={category}
-                    onEdit={() => handleOpenDialog(category)}
-                    onDelete={() => handleDelete(category.id)}
-                  />
-                </Grid>
-              ))}
-              {incomeCategories.length === 0 && (
-                <Grid item xs={12}>
-                  <Box textAlign="center" py={4}>
-                    <Typography variant="body1" color="text.secondary">
-                      Nenhuma categoria de receita encontrada.
-                    </Typography>
-                  </Box>
-                </Grid>
-              )}
-            </Grid>
+            {incomeCategories.length === 0 ? (
+              <Box textAlign="center" py={4}>
+                <Typography variant="body1" color="text.secondary">
+                  Nenhuma categoria de receita encontrada.
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ height: 600, width: '100%' }}>
+                <VirtualizedCategoryGrid 
+                  categories={incomeCategories} 
+                  onEdit={handleOpenDialog} 
+                  onDelete={handleDelete} 
+                />
+              </Box>
+            )}
           </TabPanel>
 
           <TabPanel value={tabValue} index={2}>
@@ -219,64 +220,20 @@ const CategoriesPage: React.FC = () => {
           </TabPanel>
 
           <TabPanel value={tabValue} index={3}>
-            <Grid container spacing={3}>
-              {deletedCategories.map((category) => {
-                const IconComponent = getIconComponent(category.icon);
-                return (
-                  <Grid item xs={12} sm={6} md={4} key={category.id}>
-                    <Card>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                          <Box
-                            sx={{
-                              width: 40,
-                              height: 40,
-                              borderRadius: '50%',
-                              backgroundColor: category.color,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              mr: 2
-                            }}
-                          >
-                            <IconComponent sx={{ color: 'white', fontSize: 24 }} /> 
-                          </Box>
-                          <Box sx={{ flexGrow: 1 }}>
-                            <Typography variant="h6">{category.name}</Typography>
-                            <Chip 
-                              label={category.type === 'expense' ? 'Despesa' : 'Receita'} 
-                              size="small" 
-                              color={category.type === 'expense' ? 'error' : 'success'}
-                            />
-                          </Box>
-                          <IconButton
-                            onClick={() => handleRestore(category.id)}
-                            color="primary"
-                            title="Restaurar categoria"
-                          >
-                            <RestoreIcon />
-                          </IconButton>
-                        </Box>
-                        {category.description && (
-                          <Typography variant="body2" color="text.secondary">
-                            {category.description}
-                          </Typography>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-              {deletedCategories.length === 0 && (
-                <Grid item xs={12}>
-                  <Box textAlign="center" py={4}>
-                    <Typography variant="body1" color="text.secondary">
-                      Nenhuma categoria excluída.
-                    </Typography>
-                  </Box>
-                </Grid>
-              )}
-            </Grid>
+            {deletedCategories.length === 0 ? (
+              <Box textAlign="center" py={4}>
+                <Typography variant="body1" color="text.secondary">
+                  Nenhuma categoria excluída.
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ height: 600, width: '100%' }}>
+                <VirtualizedDeletedCategoryGrid 
+                  categories={deletedCategories} 
+                  onRestore={handleRestore} 
+                />
+              </Box>
+            )}
           </TabPanel>
         </Paper>
       </Box>
@@ -297,5 +254,197 @@ const CategoriesPage: React.FC = () => {
   );
 };
 
-export default CategoriesPage;
 
+
+// Componente para renderizar categorias em uma grade virtualizada
+interface VirtualizedCategoryGridProps {
+  categories: any[];
+  onEdit: (category: any) => void;
+  onDelete: (categoryId: string) => void;
+}
+
+const VirtualizedCategoryGrid: React.FC<VirtualizedCategoryGridProps> = ({ categories, onEdit, onDelete }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 600 });
+  
+  // Número de colunas com base na largura disponível
+  const columnCount = Math.max(1, Math.floor(dimensions.width / 350));
+  const rowCount = Math.ceil(categories.length / columnCount);
+  
+  // Tamanho de cada célula
+  const cellWidth = dimensions.width / columnCount;
+  const cellHeight = 250; // Altura estimada para cada card de categoria
+  
+  useEffect(() => {
+    if (containerRef.current) {
+      setDimensions({
+        width: containerRef.current.offsetWidth,
+        height: 600
+      });
+    }
+    
+    const handleResize = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.offsetWidth,
+          height: 600
+        });
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  const Cell = ({ columnIndex, rowIndex, style }: { columnIndex: number, rowIndex: number, style: React.CSSProperties }) => {
+    const index = rowIndex * columnCount + columnIndex;
+    if (index >= categories.length) return null;
+    
+    const category = categories[index];
+    
+    return (
+      <div style={{ ...style, padding: 8 }}>
+        <CategoryCard
+          category={category}
+          onEdit={() => onEdit(category)}
+          onDelete={() => onDelete(category.id)}
+        />
+      </div>
+    );
+  };
+  
+  return (
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      {dimensions.width > 0 && (
+        <GridComponent
+          cellComponent={Cell}
+          cellProps={{}}
+          columnCount={columnCount}
+          columnWidth={cellWidth}
+          defaultHeight={dimensions.height}
+          defaultWidth={dimensions.width}
+          height={dimensions.height}
+          rowCount={rowCount}
+          rowHeight={cellHeight}
+          width={dimensions.width}
+          overscanCount={2}
+        />
+      )}
+    </div>
+  );
+};
+
+// Componente para renderizar categorias excluídas em uma grade virtualizada
+interface VirtualizedDeletedCategoryGridProps {
+  categories: any[];
+  onRestore: (categoryId: string) => void;
+}
+
+const VirtualizedDeletedCategoryGrid: React.FC<VirtualizedDeletedCategoryGridProps> = ({ categories, onRestore }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 600 });
+  
+  // Número de colunas com base na largura disponível
+  const columnCount = Math.max(1, Math.floor(dimensions.width / 350));
+  const rowCount = Math.ceil(categories.length / columnCount);
+  
+  // Tamanho de cada célula
+  const cellWidth = dimensions.width / columnCount;
+  const cellHeight = 200; // Altura estimada para cada card de categoria excluída
+  
+  useEffect(() => {
+    if (containerRef.current) {
+      setDimensions({
+        width: containerRef.current.offsetWidth,
+        height: 600
+      });
+    }
+    
+    const handleResize = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.offsetWidth,
+          height: 600
+        });
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  const Cell = ({ columnIndex, rowIndex, style }: { columnIndex: number, rowIndex: number, style: React.CSSProperties }) => {
+    const index = rowIndex * columnCount + columnIndex;
+    if (index >= categories.length) return null;
+    
+    const category = categories[index];
+    const IconComponent = getIconComponent(category.icon);
+    
+    return (
+      <div style={{ ...style, padding: 8 }}>
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  backgroundColor: category.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 2
+                }}
+              >
+                <IconComponent sx={{ color: 'white', fontSize: 24 }} /> 
+              </Box>
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="h6">{category.name}</Typography>
+                <Chip 
+                  label={category.type === 'expense' ? 'Despesa' : 'Receita'} 
+                  size="small" 
+                  color={category.type === 'expense' ? 'error' : 'success'}
+                />
+              </Box>
+              <IconButton
+                onClick={() => onRestore(category.id)}
+                color="primary"
+                title="Restaurar categoria"
+              >
+                <RestoreIcon />
+              </IconButton>
+            </Box>
+            {category.description && (
+              <Typography variant="body2" color="text.secondary">
+                {category.description}
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+  
+  return (
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      {dimensions.width > 0 && (
+        <GridComponent
+          cellComponent={Cell}
+          cellProps={{}}
+          columnCount={columnCount}
+          columnWidth={cellWidth}
+          defaultHeight={dimensions.height}
+          defaultWidth={dimensions.width}
+          height={dimensions.height}
+          rowCount={rowCount}
+          rowHeight={cellHeight}
+          width={dimensions.width}
+          overscanCount={2}
+        />
+      )}
+    </div>
+  );
+};
+
+export default CategoriesPage;

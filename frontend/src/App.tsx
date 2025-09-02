@@ -3,6 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+// Contexto de notificações
+import { NotificationProvider } from './contexts/NotificationContext';
+import Toast from './components/common/Toast';
+
 // Componentes de autenticação
 import Login from './components/Login';
 import Register from './components/Register';
@@ -110,9 +114,12 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <AppRoutes />
-      </Router>
+      <NotificationProvider>
+        <Router>
+          <AppRoutes />
+          <Toast />
+        </Router>
+      </NotificationProvider>
     </ThemeProvider>
   );
 }
