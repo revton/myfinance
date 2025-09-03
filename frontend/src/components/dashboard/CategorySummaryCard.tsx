@@ -11,10 +11,12 @@ import {
   Box,
   Button 
 } from '@mui/material';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useCategories } from '../../hooks/useCategories';
 import { CategoryIcon } from '../categories/CategoryIcon';
 import { useNavigate } from 'react-router-dom';
+import AdvancedLoadingState from '../common/AdvancedLoadingState';
+import AnimatedList from '../common/AnimatedList';
 
 interface CategorySummary {
   id: string;
@@ -38,30 +40,17 @@ export const CategorySummaryCard: React.FC = () => {
     }).format(value);
   };
   
-  if (loading) {
-    return <Card><CardContent><Typography>Carregando...</Typography></CardContent></Card>;
-  }
-  
-  // If no data, show a message
-  if (categorySummary.length === 0) {
-    return (
-      <Card elevation={2}>
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6" color="text.secondary">
-              Gastos por Categoria
-            </Typography>
-            <Button size="small" onClick={() => navigate('/categories')}>
-              Ver Todas
-            </Button>
-          </Box>
-          <Typography color="text.secondary">
-            Nenhum gasto registrado ainda.
-          </Typography>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Card header content that's common across all states
+  const cardHeader = (
+    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Typography variant="h6" color="text.secondary">
+        Gastos por Categoria
+      </Typography>
+      <Button size="small" onClick={() => navigate('/categories')}>
+        Ver Todas
+      </Button>
+    </Box>
+  );
   
   const chartData = categorySummary.map((cat, index) => ({
     name: cat.name,
@@ -69,61 +58,72 @@ export const CategorySummaryCard: React.FC = () => {
     color: COLORS[index % COLORS.length]
   }));
   
+  // Content to show when data is loaded
+  const contentWithData = (
+    <>
+      <Box height={200} mb={2}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80}
+              paddingAngle={5}
+              dataKey="value"
+              nameKey="name"
+              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+              labelLine={false}
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </Box>
+      
+      <AnimatedList>
+        {categorySummary.map((category) => (
+          <ListItem key={category.id} divider>
+            <ListItemIcon>
+              <CategoryIcon icon={category.icon} color={category.color} />
+            </ListItemIcon>
+            <ListItemText primary={category.name} />
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="body2" color="text.secondary">
+                {category.percentage.toFixed(1)}%
+              </Typography>
+              <Typography variant="body2" fontWeight="bold">
+                {formatCurrency(category.amount)}
+              </Typography>
+            </Box>
+          </ListItem>
+        ))}
+      </AnimatedList>
+    </>
+  );
+  
+  // Use AdvancedLoadingState to handle loading, error, and content states
   return (
     <Card elevation={2}>
       <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" color="text.secondary">
-            Gastos por Categoria
-          </Typography>
-          <Button size="small" onClick={() => navigate('/categories')}>
-            Ver Todas
-          </Button>
-        </Box>
-        
-        <Box display="flex" gap={2}>
-          {/* Gráfico */}
-          <Box flex={1} height={200}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={40}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </Box>
-          
-          {/* Lista */}
-          <Box flex={1}>
-            <List dense>
-              {categorySummary.slice(0, 5).map((category) => (
-                <ListItem key={category.id}>
-                  <ListItemIcon>
-                    <CategoryIcon 
-                      icon={category.icon} 
-                      color={category.color} 
-                      size="small" 
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={category.name}
-                    secondary={`${category.percentage.toFixed(1)}% - ${formatCurrency(category.amount)}`}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        </Box>
+        {cardHeader}
+        <AdvancedLoadingState 
+          isLoading={loading} 
+          loadingText="Carregando dados de categorias..." 
+          showSkeleton={true}
+          height={200}
+        >
+          {categorySummary.length === 0 ? (
+            <Typography color="text.secondary">
+              Nenhum gasto registrado ainda.
+            </Typography>
+          ) : contentWithData}
+        </AdvancedLoadingState>
       </CardContent>
     </Card>
   );
