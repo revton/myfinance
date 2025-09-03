@@ -10,15 +10,19 @@ import {
   ListItemIcon,
   Chip,
   Box,
-  Button 
+  Button,
+  useTheme
 } from '@mui/material';
 import { 
   TrendingUp, 
   TrendingDown,
-  Category 
+  Category,
+  Receipt
 } from '@mui/icons-material';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useNavigate } from 'react-router-dom';
+import AdvancedLoadingState from '../common/AdvancedLoadingState';
+import AnimatedList from '../common/AnimatedList';
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -32,26 +36,44 @@ const formatDate = (date: Date) => {
 };
 
 export const RecentTransactionsCard: React.FC = () => {
-  const { recentTransactions, loading } = useTransactions();
+  const { recentTransactions, loading, refresh } = useTransactions();
   const navigate = useNavigate();
+  const theme = useTheme();
   
-  if (loading) {
-    return <Card><CardContent><Typography>Carregando...</Typography></CardContent></Card>;
-  }
-  
-  return (
-    <Card elevation={2}>
-      <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" color="text.secondary">
+  // Card header that's consistent across all states
+  const cardHeader = (
+    <Box sx={{ bgcolor: theme.palette.primary.main, py: 1, px: 2 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Box display="flex" alignItems="center" gap={1}>
+          <Receipt sx={{ color: 'white' }} />
+          <Typography variant="h6" sx={{ color: 'white' }}>
             Transações Recentes
           </Typography>
-          <Button size="small" onClick={() => navigate('/transactions')}>
-            Ver Todas
-          </Button>
         </Box>
-        
-        <List dense>
+        <Button 
+          size="small" 
+          onClick={() => navigate('/transactions')} 
+          variant="outlined"
+          sx={{ 
+            color: 'white', 
+            borderColor: 'white',
+            '&:hover': {
+              borderColor: 'rgba(255,255,255,0.8)',
+              backgroundColor: 'rgba(255,255,255,0.1)'
+            }
+          }}
+        >
+          Ver Todas
+        </Button>
+      </Box>
+    </Box>
+  );
+
+  // Transaction list content
+  const transactionsContent = (
+    <CardContent>
+      {recentTransactions && recentTransactions.length > 0 ? (
+        <AnimatedList>
           {recentTransactions.map((transaction) => (
             <ListItem key={transaction.id} divider>
               <ListItemIcon>
@@ -88,8 +110,40 @@ export const RecentTransactionsCard: React.FC = () => {
               />
             </ListItem>
           ))}
-        </List>
-      </CardContent>
+        </AnimatedList>
+      ) : (
+        <Box display="flex" flexDirection="column" alignItems="center" py={3}>
+          <Typography variant="body1" color="text.secondary" gutterBottom>
+            Nenhuma transação recente encontrada
+          </Typography>
+          <Button 
+            variant="outlined" 
+            size="small" 
+            onClick={() => navigate('/transactions/new')}
+            sx={{ mt: 1 }}
+          >
+            Adicionar Transação
+          </Button>
+        </Box>
+      )}
+    </CardContent>
+  );
+
+  return (
+    <Card elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+      {cardHeader}
+      
+      <AdvancedLoadingState
+        isLoading={loading}
+        error={!recentTransactions && !loading ? new Error("Falha ao carregar transações") : null}
+        onRetry={refresh}
+        loadingText="Carregando transações..."
+        errorText="Não foi possível carregar as transações recentes."
+        height="auto"
+        showSkeleton={true}
+      >
+        {transactionsContent}
+      </AdvancedLoadingState>
     </Card>
   );
 };
