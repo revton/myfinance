@@ -13,7 +13,7 @@ import {
   DialogActions,
   Button
 } from '@mui/material';
-import { List as ListComponent } from 'react-window';
+// Importação do react-window removida pois não é mais necessária
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTransactions } from '../../contexts/TransactionContext';
 import { useAdvancedFilters } from '../../hooks/useAdvancedFilters';
@@ -202,25 +202,15 @@ const FilteredTransactionsList: React.FC<FilteredTransactionsListProps> = ({
           Nenhuma transação encontrada com os filtros aplicados.
         </Alert>
       ) : (
-        <Box sx={{ height: 400, width: '100%' }}>
-          <ListComponent
-            height={400}
-            width="100%"
-            itemCount={filteredTransactions.length}
-            itemSize={72} /* Altura estimada de cada item de transação */
-            overscanCount={5}
-          >
-            {({ index, style }) => (
-              <div style={style}>
-                <TransactionItem
-                  key={filteredTransactions[index].id}
-                  transaction={filteredTransactions[index]}
-                  onEdit={() => navigate(`/transactions/${filteredTransactions[index].id}/edit`)}
-                  onDelete={() => handleDeleteClick(filteredTransactions[index].id)}
-                />
-              </div>
-            )}
-          </ListComponent>
+        <Box sx={{ width: '100%' }}>
+          {filteredTransactions.map((transaction) => (
+            <TransactionItem
+              key={transaction.id}
+              transaction={transaction}
+              onEdit={() => navigate(`/transactions/${transaction.id}/edit`)}
+              onDelete={() => handleDeleteClick(transaction.id)}
+            />
+          ))}
         </Box>
       )}
 
