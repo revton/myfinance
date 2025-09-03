@@ -11,6 +11,13 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 - Corrigir bugs identificados durante testes
 - Preparar a aplicação para produção
 
+### 🚀 **Alterações Implementadas Recentemente**
+- Adicionadas legendas ao gráfico de pizza no card "Gastos por Categoria"
+- Corrigido o problema da página em branco ao clicar em "VER TODAS" nas transações recentes
+- Substituída a virtualização de lista por renderização direta para melhor compatibilidade
+- Otimizada a renderização de gráficos com tooltips e formatação de valores
+- Implementado tratamento de erros em visualizações do dashboard
+
 ---
 
 ## 🎨 **Melhorias de UX/UI**
@@ -89,18 +96,20 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 - [ ] Implementar confirmação para exclusão de categorias
 
 ### **3. Transações**
-- [ ] Corrigir cálculos de saldo
-- [ ] Implementar validação de valores negativos
-- [ ] Corrigir filtros e ordenações
-- [ ] Adicionar tratamento de erros em operações CRUD
-- [ ] Implementar confirmação para exclusão de transações
+- [x] Corrigir cálculos de saldo
+- [x] Implementar validação de valores negativos
+- [x] Corrigir filtros e ordenações
+- [x] Corrigir problema da página em branco ao clicar em "VER TODAS" nas transações recentes
+- [x] Adicionar tratamento de erros em operações CRUD
+- [x] Implementar confirmação para exclusão de transações
 
 ### **4. Dashboard**
-- [ ] Corrigir cálculos de resumo financeiro
-- [ ] Implementar loading states para gráficos
+- [x] Corrigir cálculos de resumo financeiro
+- [x] Implementar loading states para gráficos
+- [x] Adicionar legendas ao gráfico de pizza no card "Gastos por Categoria"
 - [ ] Corrigir responsividade em dispositivos móveis
-- [ ] Adicionar tratamento de erros em visualizações
-- [ ] Otimizar renderização de gráficos
+- [x] Adicionar tratamento de erros em visualizações
+- [x] Otimizar renderização de gráficos
 
 ---
 
