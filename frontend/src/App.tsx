@@ -23,10 +23,6 @@ const DashboardPage = React.lazy(() => import('./pages/DashboardPage').then(modu
 const CategoriesPage = React.lazy(() => import('./pages/CategoriesPage'));
 const TransactionsPage = React.lazy(() => import('./pages/TransactionsPage'));
 const TransactionFormPage = React.lazy(() => import('./pages/TransactionFormPage'));
-const Login = React.lazy(() => import('./components/Login'));
-const Register = React.lazy(() => import('./components/Register'));
-const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
-const ResetPassword = React.lazy(() => import('./components/ResetPassword'));
 
 const theme = createTheme({
   palette: {
