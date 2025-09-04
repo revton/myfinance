@@ -23,6 +23,7 @@ const DashboardPage = React.lazy(() => import('./pages/DashboardPage').then(modu
 const CategoriesPage = React.lazy(() => import('./pages/CategoriesPage'));
 const TransactionsPage = React.lazy(() => import('./pages/TransactionsPage'));
 const TransactionFormPage = React.lazy(() => import('./pages/TransactionFormPage'));
+import PrivateRoute from './components/PrivateRoute';
 
 const theme = createTheme({
   palette: {
