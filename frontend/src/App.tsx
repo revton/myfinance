@@ -19,11 +19,14 @@ const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
 const ResetPassword = React.lazy(() => import('./components/ResetPassword'));
 
 // Componente principal da aplicação (lazy loaded)
-const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
 const CategoriesPage = React.lazy(() => import('./pages/CategoriesPage'));
 const TransactionsPage = React.lazy(() => import('./pages/TransactionsPage'));
 const TransactionFormPage = React.lazy(() => import('./pages/TransactionFormPage'));
-import PrivateRoute from './components/PrivateRoute';
+const Login = React.lazy(() => import('./components/Login'));
+const Register = React.lazy(() => import('./components/Register'));
+const ForgotPassword = React.lazy(() => import('./components/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./components/ResetPassword'));
 
 const theme = createTheme({
   palette: {
