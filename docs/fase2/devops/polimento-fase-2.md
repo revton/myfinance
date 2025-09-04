@@ -23,7 +23,8 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 ## 🎨 **Melhorias de UX/UI**
 
 ### **1. Animações e Transições**
-- [ ] Adicionar animações suaves entre páginas (React Transition Group)
+- [x] Adicionar animações suaves entre páginas (React Transition Group)
+- [ ] Implementar transições nos componentes de lista (fade in/out)
 - [ ] Implementar transições nos componentes de lista (fade in/out)
 - [x] Adicionar efeitos hover nos botões e cards
 - [x] Implementar skeleton loaders para conteúdo dinâmico
