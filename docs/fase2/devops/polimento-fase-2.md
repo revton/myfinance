@@ -24,8 +24,8 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 
 ### **1. Animações e Transições**
 - [x] Adicionar animações suaves entre páginas (React Transition Group)
-- [ ] Implementar transições nos componentes de lista (fade in/out)
-- [ ] Implementar transições nos componentes de lista (fade in/out)
+- [x] Implementar transições nos componentes de lista (fade in/out)
+
 - [x] Adicionar efeitos hover nos botões e cards
 - [x] Implementar skeleton loaders para conteúdo dinâmico
 - [x] Adicionar feedback visual para ações do usuário (toasts/snackbars)
