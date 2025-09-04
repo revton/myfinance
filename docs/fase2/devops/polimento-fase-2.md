@@ -32,7 +32,7 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 
 ### **2. Loading States Avançados**
 - [x] Implementar skeleton screens para todas as listas
-- [ ] Adicionar loading buttons com indicadores visuais
+- [x] Adicionar loading buttons com indicadores visuais
 - [ ] Criar progress indicators para operações longas
 - [ ] Implementar lazy loading para imagens e componentes
 - [ ] Adicionar retry mechanisms para falhas de rede
