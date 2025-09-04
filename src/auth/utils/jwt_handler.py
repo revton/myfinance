@@ -1,15 +1,18 @@
-"""
-Manipulador de JWT para o sistema de autenticação
+"""Manipulador de JWT para o sistema de autenticação
 
 Este módulo implementa criação, validação e refresh de tokens JWT
-para autenticação segura no sistema.
+para autenticação segura no sistema, incluindo suporte para revogação
+de tokens e prevenção de race conditions.
 """
 
 import os
 import jwt
+import uuid
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from fastapi import HTTPException, status
+
+# Importação circular evitada com importação condicional em métodos específicos
 
 class JWTHandler:
     """Manipulador de tokens JWT"""
@@ -20,13 +23,14 @@ class JWTHandler:
         self.access_token_expire_minutes = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
         self.refresh_token_expire_days = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
     
-    def create_token(self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+    def create_token(self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None, token_type: str = "access") -> str:
         """
         Cria um token JWT
         
         Args:
             data: Dados a serem incluídos no token
             expires_delta: Tempo de expiração personalizado
+            token_type: Tipo do token ('access' ou 'refresh')
             
         Returns:
             Token JWT codificado
@@ -38,7 +42,14 @@ class JWTHandler:
         else:
             expire = datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes)
         
-        to_encode.update({"exp": expire})
+        # Adicionar claims padrão
+        jti = str(uuid.uuid4())  # JWT ID único para cada token
+        to_encode.update({
+            "exp": expire,
+            "jti": jti,
+            "token_type": token_type,
+            "iat": datetime.utcnow()  # Issued At
+        })
         
         try:
             encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
@@ -59,7 +70,7 @@ class JWTHandler:
         Returns:
             Token de acesso JWT
         """
-        return self.create_token(data, timedelta(minutes=self.access_token_expire_minutes))
+        return self.create_token(data, timedelta(minutes=self.access_token_expire_minutes), "access")
     
     def create_refresh_token(self, data: Dict[str, Any]) -> str:
         """
@@ -71,20 +82,21 @@ class JWTHandler:
         Returns:
             Token de refresh JWT
         """
-        return self.create_token(data, timedelta(days=self.refresh_token_expire_days))
+        return self.create_token(data, timedelta(days=self.refresh_token_expire_days), "refresh")
     
-    def verify_token(self, token: str) -> Dict[str, Any]:
+    def verify_token(self, token: str, verify_revoked: bool = True) -> Dict[str, Any]:
         """
         Verifica e decodifica um token JWT
         
         Args:
             token: Token JWT a ser verificado
+            verify_revoked: Se True, verifica se o token foi revogado
             
         Returns:
             Dados decodificados do token
             
         Raises:
-            HTTPException: Se o token for inválido
+            HTTPException: Se o token for inválido ou revogado
         """
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
@@ -92,6 +104,24 @@ class JWTHandler:
             # Verificar se o token contém os campos obrigatórios
             if "user_id" not in payload:
                 raise ValueError("Token não contém user_id")
+                
+            if "jti" not in payload:
+                raise ValueError("Token não contém jti (JWT ID)")
+                
+            # Verificar se o token foi revogado
+            if verify_revoked:
+                # Importação condicional para evitar importação circular
+                from .token_blacklist import is_token_revoked
+                
+                token_type = payload.get("token_type", "access")
+                jti = payload.get("jti")
+                
+                if is_token_revoked(jti, token_type):
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Token revogado",
+                        headers={"WWW-Authenticate": "Bearer"},
+                    )
             
             return payload
             
@@ -114,7 +144,7 @@ class JWTHandler:
                 headers={"WWW-Authenticate": "Bearer"},
             )
     
-    def refresh_access_token(self, refresh_token: str) -> str:
+    def refresh_access_token(self, refresh_token: str) -> Tuple[str, Dict[str, Any]]:
         """
         Cria um novo token de acesso usando um refresh token
         
@@ -122,7 +152,7 @@ class JWTHandler:
             refresh_token: Token de refresh válido
             
         Returns:
-            Novo token de acesso
+            Tupla com novo token de acesso e payload do refresh token
             
         Raises:
             HTTPException: Se o refresh token for inválido
@@ -131,6 +161,14 @@ class JWTHandler:
             # Verificar o refresh token
             payload = self.verify_token(refresh_token)
             
+            # Verificar se é realmente um refresh token
+            if payload.get("token_type") != "refresh":
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token fornecido não é um refresh token",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            
             # Criar novo token de acesso
             access_token_data = {
                 "user_id": payload["user_id"],
@@ -138,9 +176,11 @@ class JWTHandler:
                 "sub": payload.get("sub")
             }
             
-            return self.create_access_token(access_token_data)
+            return self.create_access_token(access_token_data), payload
             
-        except HTTPException:
+        except HTTPException as e:
+            raise e
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token de refresh inválido",
@@ -229,6 +269,37 @@ class JWTHandler:
             "token_type": "bearer",
             "expires_in": self.access_token_expire_minutes * 60  # em segundos
         }
+        
+    def revoke_token(self, token: str, token_type: str = None) -> None:
+        """
+        Revoga um token adicionando-o à lista de tokens revogados
+        
+        Args:
+            token: Token JWT a ser revogado
+            token_type: Tipo do token ('access' ou 'refresh'). Se None, será extraído do token.
+            
+        Raises:
+            HTTPException: Se o token for inválido ou já estiver expirado
+        """
+        try:
+            # Obter payload sem verificar se está revogado (para evitar loop)
+            payload = self.verify_token(token, verify_revoked=False)
+            
+            # Se o tipo não foi especificado, usar o do token
+            if token_type is None:
+                token_type = payload.get("token_type", "access")
+                
+            # Importação condicional para evitar importação circular
+            from .token_blacklist import revoke_token as blacklist_revoke_token
+            
+            # Adicionar à lista de revogados
+            blacklist_revoke_token(payload, token_type)
+            
+        except HTTPException as e:
+            # Se o token já estiver expirado, não precisa revogar
+            if "expirado" in e.detail:
+                return
+            raise e
     
     def validate_token_format(self, token: str) -> bool:
         """
@@ -260,4 +331,4 @@ class JWTHandler:
                 base64.urlsafe_b64decode(part)
             return True
         except:
-            return False 
+            return False

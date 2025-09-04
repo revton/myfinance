@@ -82,7 +82,7 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 ## 🐛 **Correção de Bugs**
 
 ### **1. Autenticação**
-- [ ] Corrigir race conditions em refresh tokens
+- [x] Corrigir race conditions em refresh tokens
 - [ ] Implementar retry automático para requisições falhas de auth
 - [ ] Adicionar tratamento de erros de conexão
 - [ ] Corrigir logout automático em caso de token expirado
@@ -116,8 +116,8 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 ## 🚀 **Preparação para Produção**
 
 ### **1. Segurança**
-- [ ] Implementar Content Security Policy (CSP)
-- [ ] Adicionar HTTP security headers
+- [x] Implementar Content Security Policy (CSP)
+- [x] Adicionar HTTP security headers
 - [ ] Implementar rate limiting
 - [ ] Adicionar input sanitization
 - [ ] Implementar proteção contra CSRF

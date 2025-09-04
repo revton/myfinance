@@ -1,0 +1,1 @@
+"""Pacote de middlewares para a aplicação FastAPI"""

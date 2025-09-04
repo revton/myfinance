@@ -612,12 +612,13 @@ class AuthService:
                 detail=f"Erro interno do servidor: {str(e)}"
             )
     
-    async def logout_user(self, user_id: str) -> Dict[str, str]:
+    async def logout_user(self, user_id: str, token: str = None) -> Dict[str, str]:
         """
         Realiza logout do usuário
         
         Args:
             user_id: ID do usuário
+            token: Token de acesso atual a ser revogado (opcional)
             
         Returns:
             Mensagem de confirmação
@@ -626,12 +627,15 @@ class AuthService:
             HTTPException: Se houver erro no logout
         """
         try:
-            # Em um sistema real, aqui você poderia:
-            # 1. Invalidar tokens no banco de dados
-            # 2. Adicionar tokens à blacklist
-            # 3. Limpar sessões ativas
+            # Revogar o token atual se fornecido
+            if token:
+                jwt_handler = JWTHandler()
+                jwt_handler.revoke_token(token)
+                
+            # Limpar tokens expirados da lista de revogados
+            from .utils.token_blacklist import clean_expired_tokens
+            clean_expired_tokens()
             
-            # Por enquanto, apenas retorna sucesso
             return {"message": "Logout realizado com sucesso"}
             
         except Exception as e:
@@ -651,21 +655,48 @@ class AuthService:
             Novos tokens de acesso e refresh
             
         Raises:
-            HTTPException: Se o refresh token for inválido
+            HTTPException: Se o refresh token for inválido ou revogado
         """
         try:
-            # TODO: Implementar validação real do refresh token
-            # Por enquanto, apenas simula a renovação
-            new_access_token = "new-access-token-123"
-            new_refresh_token = "new-refresh-token-123"
+            # Validar e renovar o token
+            jwt_handler = JWTHandler()
+            
+            # Obter o refresh token da requisição
+            refresh_token = request_data.refresh_token
+            
+            # Verificar e gerar novo token de acesso
+            # refresh_access_token agora retorna uma tupla (novo_token, payload_antigo)
+            new_access_token, old_token_payload = jwt_handler.refresh_access_token(refresh_token)
+            
+            # Revogar o refresh token antigo para evitar reuso (prevenção de race condition)
+            jwt_handler.revoke_token(refresh_token, "refresh")
+            
+            # Gerar novo refresh token
+            user_data = {
+                "user_id": old_token_payload["user_id"],
+                "email": old_token_payload.get("email"),
+                "sub": old_token_payload.get("sub")
+            }
+            new_refresh_token = jwt_handler.create_refresh_token(user_data)
+            
+            # Limpar tokens expirados periodicamente
+            from .utils.token_blacklist import clean_expired_tokens
+            clean_expired_tokens()
             
             return {
                 "access_token": new_access_token,
                 "refresh_token": new_refresh_token,
-                "token_type": "bearer"
+                "token_type": "bearer",
+                "expires_in": jwt_handler.access_token_expire_minutes * 60  # em segundos
             }
+        except HTTPException as e:
+            raise e
         except Exception as e:
-            raise HTTPException(status_code=401, detail="Token de refresh inválido")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, 
+                detail=f"Token de refresh inválido: {str(e)}",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
     
     async def delete_user(self, user_id: str) -> Dict[str, str]:
         """
@@ -703,4 +734,4 @@ class AuthService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Erro interno do servidor: {str(e)}"
-            ) 
+            )

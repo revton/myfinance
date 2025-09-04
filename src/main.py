@@ -9,6 +9,7 @@ from .database_sqlalchemy import get_db, create_tables, test_connection
 from .database import Transaction as TransactionModel
 from .auth import auth_router
 from .categories import routes as category_router
+from .middleware.security import add_security_middleware
 import uuid
 from datetime import datetime
 import logging
@@ -50,6 +51,27 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+# Adicionar middleware de segurança com cabeçalhos HTTP e CSP
+add_security_middleware(
+    app,
+    csp_policy={
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",  # Permitir estilos inline para compatibilidade
+        "img-src": "'self' data:",
+        "font-src": "'self'",
+        "connect-src": "'self' https://api.supabase.co",  # Permitir conexão com Supabase
+        "frame-src": "'none'",
+        "object-src": "'none'",
+        "base-uri": "'self'",
+        "form-action": "'self'"
+    },
+    hsts_max_age=31536000,  # 1 ano
+    include_subdomains=True,
+    preload=False,
+    permissions_policy="camera=(), microphone=(), geolocation=()"
 )
 
 # Incluir rotas de autenticação
