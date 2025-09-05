@@ -23,7 +23,7 @@ interface CategoryCardProps {
   onDelete: () => void;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete }) => {
+const CategoryCard: React.FC<CategoryCardProps> = React.memo(({ category, onEdit, onDelete }) => {
   const IconComponent = getIconComponent(category.icon); 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>

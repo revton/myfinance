@@ -33,7 +33,7 @@ interface TransactionItemProps {
   onDelete?: (transactionId: string) => void;
 }
 
-const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onEdit, onDelete }) => {
+const TransactionItem: React.FC<TransactionItemProps> = React.memo(({ transaction, onEdit, onDelete }) => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',

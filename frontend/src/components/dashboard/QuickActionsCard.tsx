@@ -19,7 +19,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-export const QuickActionsCard: React.FC = () => {
+export const QuickActionsCard: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const theme = useTheme();
   

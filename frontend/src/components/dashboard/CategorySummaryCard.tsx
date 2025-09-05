@@ -29,7 +29,7 @@ interface CategorySummary {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-export const CategorySummaryCard: React.FC = () => {
+export const CategorySummaryCard: React.FC = React.memo(() => {
   const { categorySummary, isLoading, error, refresh } = useCategories();
   const navigate = useNavigate();
 

@@ -31,7 +31,7 @@ interface BalanceData {
   percentageChange: number;
 }
 
-export const BalanceCard: React.FC = () => {
+export const BalanceCard: React.FC = React.memo(() => {
   const { transactions, isLoading, error, refetchTransactions } = useTransactions();
   const theme = useTheme();
   

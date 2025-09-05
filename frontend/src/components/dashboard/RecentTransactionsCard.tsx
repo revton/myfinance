@@ -35,7 +35,7 @@ const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('pt-BR').format(date);
 };
 
-export const RecentTransactionsCard: React.FC = () => {
+export const RecentTransactionsCard: React.FC = React.memo(() => {
   const { transactions, isLoading, error, refetchTransactions } = useTransactions();
   const navigate = useNavigate();
   const theme = useTheme();
