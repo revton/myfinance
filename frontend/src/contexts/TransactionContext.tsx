@@ -1,5 +1,6 @@
 // src/contexts/TransactionContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { APP_CONFIG } from '../config';
 
@@ -17,39 +18,32 @@ interface Transaction {
 
 interface TransactionContextData {
   transactions: Transaction[];
-  loading: boolean;
-  error: string | null;
-  fetchTransactions: () => Promise<void>;
+  isLoading: boolean;
+  error: Error | null;
+  refetchTransactions: () => void;
 }
 
 const TransactionContext = createContext<TransactionContextData>({} as TransactionContextData);
 
-export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const fetchTransactions = async (): Promise<Transaction[]> => {
+  const response = await api.get<Transaction[]>(APP_CONFIG.api.endpoints.transactions);
+  return response.data;
+};
 
-  const fetchTransactions = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.get<Transaction[]>(APP_CONFIG.api.endpoints.transactions);
-      setTransactions(response.data);
-    } catch (err: any) {
-      console.error('Error fetching transactions:', err);
-      setError(err.response?.data?.detail || 'Failed to load transactions.');
-      setTransactions([]);
-    } finally {
-      setLoading(false);
-    }
+export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const queryClient = useQueryClient();
+
+  const { data: transactions = [], isLoading, error, refetch } = useQuery<Transaction[], Error>({
+    queryKey: ['transactions'],
+    queryFn: fetchTransactions,
+  });
+
+  const refetchTransactions = () => {
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
   };
 
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
-
   return (
-    <TransactionContext.Provider value={{ transactions, loading, error, fetchTransactions }}>
+    <TransactionContext.Provider value={{ transactions, isLoading, error, refetchTransactions }}>
       {children}
     </TransactionContext.Provider>
   );

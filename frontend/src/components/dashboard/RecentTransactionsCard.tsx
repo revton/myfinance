@@ -19,7 +19,7 @@ import {
   Category,
   Receipt
 } from '@mui/icons-material';
-import { useTransactions } from '../../hooks/useTransactions';
+import { useTransactions } from '../../contexts/TransactionContext';
 import { useNavigate } from 'react-router-dom';
 import AdvancedLoadingState from '../common/AdvancedLoadingState';
 import AnimatedList from '../common/AnimatedList';
@@ -36,9 +36,13 @@ const formatDate = (date: Date) => {
 };
 
 export const RecentTransactionsCard: React.FC = () => {
-  const { recentTransactions, loading, refresh } = useTransactions();
+  const { transactions, isLoading, error, refetchTransactions } = useTransactions();
   const navigate = useNavigate();
   const theme = useTheme();
+  
+  const recentTransactions = React.useMemo(() => {
+    return transactions.slice(0, 5);
+  }, [transactions]);
   
   // Card header that's consistent across all states
   const cardHeader = (
@@ -134,9 +138,9 @@ export const RecentTransactionsCard: React.FC = () => {
       {cardHeader}
       
       <AdvancedLoadingState
-        isLoading={loading}
-        error={!recentTransactions && !loading ? new Error("Falha ao carregar transações") : null}
-        onRetry={refresh}
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => refetchTransactions()}
         loadingText="Carregando transações..."
         errorText="Não foi possível carregar as transações recentes."
         height="auto"

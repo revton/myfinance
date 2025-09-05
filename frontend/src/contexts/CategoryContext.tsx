@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
-import { API_BASE_URL, APP_CONFIG } from '../config';
+import { APP_CONFIG } from '../config';
 import * as Sentry from '@sentry/react';
 
 interface Category {
@@ -14,112 +15,87 @@ interface Category {
   is_default: boolean;
   created_at: string;
   updated_at: string;
-  transaction_count?: number; // From backend CategoryWithTransactionCount
+  transaction_count?: number;
 }
 
 interface CategoryContextData {
   categories: Category[];
-  loading: boolean;
-  error: string | null;
+  isLoading: boolean;
+  error: Error | null;
   createCategory: (category: Omit<Category, 'id' | 'is_active' | 'is_default' | 'created_at' | 'updated_at' | 'transaction_count'>) => Promise<void>;
   updateCategory: (id: string, category: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   restoreCategory: (id: string) => Promise<void>;
-  refreshCategories: () => void;
+  refetchCategories: () => void;
   getCategoriesByType: (type: 'expense' | 'income') => Category[];
 }
 
 const CategoryContext = createContext<CategoryContextData>({} as CategoryContextData);
 
+const fetchCategories = async (): Promise<Category[]> => {
+  const response = await api.get<Category[]>(`${APP_CONFIG.api.endpoints.categories}`);
+  return response.data;
+};
+
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchCategories = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.get<Category[]>(`${APP_CONFIG.api.endpoints.categories}`);
-      setCategories(response.data);
-    } catch (err) {
-      console.error('Error fetching categories:', err);
+  const { data: categories = [], isLoading, error, refetch } = useQuery<Category[], Error>({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
+
+  const mutationOptions = {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+    onError: (err: any) => {
+      console.error(err);
       Sentry.captureException(err);
-      setError('Failed to load categories.');
-      setCategories([]);
-    } finally {
-      setLoading(false);
-    }
+      throw new Error(err.response?.data?.detail || 'An error occurred');
+    },
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  const createCategoryMutation = useMutation({
+    mutationFn: (categoryData: Omit<Category, 'id' | 'is_active' | 'is_default' | 'created_at' | 'updated_at' | 'transaction_count'>) =>
+      api.post(`${APP_CONFIG.api.endpoints.categories}`, categoryData),
+    ...mutationOptions,
+  });
 
-  const createCategory = async (categoryData: Omit<Category, 'id' | 'is_active' | 'is_default' | 'created_at' | 'updated_at' | 'transaction_count'>) => {
-    try {
-      await api.post(`${APP_CONFIG.api.endpoints.categories}`, categoryData);
-      fetchCategories(); // Refresh list after creation
-    } catch (err: any) {
-      console.error('Error creating category:', err);
-      Sentry.captureException(err);
-      throw new Error(err.response?.data?.detail || 'Failed to create category.');
-    }
-  };
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({ id, categoryData }: { id: string; categoryData: Partial<Category> }) =>
+      api.put(`${APP_CONFIG.api.endpoints.categories}/${id}`, categoryData),
+    ...mutationOptions,
+  });
 
-  const updateCategory = async (id: string, categoryData: Partial<Category>) => {
-    try {
-      await api.put(`${APP_CONFIG.api.endpoints.categories}/${id}`, categoryData);
-      fetchCategories(); // Refresh list after update
-    } catch (err: any) {
-      console.error('Error updating category:', err);
-      Sentry.captureException(err);
-      throw new Error(err.response?.data?.detail || 'Failed to update category.');
-    }
-  };
+  const deleteCategoryMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`${APP_CONFIG.api.endpoints.categories}/${id}`),
+    ...mutationOptions,
+  });
 
-  const deleteCategory = async (id: string) => {
-    try {
-      await api.delete(`${APP_CONFIG.api.endpoints.categories}/${id}`);
-      fetchCategories(); // Refresh list after deletion
-    } catch (err: any) {
-      console.error('Error deleting category:', err);
-      Sentry.captureException(err);
-      throw new Error(err.response?.data?.detail || 'Failed to delete category.');
-    }
-  };
-
-  const restoreCategory = async (id: string) => {
-    try {
-      await api.post(`${APP_CONFIG.api.endpoints.categories}/${id}/restore`);
-      fetchCategories(); // Refresh list after restore
-    } catch (err: any) {
-      console.error('Error restoring category:', err);
-      Sentry.captureException(err);
-      throw new Error(err.response?.data?.detail || 'Failed to restore category.');
-    }
-  };
-
-  const refreshCategories = () => {
-    fetchCategories();
-  };
+  const restoreCategoryMutation = useMutation({
+    mutationFn: (id: string) => api.post(`${APP_CONFIG.api.endpoints.categories}/${id}/restore`),
+    ...mutationOptions,
+  });
 
   const getCategoriesByType = (type: 'expense' | 'income') => {
     return categories.filter(cat => cat.type === type);
   };
 
   return (
-    <CategoryContext.Provider value={{ 
-      categories, 
-      loading, 
-      error, 
-      createCategory, 
-      updateCategory, 
-      deleteCategory, 
-      restoreCategory,
-      refreshCategories,
-      getCategoriesByType
-    }}>
+    <CategoryContext.Provider
+      value={{
+        categories,
+        isLoading,
+        error,
+        createCategory: createCategoryMutation.mutateAsync,
+        updateCategory: (id, data) => updateCategoryMutation.mutateAsync({ id, categoryData: data }),
+        deleteCategory: deleteCategoryMutation.mutateAsync,
+        restoreCategory: restoreCategoryMutation.mutateAsync,
+        refetchCategories: refetch,
+        getCategoriesByType,
+      }}
+    >
       {children}
     </CategoryContext.Provider>
   );

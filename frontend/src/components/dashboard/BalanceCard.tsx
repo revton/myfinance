@@ -20,7 +20,7 @@ import {
   AttachMoney,
   MoneyOff
 } from '@mui/icons-material';
-import { useTransactions } from '../../hooks/useTransactions';
+import { useTransactions } from '../../contexts/TransactionContext';
 import AdvancedLoadingState from '../common/AdvancedLoadingState';
 
 interface BalanceData {
@@ -32,8 +32,23 @@ interface BalanceData {
 }
 
 export const BalanceCard: React.FC = () => {
-  const { balanceData, loading, refresh } = useTransactions();
+  const { transactions, isLoading, error, refetchTransactions } = useTransactions();
   const theme = useTheme();
+  
+  const balanceData = React.useMemo(() => {
+    // This is a placeholder for the actual balance calculation logic
+    // In a real application, this would be calculated on the backend
+    const currentBalance = transactions.reduce((acc, t) => t.type === 'income' ? acc + t.amount : acc - t.amount, 0);
+    const monthlyIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+    const monthlyExpenses = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+    return {
+      currentBalance,
+      monthlyIncome,
+      monthlyExpenses,
+      previousMonthBalance: 0,
+      percentageChange: 0,
+    }
+  }, [transactions]);
   
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -61,7 +76,7 @@ export const BalanceCard: React.FC = () => {
           </Typography>
         </Box>
         <Tooltip title="Atualizar saldo" arrow>
-          <IconButton onClick={refresh} size="small" sx={{ color: 'white' }}>
+          <IconButton onClick={() => refetchTransactions()} size="small" sx={{ color: 'white' }}>
             <Refresh />
           </IconButton>
         </Tooltip>
@@ -170,9 +185,9 @@ export const BalanceCard: React.FC = () => {
       {cardHeader}
       
       <AdvancedLoadingState
-        isLoading={loading}
-        error={!balanceData && !loading ? new Error("Falha ao carregar dados") : null}
-        onRetry={refresh}
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => refetchTransactions()}
         loadingText="Carregando dados financeiros..."
         errorText="Não foi possível carregar os dados de saldo."
         height="auto"

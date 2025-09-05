@@ -1,5 +1,5 @@
 // src/hooks/useCategories.ts
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useCategories as useCategoriesContext } from '../contexts/CategoryContext';
 import { useTransactions as useTransactionsContext } from '../contexts/TransactionContext';
 
@@ -13,18 +13,18 @@ interface CategorySummary {
 }
 
 export const useCategories = () => {
-  const { categories, loading: categoriesLoading, refreshCategories } = useCategoriesContext();
-  const { transactions, loading: transactionsLoading, fetchTransactions } = useTransactionsContext();
+  const { categories, isLoading: categoriesLoading, refetchCategories } = useCategoriesContext();
+  const { transactions, isLoading: transactionsLoading, refetchTransactions } = useTransactionsContext();
 
-  const loading = categoriesLoading || transactionsLoading;
+  const isLoading = categoriesLoading || transactionsLoading;
 
   const refresh = () => {
-    refreshCategories();
-    fetchTransactions();
+    refetchCategories();
+    refetchTransactions();
   };
 
   const categorySummary = useMemo(() => {
-    if (loading || !categories.length || !transactions.length) {
+    if (isLoading || !categories.length || !transactions.length) {
       return [];
     }
 
@@ -85,7 +85,7 @@ export const useCategories = () => {
     summary.sort((a, b) => b.amount - a.amount);
 
     return summary;
-  }, [categories, transactions, loading]);
+  }, [categories, transactions, isLoading]);
 
-  return { categorySummary, loading, refresh };
+  return { categorySummary, isLoading, refresh };
 };

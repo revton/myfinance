@@ -30,7 +30,7 @@ interface CategorySummary {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export const CategorySummaryCard: React.FC = () => {
-  const { categorySummary, loading, refresh } = useCategories();
+  const { categorySummary, isLoading, error, refresh } = useCategories();
   const navigate = useNavigate();
 
   const formatCurrency = (value: number) => {
@@ -113,11 +113,12 @@ export const CategorySummaryCard: React.FC = () => {
       <CardContent>
         {cardHeader}
         <AdvancedLoadingState 
-          isLoading={loading} 
+          isLoading={isLoading} 
+          error={error}
+          onRetry={refresh}
           loadingText="Carregando dados de categorias..." 
           showSkeleton={true}
           height={200}
-          onRetry={refresh}
         >
           {categorySummary.length === 0 ? (
             <Typography color="text.secondary">
