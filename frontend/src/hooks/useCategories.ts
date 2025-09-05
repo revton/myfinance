@@ -1,7 +1,7 @@
 // src/hooks/useCategories.ts
 import { useContext, useMemo } from 'react';
 import { useCategories as useCategoriesContext } from '../contexts/CategoryContext';
-import { useTransactions } from '../contexts/TransactionContext';
+import { useTransactions as useTransactionsContext } from '../contexts/TransactionContext';
 
 interface CategorySummary {
   id: string;
@@ -13,23 +13,28 @@ interface CategorySummary {
 }
 
 export const useCategories = () => {
-  const { categories, loading: categoriesLoading } = useCategoriesContext();
-  const { transactions, loading: transactionsLoading } = useTransactions();
-  
+  const { categories, loading: categoriesLoading, refreshCategories } = useCategoriesContext();
+  const { transactions, loading: transactionsLoading, fetchTransactions } = useTransactionsContext();
+
   const loading = categoriesLoading || transactionsLoading;
-  
+
+  const refresh = () => {
+    refreshCategories();
+    fetchTransactions();
+  };
+
   const categorySummary = useMemo(() => {
     if (loading || !categories.length || !transactions.length) {
       return [];
     }
-    
+
     // Calculate expenses by category
     const expenseTransactions = transactions.filter(t => t.type === 'expense');
-    
+
     if (expenseTransactions.length === 0) {
       return [];
     }
-    
+
     // Group transactions by category and calculate totals
     const categoryTotals: Record<string, number> = {};
     expenseTransactions.forEach(transaction => {
@@ -39,14 +44,14 @@ export const useCategories = () => {
       }
       categoryTotals[categoryId] += transaction.amount;
     });
-    
+
     // Create summary array with category details
     const summary: CategorySummary[] = [];
     let totalExpenses = 0;
-    
+
     Object.entries(categoryTotals).forEach(([categoryId, amount]) => {
       totalExpenses += amount;
-      
+
       if (categoryId === 'uncategorized') {
         summary.push({
           id: 'uncategorized',
@@ -70,17 +75,17 @@ export const useCategories = () => {
         }
       }
     });
-    
+
     // Calculate percentages
     summary.forEach(item => {
       item.percentage = totalExpenses > 0 ? (item.amount / totalExpenses) * 100 : 0;
     });
-    
+
     // Sort by amount descending
     summary.sort((a, b) => b.amount - a.amount);
-    
+
     return summary;
   }, [categories, transactions, loading]);
-  
-  return { categorySummary, loading };
+
+  return { categorySummary, loading, refresh };
 };
