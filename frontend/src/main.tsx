@@ -5,6 +5,9 @@ import App from './App.tsx'
 import { CategoryProvider } from './contexts/CategoryContext'
 import { TransactionProvider } from './contexts/TransactionContext'
 import * as Sentry from '@sentry/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient();
 
 // Inicialização do Sentry
 if (import.meta.env.VITE_SENTRY_DSN_FRONTEND) {
@@ -36,11 +39,13 @@ if (import.meta.env.VITE_SENTRY_DSN_FRONTEND) {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Sentry.ErrorBoundary fallback={"<p>An error has occurred</p>"}>
-      <TransactionProvider>
-        <CategoryProvider>
-          <App />
-        </CategoryProvider>
-      </TransactionProvider>
+      <QueryClientProvider client={queryClient}>
+        <TransactionProvider>
+          <CategoryProvider>
+            <App />
+          </CategoryProvider>
+        </TransactionProvider>
+      </QueryClientProvider>
     </Sentry.ErrorBoundary>
   </StrictMode>,
 )
