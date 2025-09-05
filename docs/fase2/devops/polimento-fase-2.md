@@ -57,7 +57,7 @@ Este documento detalha as atividades de polimento e refinamentos da Fase 2 do My
 
 ### **1. Frontend**
 - [x] Implementar code splitting e lazy loading de rotas
-- [ ] Otimizar bundle size com tree shaking
+- [x] Otimizar bundle size com tree shaking
 - [ ] Implementar caching de dados com React Query
 - [ ] Adicionar memoization para componentes pesados
 - [ ] Otimizar renders desnecessários com React.memo
