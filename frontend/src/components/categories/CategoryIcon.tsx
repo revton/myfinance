@@ -26,4 +26,4 @@ export const CategoryIcon: React.FC<CategoryIconProps> = React.memo(({ icon, col
   const selectedIcon = icons[icon] || <MoreHoriz />;
 
   return React.cloneElement(selectedIcon, { style: { color }, fontSize: size });
-};
+});
