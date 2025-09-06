@@ -129,4 +129,4 @@ export const CategorySummaryCard: React.FC = React.memo(() => {
       </CardContent>
     </Card>
   );
-};
+});

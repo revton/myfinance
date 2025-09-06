@@ -150,4 +150,4 @@ export const RecentTransactionsCard: React.FC = React.memo(() => {
       </AdvancedLoadingState>
     </Card>
   );
-};
+});

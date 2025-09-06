@@ -197,4 +197,4 @@ export const BalanceCard: React.FC = React.memo(() => {
       </AdvancedLoadingState>
     </Card>
   );
-};
+});
