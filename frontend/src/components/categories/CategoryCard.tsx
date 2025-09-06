@@ -93,6 +93,6 @@ const CategoryCard: React.FC<CategoryCardProps> = React.memo(({ category, onEdit
       )}
     </Card>
   );
-};
+});
 
 export default CategoryCard;
