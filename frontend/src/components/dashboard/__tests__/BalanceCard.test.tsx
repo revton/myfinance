@@ -5,17 +5,15 @@ import { BalanceCard } from '../BalanceCard';
 import { vi } from 'vitest';
 
 // Mock the useTransactions hook
-vi.mock('../../../hooks/useTransactions', () => ({
+vi.mock('../../../contexts/TransactionContext', () => ({
   useTransactions: () => ({
-    balanceData: {
-      currentBalance: 1000,
-      monthlyIncome: 2000,
-      monthlyExpenses: 1000,
-      previousMonthBalance: 800,
-      percentageChange: 25,
-    },
-    loading: false,
-    refresh: vi.fn(),
+    transactions: [
+      { id: '1', type: 'income', amount: 2000, description: 'Salary', created_at: new Date().toISOString() },
+      { id: '2', type: 'expense', amount: 1000, description: 'Rent', created_at: new Date().toISOString() },
+    ],
+    isLoading: false,
+    error: null,
+    refetchTransactions: vi.fn(),
   }),
 }));
 
