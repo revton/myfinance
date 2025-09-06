@@ -103,4 +103,4 @@ export const QuickActionsCard: React.FC = React.memo(() => {
       </CardContent>
     </Card>
   );
-};
+});
