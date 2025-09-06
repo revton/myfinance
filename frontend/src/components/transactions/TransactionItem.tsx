@@ -131,6 +131,6 @@ const TransactionItem: React.FC<TransactionItemProps> = React.memo(({ transactio
       </Box>
     </Box>
   );
-};
+});
 
 export default TransactionItem;
