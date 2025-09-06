@@ -14,7 +14,7 @@ interface CategoryIconProps {
   size: 'small' | 'medium' | 'large';
 }
 
-export const CategoryIcon: React.FC<CategoryIconProps> = ({ icon, color, size }) => {
+export const CategoryIcon: React.FC<CategoryIconProps> = React.memo(({ icon, color, size }) => {
   const icons: { [key: string]: React.ReactElement } = {
     Fastfood: <Fastfood />, 
     DirectionsCar: <DirectionsCar />, 
