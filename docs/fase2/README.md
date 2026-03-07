@@ -37,14 +37,14 @@ A **Fase 2** do MyFinance foca na implementação de duas funcionalidades fundam
 ### 🎨 **Melhorias de UX**
 - [Dashboard](./ux/dashboard.md)
 - [Filtros Avançados](./ux/filtros-avancados.md)
-- [Loading States](./ux/loading-states.md)
-- [Error Handling](./ux/error-handling.md)
+- [Balance Card Fix](./ux/balance-card-fix.md)
+- [Balance Card Fix Summary](./ux/balance-card-fix-summary.md)
 
 ### 🚀 **DevOps e Deploy**
 - [Configuração de Ambiente](./devops/configuracao-ambiente.md)
 - [Polimento da Fase 2](./devops/polimento-fase-2.md)
-- [Deploy e Monitoramento](./devops/deploy-monitoramento.md)
-- [Testes de Integração](./devops/testes-integracao.md)
+- [DevOps README](./devops/README.md)
+
 
 ## ✅ **O que já foi implementado**
 
