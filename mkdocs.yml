@@ -35,6 +35,7 @@ nav:
   - 🗺️ Roadmap: roadmap.md
   - 🔄 Fase 2 - Detalhamento:
     - fase2/README.md
+    - fase2-detalhada.md
     - Sistema de Autenticação:
       - fase2/autenticacao/especificacao-tecnica.md
       - fase2/autenticacao/modelo-dados.md
@@ -49,22 +50,30 @@ nav:
     - Melhorias de UX:
       - fase2/ux/dashboard.md
       - fase2/ux/filtros-avancados.md
-      - fase2/ux/loading-states.md
-      - fase2/ux/error-handling.md
+      - fase2/ux/balance-card-fix.md
+      - fase2/ux/balance-card-fix-summary.md
     - DevOps e Deploy:
+      - fase2/devops/README.md
       - fase2/devops/configuracao-ambiente.md
-      - fase2/devops/deploy-monitoramento.md
-      - fase2/devops/testes-integracao.md
+      - fase2/devops/polimento-fase-2.md
   - Desenvolvedor: 
     - dev/index.md
     - dev/env-setup.md
     - dev/supabase-environments.md
     - dev/migration-sqlalchemy-summary.md
+    - dev/autenticacao-guia-desenvolvedor.md
+    - dev/categorias-guia-desenvolvedor.md
+    - dev/database-migration-production.md
+    - dev/glitchtip-implementation.md
+    - dev/screenshots-playwright.md
+    - dev/testes-cobertura.md
   - Usuário: 
       - user/index.md
+      - user/polimento-fase-2.md
       - Autenticação: user/autenticacao-guia-usuario.md
       - Transações: user/transacoes-guia-usuario.md
       - Categorias: user/categorias-guia-usuario.md
+  - Screenshots: screenshots/README.md
   - Deploy: deploy.md
   - Testes: local-testing.md
 
